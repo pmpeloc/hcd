@@ -17,11 +17,11 @@
 | Capa | Componente | Responsabilidad |
 |---|---|---|
 | Usuarios | Paciente · Médico · Clínica | PWA · web (carga y lectura) · panel web (avala médicos) |
-| Aplicación | Frontend Next.js (PWA) + Privy | Login y wallet embebida. Cifra y descifra en el navegador (WebCrypto). Escaneo de QR. |
+| Aplicación | Frontend Next.js (PWA) + Supabase Auth + Privy | Login con Supabase Auth; wallet embebida con Privy. Cifra y descifra en el navegador (WebCrypto). Escaneo de QR. |
 | Servicios | API NestJS + supabase-js | Lógica de la SaaS. Arma las transacciones y co-firma como fee payer. |
 | Servicios | Servicio de llaves | Entrega la DEK solo al paciente, al médico emisor o a un médico con permiso vigente. Keypair `key_service` propio. |
 | Servicios | Indexer de eventos | Escucha el programa y guarda la línea de tiempo en Postgres |
-| Datos | PostgreSQL (Supabase, con RLS) | Usuarios, organizaciones y metadatos. Nunca datos médicos en claro. |
+| Datos | PostgreSQL (Supabase, con RLS) | Usuarios, organizaciones y metadatos. Nunca datos médicos en claro. RLS aísla cada organización: ver [patrón](stack.md#patrón-multi-organización-con-rls). |
 | Datos | Almacenamiento (Supabase Storage o R2) | Solo archivos cifrados. Borrable. |
 | Datos | Solana devnet · programa Anchor | Perfiles, prestadores, Records (hash, emisor, estado), permisos y auditoría |
 
@@ -75,7 +75,7 @@ Borrado: destruir la DEK envuelta y borrar el archivo ("borrado criptográfico")
 
 ## Flujo de uso
 
-1. **Alta:** el paciente entra con email o Google vía Privy; se crea su perfil en Solana.
+1. **Alta:** el paciente entra con email o Google (Supabase Auth); Privy le crea la wallet y se registra su perfil en Solana.
 2. **Carga:** el médico escanea el QR del paciente presente, el estudio se cifra en el navegador, va al almacenamiento y el médico firma `issue_record`.
 3. **Revisión:** el paciente recibe la notificación; si no es suyo, lo marca y el médico lo anula.
 4. **Pedido de acceso:** otro médico pide acceso con el código del paciente (off-chain).

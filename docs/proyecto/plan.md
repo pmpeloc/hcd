@@ -19,7 +19,7 @@ Vienen del [relevamiento de Franco](../miembros/franco/relevamientos/2026-10-03-
 | Llaves del backend | — | Fee payer y autoridad `key_service` en **keypairs distintos** |
 | Payer de cuentas | Signer separado del dueño | Igual. Si se cierran cuentas, el rent vuelve al sponsor (`rent_payer` + `close = rent_payer`) |
 | Visor | Recalcula el hash | Igual, y es obligatorio: si no coincide, muestra "Estudio alterado" y no descifra |
-| Wallet | Privy | Privy confirmado para el MVP (no Cavos) |
+| Login y wallet | Privy | **Login con Supabase Auth; Privy solo para la wallet** (no Cavos). RLS con `app_user`. |
 | Por dónde empezar | Monorepo y programa en paralelo | **Primero el programa Anchor** (todo depende de su IDL) |
 | Nombre | Pendiente | HCD · Historial Clínico Digital |
 | Estructura | Un monorepo con pnpm | **Cuatro repos:** `hcd` (docs), `hcd_api` (backend + programa Anchor), `hcd_app` (app), `hcd_landing` (landing). Ver sección 11. |
@@ -39,7 +39,7 @@ Plazo: cierre el 13/10/2026 a las 06:59 UTC = **03:59 del 13/10 en Argentina**. 
 
 | Dentro del MVP | Fuera del MVP (se documenta, no se construye) |
 |---|---|
-| Login con email o Google (Privy) para paciente, médico y admin | Cómputo confidencial con Arcium |
+| Login con email o Google (Supabase Auth) y wallet embebida (Privy) para paciente, médico y admin | Cómputo confidencial con Arcium |
 | Alta de clínicas y médicos; verificación manual por el equipo (admin) | Recuperación avanzada con Swig (MVP: recuperación de Privy) |
 | Carga de estudios **por el médico** con el QR del paciente, cifrado en el navegador | App nativa con Solana Mobile (MVP: PWA) |
 | El paciente puede marcar un estudio como "no es mío" | Acceso de emergencia y contactos de confianza |
@@ -52,16 +52,16 @@ Plazo: cierre el 13/10/2026 a las 06:59 UTC = **03:59 del 13/10 en Argentina**. 
 
 | Actor | Rol | Cómo entra |
 |---|---|---|
-| Paciente | Dueño de su historia. Lee sus estudios, marca "no es mío", aprueba o revoca accesos. | PWA, Privy, wallet embebida |
-| Médico emisor | Carga estudios firmados con su wallet. Puede releer los suyos. | Web, Privy, matrícula verificada por el admin |
-| Médico lector | Pide acceso y lee mientras el permiso esté vigente. | Web, Privy, matrícula verificada |
+| Paciente | Dueño de su historia. Lee sus estudios, marca "no es mío", aprueba o revoca accesos. | PWA, Supabase Auth, wallet embebida de Privy |
+| Médico emisor | Carga estudios firmados con su wallet. Puede releer los suyos. | Web, Supabase Auth, wallet de Privy, matrícula verificada por el admin |
+| Médico lector | Pide acceso y lee mientras el permiso esté vigente. | Web, Supabase Auth, wallet de Privy, matrícula verificada |
 | Clínica | Avala qué médicos le pertenecen. No carga estudios. | Panel web |
 | Admin | Habilita clínicas y médicos. En el MVP, el equipo. | Wallet de autoridad del programa |
 | Servicio de llaves | Único componente que entrega llaves, solo con permiso vigente. | Backend con keypair propio (autoridad `key_service`) |
 
 ## 4. Flujos
 
-**A · Alta del paciente:** abre la PWA, entra con Privy, se crea su wallet embebida y se registra su perfil (`register_patient`). El DNI no se guarda: solo se usa para verificar a la persona en persona.
+**A · Alta del paciente:** abre la PWA, entra con Supabase Auth (email o Google), Privy le crea la wallet embebida y se registra su perfil (`register_patient`). El DNI no se guarda: solo se usa para verificar a la persona en persona.
 
 **B · El médico carga un estudio:**
 1. El paciente muestra un QR con su wallet pública y un código corto que vence en 2 minutos.
@@ -96,8 +96,8 @@ Si el paciente no aprueba, no existe el permiso y el servicio niega por defecto:
 El listado detallado, con versiones y repo por repo, está en **[stack.md](stack.md)**. Resumen:
 
 - **Programa:** Rust + Anchor, cliente con Codama y `@solana/kit`. En Windows, Anchor requiere WSL.
-- **App y landing:** Next.js + React + TypeScript + Tailwind + shadcn/ui; Privy para login y wallet; WebCrypto para cifrar.
-- **Backend:** NestJS + supabase-js (sin ORM) + Zod.
+- **App y landing:** Next.js + React + TypeScript + Tailwind + shadcn/ui; Supabase Auth para login, Privy para la wallet; WebCrypto para cifrar.
+- **Backend:** NestJS + supabase-js (sin ORM) + Zod; aislamiento entre organizaciones con RLS.
 - **Datos:** PostgreSQL y Storage en Supabase; Solana devnet con RPC de Helius.
 - **Hosting:** Vercel (app y landing), Railway o Render (API), Supabase (datos).
 - **Paquetes:** npm en todos los repos.
@@ -145,7 +145,7 @@ Eventos: RecordIssued, RecordDisputed, RecordVoided, AccessGranted, AccessRevoke
 
 ## 9. Backend
 
-Módulos de NestJS: `auth` (guard que verifica el token de Privy), `organizations`, `records`, `access`, `keys`, `tx` (arma transacciones y fee payer), `indexer`.
+Módulos de NestJS: `auth` (guard que verifica el token de Supabase Auth), `organizations`, `records`, `access`, `keys`, `tx` (arma transacciones y fee payer), `indexer`.
 
 | Endpoint | Quién | Para qué |
 |---|---|---|
@@ -160,7 +160,7 @@ Módulos de NestJS: `auth` (guard que verifica el token de Privy), `organization
 
 Tablas: `users` (sin DNI), `organizations`, `staff_members`, `doctors`, `records`, `access_requests`, `audit_events`, `key_releases`.
 
-Aislamiento: `organization_id` en cada fila y rutas de almacenamiento y llaves envolventes por organización. La segunda barrera con RLS depende de cómo se use supabase-js: ver el punto pendiente en [stack.md](stack.md#pendientes-de-confirmar).
+Aislamiento: `organization_id` en cada fila con RLS (ver [patrón multi-organización](stack.md#patrón-multi-organización-con-rls)), y rutas de almacenamiento y llaves envolventes por organización.
 
 ## 10. Frontend
 
@@ -197,7 +197,7 @@ Estudio vinculado a la persona equivocada (mitigación: QR presente + "no es mí
 
 | Días | Solana | Backend | Frontend | Producto y pitch |
 |---|---|---|---|---|
-| 1–2 (3 y 4/10) | Cuentas, reglas, esqueleto, config, prestadores | Monorepo, base, auth Privy, Supabase | Next.js, login, layouts por rol | Alcance, flujo y guion |
+| 1–2 (3 y 4/10) | Cuentas, reglas, esqueleto, config, prestadores | Repos, base, auth con Supabase + wallet Privy (prueba de 1 hora primero) | Next.js, login, layouts por rol | Alcance, flujo y guion |
 | 3–4 (5 y 6/10) | issue, dispute, void, grant, revoke, log_access con tests negativos. **Deploy en devnet** | Cliente Codama, módulos tx y fee payer | QR y escáner, perfil | Datos de prueba |
 | 5–6 (7 y 8/10) | Revisión cruzada | Servicio de llaves, storage, indexer | Carga y cifrado, lista de estudios | Diapositivas del pitch |
 | 7–8 (9 y 10/10) | Soporte a integración | Solicitudes, notificaciones, aislamiento | Solicitud, aprobación, visor, línea de tiempo | Probar el recorrido |

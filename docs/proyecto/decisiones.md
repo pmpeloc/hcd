@@ -2,6 +2,14 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-03 · Login con Supabase Auth, wallet con Privy y aislamiento con RLS · Misael
+- **Supabase Auth** hace el login (email y Google). **Privy** solo crea y maneja la wallet embebida de Solana, aceptando el token de Supabase (modo "custom auth").
+- Así Supabase reconoce al usuario y **RLS aísla los datos entre organizaciones** con una tabla `app_user` y `get_my_organization_id()`. El backend lee con un cliente por request con el token del usuario y solo él escribe.
+- Se mantiene todo lo anterior: fee payer propio, backend que arma las transacciones, wallet embebida.
+- **Solo Privy, no Cavos** (ni las dos a la vez): cada una crea su propia wallet y la de Cavos no acepta nuestro fee payer.
+- **Antes de construir encima:** prueba de 1 hora para confirmar que Privy crea wallets de Solana con el token de Supabase. Si falla, el login vuelve a Privy con canje de token.
+- Detalle del patrón en [stack.md](stack.md#patrón-multi-organización-con-rls).
+
 ## 2026-10-03 · Caso Pepito: origen y emisor visibles en el MVP · Misael (aceptado por el equipo)
 Para el caso de un médico cómplice que carga un estudio falso: en el MVP el visor muestra el origen ("emitido por el centro" o "copia digitalizada por el médico") y los datos completos del emisor (nombre, matrícula, especialidad, fecha on-chain, transacción). El resto de las soluciones (alerta de conflicto, suspender prestadores, auditoría como evidencia, centros como emisores, detección de patrones) queda en la [hoja de ruta](plan.md#15-hoja-de-ruta-después-del-mvp).
 

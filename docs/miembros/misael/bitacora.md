@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-03 · docs: use Supabase Auth for login, Privy for wallets and RLS per organization
+- **Qué hice:** decidimos que el login lo haga Supabase Auth y que Privy solo cree la wallet (modo "custom auth"), para poder aislar organizaciones con RLS. Documenté el patrón multi-organización completo en `stack.md` (guard con `getClaims`, cliente por request con el token del usuario, `app_user` + `get_my_organization_id()`, solo el backend escribe, cuidado con las RPC `security definer`, tests con pgTAP), sin depender de conocer otros proyectos. Confirmado: solo Privy, no Cavos.
+- **Archivos clave:** `docs/proyecto/stack.md`, `decisiones.md`, `plan.md`, `arquitectura.md`.
+- **Próximo paso:** prueba de 1 hora de Privy con Supabase Auth y Solana; armar el tablero de tareas.
+
 ## 2026-10-03 · chore: split project into docs and code repos and define the stack
 - **Qué hice:** definimos cuatro repos (`hcd` docs, `hcd_api` backend + programa, `hcd_app`, `hcd_landing`), los tres de código clonados dentro de `hcd`. Adapté el hook `pre-commit` para que funcione en los repos de código y exija la bitácora pendiente en `hcd/docs` (probado), agregué `.gitignore`, plantilla de `AGENTS.md` para los repos de código y el onboarding. Armé `stack.md` con versiones verificadas: NestJS 12, supabase-js sin ORM, npm, TypeScript 6. Revisé Cavos contra Privy: Cavos no permite fee payer propio ni verificar usuarios en el backend, así que seguimos con Privy. Registré el caso Pepito (MVP: origen y emisor en el visor; resto a la hoja de ruta).
 - **Archivos clave:** `.githooks/pre-commit`, `.gitignore`, `AGENTS.md`, `README.md`, `templates/code-repo/`, `docs/proyecto/stack.md`, `plan.md`, `decisiones.md`.
