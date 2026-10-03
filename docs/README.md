@@ -13,6 +13,7 @@ Se puede abrir como bóveda de Obsidian (abrir la carpeta `docs/` como vault). L
   - `estado.md`: en qué está ahora, qué sigue y qué lo bloquea. Siempre al día.
   - `bitacora.md`: una entrada por commit, la más nueva arriba.
   - `ideas.md`: ideas y propuestas que va dejando.
+  - `relevamientos/` (opcional): investigaciones largas, por ejemplo conversaciones con IA hechas fuera del repo. Un archivo por tema: `AAAA-MM-DD-tema.md`.
 - Con cada commit que toca código, el agente (o la persona) actualiza su `bitacora.md` y su `estado.md` en el mismo commit. El hook `pre-commit` no deja commitear si falta.
 - Las decisiones que afectan a todos van en [`proyecto/decisiones.md`](proyecto/decisiones.md).
 - Cada uno edita solo su carpeta. En los archivos compartidos se agrega, no se reescribe lo de otros.
