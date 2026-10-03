@@ -18,7 +18,7 @@
 |---|---|---|
 | Usuarios | Paciente · Médico · Clínica | PWA · web (carga y lectura) · panel web (avala médicos) |
 | Aplicación | Frontend Next.js (PWA) + Privy | Login y wallet embebida. Cifra y descifra en el navegador (WebCrypto). Escaneo de QR. |
-| Servicios | API Node.js (Express + Sequelize) | Lógica de la SaaS. Arma las transacciones y co-firma como fee payer. |
+| Servicios | API NestJS + supabase-js | Lógica de la SaaS. Arma las transacciones y co-firma como fee payer. |
 | Servicios | Servicio de llaves | Entrega la DEK solo al paciente, al médico emisor o a un médico con permiso vigente. Keypair `key_service` propio. |
 | Servicios | Indexer de eventos | Escucha el programa y guarda la línea de tiempo en Postgres |
 | Datos | PostgreSQL (Supabase, con RLS) | Usuarios, organizaciones y metadatos. Nunca datos médicos en claro. |
@@ -69,7 +69,8 @@ Borrado: destruir la DEK envuelta y borrar el archivo ("borrado criptográfico")
 ## Qué garantiza y qué no
 
 - **Garantiza:** quién emitió cada estudio, cuándo (reloj de la red) y que nadie lo alteró después.
-- **No garantiza:** que el contenido sea verdadero. Un médico verificado puede cargar un estudio falso desde el origen.
+- **No garantiza:** que el contenido sea verdadero. Un médico verificado puede cargar un estudio falso desde el origen (caso Pepito: un médico amigo carga una radiografía falsa para conseguir analgésicos).
+- **Para eso, en el MVP:** el visor muestra el origen ("emitido por el centro" o "copia digitalizada por el médico") y los datos completos del emisor, así quien lee puede desconfiar. El fraude queda firmado con la matrícula del médico. Más medidas en la [hoja de ruta](plan.md#15-hoja-de-ruta-después-del-mvp).
 - La firma de wallet no es firma digital legal (Ley 25.506): ver [investigacion.md](investigacion.md#marco-legal-en-argentina).
 
 ## Flujo de uso

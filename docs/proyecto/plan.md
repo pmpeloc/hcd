@@ -22,6 +22,10 @@ Vienen del [relevamiento de Franco](../miembros/franco/relevamientos/2026-10-03-
 | Wallet | Privy | Privy confirmado para el MVP (no Cavos) |
 | Por dónde empezar | Monorepo y programa en paralelo | **Primero el programa Anchor** (todo depende de su IDL) |
 | Nombre | Pendiente | HCD · Historial Clínico Digital |
+| Estructura | Un monorepo con pnpm | **Cuatro repos:** `hcd` (docs), `hcd_api` (backend + programa Anchor), `hcd_app` (app), `hcd_landing` (landing). Ver sección 11. |
+| Backend | Express + Sequelize | **NestJS** + **supabase-js** (sin ORM) |
+| Gestor de paquetes | pnpm | **npm** en todos los repos |
+| Validación de origen (caso Pepito) | — | El visor muestra el origen del estudio y los datos completos del emisor. Ver sección 8. |
 
 ## 1. Resumen
 
@@ -89,23 +93,14 @@ Si el paciente no aprueba, no existe el permiso y el servicio niega por defecto:
 
 ## 6. Stack
 
-| Capa | Elección | Alternativa |
-|---|---|---|
-| Programa | Rust + Anchor | Pinocchio |
-| Cliente del programa | Codama sobre el IDL + `@solana/kit` | `@coral-xyz/anchor` |
-| Frontend | Next.js + React + TypeScript + Tailwind + shadcn/ui, como PWA | — |
-| Login y wallet | Privy (`@privy-io/react-auth`) | — |
-| Cifrado | WebCrypto, AES-256-GCM en el navegador | libsodium |
-| Backend | Node.js + TypeScript + Express + Sequelize | Fastify/NestJS, Prisma |
-| Base de datos | PostgreSQL en Supabase con Row Level Security | Neon, Railway |
-| Almacenamiento | Supabase Storage o Cloudflare R2 | AWS S3 |
-| Indexación | `onLogs` + parser de eventos de Anchor | Helius webhooks |
-| RPC | Helius (plan gratuito) en devnet | RPC público de devnet |
-| Notificaciones | Web Push de la PWA + email | — |
-| Hosting | Vercel (web), Railway o Render (API), Supabase (datos) | Fly.io |
-| Calidad | Tests de Anchor, Vitest, Playwright | — |
+El listado detallado, con versiones y repo por repo, está en **[stack.md](stack.md)**. Resumen:
 
-Verificar las versiones vigentes en la documentación oficial antes de instalar. **En Windows, Anchor requiere WSL** (verificado en la [guía oficial](https://www.anchor-lang.com/docs/installation)).
+- **Programa:** Rust + Anchor, cliente con Codama y `@solana/kit`. En Windows, Anchor requiere WSL.
+- **App y landing:** Next.js + React + TypeScript + Tailwind + shadcn/ui; Privy para login y wallet; WebCrypto para cifrar.
+- **Backend:** NestJS + supabase-js (sin ORM) + Zod.
+- **Datos:** PostgreSQL y Storage en Supabase; Solana devnet con RPC de Helius.
+- **Hosting:** Vercel (app y landing), Railway o Render (API), Supabase (datos).
+- **Paquetes:** npm en todos los repos.
 
 ## 7. Programa de Solana
 
@@ -146,10 +141,11 @@ Eventos: RecordIssued, RecordDisputed, RecordVoided, AccessGranted, AccessRevoke
 - **Entrega:** DEK y URL firmada de 60 segundos. Opcional: sellar la DEK con una clave efímera X25519 del navegador del médico.
 - **Auditoría:** cada entrega llama a `log_access`, más una tabla `key_releases` en Postgres.
 - **Borrado:** destruir la DEK envuelta y borrar el archivo. En la cadena queda solo un hash.
+- **Origen y emisor en el visor (caso Pepito, MVP):** el visor muestra quién cargó el estudio (nombre, matrícula, especialidad), la fecha on-chain y el link a la transacción. Además indica el origen: **"emitido por \<centro\>"** si lo cargó un médico del centro que hizo el estudio, o **"copia digitalizada por \<médico\>"** si lo cargó otro médico. Así quien lee puede desconfiar de, por ejemplo, una radiografía cargada por un médico de cabecera.
 
 ## 9. Backend
 
-Módulos: `auth` (token de Privy), `organizations`, `records`, `access`, `keys`, `tx` (arma transacciones y fee payer), `indexer`.
+Módulos de NestJS: `auth` (guard que verifica el token de Privy), `organizations`, `records`, `access`, `keys`, `tx` (arma transacciones y fee payer), `indexer`.
 
 | Endpoint | Quién | Para qué |
 |---|---|---|
@@ -164,7 +160,7 @@ Módulos: `auth` (token de Privy), `organizations`, `records`, `access`, `keys`,
 
 Tablas: `users` (sin DNI), `organizations`, `staff_members`, `doctors`, `records`, `access_requests`, `audit_events`, `key_releases`.
 
-Aislamiento: `organization_id` en cada fila, RLS en Postgres como segunda barrera (ojo: la clave de servicio de Supabase saltea RLS), rutas de almacenamiento y llaves envolventes por organización.
+Aislamiento: `organization_id` en cada fila y rutas de almacenamiento y llaves envolventes por organización. La segunda barrera con RLS depende de cómo se use supabase-js: ver el punto pendiente en [stack.md](stack.md#pendientes-de-confirmar).
 
 ## 10. Frontend
 
@@ -175,16 +171,23 @@ Aislamiento: `organization_id` en cada fila, RLS en Postgres como segunda barrer
 
 Librerías: `@privy-io/react-auth`, TanStack Query, React Hook Form + Zod, `qrcode` y `@yudiel/react-qr-scanner`, `pdf.js`, Serwist o next-pwa con Web Push.
 
-## 11. Estructura del repositorio
+## 11. Estructura de repositorios
+
+Cuatro repos en la cuenta `pmpeloc`. Los tres de código se clonan **dentro** de `hcd`, y `hcd` los ignora en su `.gitignore`.
 
 ```
-apps/web/          Next.js
-apps/api/          Node + Express
-programs/clinical/ Programa Anchor + tests
-packages/client/   Cliente generado con Codama
-packages/shared/   Tipos, Zod y cifrado
-docs/              Documentación (en español)
+hcd/                 github.com/pmpeloc/hcd          Documentación (docs/ en español), reglas y hooks
+├── hcd_api/         github.com/pmpeloc/hcd_api      Backend NestJS + programa Anchor
+│   ├── programs/hcd/   Programa Anchor (Rust) + tests
+│   ├── idl/            IDL publicado, del que hcd_app genera su cliente
+│   └── src/            API NestJS
+├── hcd_app/         github.com/pmpeloc/hcd_app      Next.js: paciente, médico, clínica y admin
+└── hcd_landing/     github.com/pmpeloc/hcd_landing  Next.js estático: landing
 ```
+
+- **Cliente del programa:** `hcd_api` publica el IDL en `idl/`. Cada repo que lo necesita (`hcd_api` y `hcd_app`) genera su cliente con Codama a partir de ese archivo.
+- **Esquemas Zod compartidos:** sin monorepo no hay paquete compartido. Para el MVP, los esquemas de los endpoints se copian de `hcd_api` a `hcd_app`. Si se vuelve un problema, se publica un paquete.
+- **Documentación y hooks:** todos los repos usan los hooks de `hcd/.githooks` y documentan en `hcd/docs/`. Ver [AGENTS.md](../../AGENTS.md).
 
 ## 12. Riesgos principales
 
@@ -215,3 +218,23 @@ Estudio vinculado a la persona equivocada (mitigación: QR presente + "no es mí
 0:00 problema · 0:30 el médico carga un estudio con el QR · 1:30 otro médico pide acceso y el paciente aprueba por 1 hora · 2:30 el paciente niega a un segundo médico y vence el permiso del primero · 3:15 línea de tiempo verificable y diferenciación · 4:00 límites y hoja de ruta.
 
 Hipótesis a validar: ¿quién paga primero, la clínica o la aseguradora? Si alguien tiene un contacto en una clínica de Jujuy, pedirle 15 minutos antes del cierre.
+
+## 15. Hoja de ruta (después del MVP)
+
+Del plan v1:
+- Reducir la confianza en el servicio de llaves con Arcium o Lit.
+- Recuperación de cuenta con Swig, recuperación social y contactos de confianza.
+- Acceso de emergencia con doble confirmación, registro inmediato y aviso al paciente.
+- Interoperabilidad: exportar e importar HL7 FHIR (Patient, DiagnosticReport, Observation).
+- Aseguradoras: verificar que un estudio existe sin ver su contenido, para evitar duplicados.
+- Escala: importación masiva con Merkle roots, KMS por organización, auditoría externa y mainnet.
+- Validación legal con un abogado especializado en datos de salud y firma digital.
+
+Del caso Pepito (médico cómplice que carga un estudio falso):
+- **Alerta de conflicto:** marcar cuando el médico que cargó un estudio es el mismo que después pide acceso o receta en base a él.
+- **Suspender prestadores:** si se descubre un fraude, el admin le quita la verificación (`suspend_provider` o `set_provider_verified` en `false`) y todos sus estudios se muestran con la advertencia "emisor suspendido".
+- **Auditoría como evidencia:** exportar el registro firmado de un médico para presentarlo ante el colegio médico.
+- **Centros de imágenes como emisores directos**, para que sus estudios figuren como "emitido por el centro".
+- **Detección de patrones:** un médico de cabecera que carga muchas imágenes, o muchos estudios para un mismo paciente.
+
+Del relevamiento de Franco: página para verificar copias que circulan por fuera, validar firma digital del PDF (PAdES), multisig con Squads para la clave admin, conexión con REFEPS/SISA y cobro por organización de los lamports consumidos.

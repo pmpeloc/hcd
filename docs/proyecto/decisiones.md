@@ -2,6 +2,19 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-03 · Caso Pepito: origen y emisor visibles en el MVP · Misael (aceptado por el equipo)
+Para el caso de un médico cómplice que carga un estudio falso: en el MVP el visor muestra el origen ("emitido por el centro" o "copia digitalizada por el médico") y los datos completos del emisor (nombre, matrícula, especialidad, fecha on-chain, transacción). El resto de las soluciones (alerta de conflicto, suspender prestadores, auditoría como evidencia, centros como emisores, detección de patrones) queda en la [hoja de ruta](plan.md#15-hoja-de-ruta-después-del-mvp).
+
+## 2026-10-03 · Stack: NestJS, supabase-js sin ORM, npm y TypeScript 6 · Misael
+- Backend con **NestJS** en vez de Express. Por eso: `@nestjs/throttler` en lugar de `express-rate-limit`, Jest en lugar de Vitest y un `ZodValidationPipe` propio (`nestjs-zod` todavía no soporta NestJS 12).
+- **`@supabase/supabase-js` directo**, sin ORM. Migraciones y tipos con el Supabase CLI.
+- **npm** en todos los repos.
+- **TypeScript 6.0** en todos los repos (la del CLI de NestJS).
+- Detalle en [stack.md](stack.md).
+
+## 2026-10-03 · Cuatro repos: `hcd`, `hcd_api`, `hcd_app` y `hcd_landing` · Misael
+`hcd` queda como repo de documentación. El programa Anchor va dentro de `hcd_api`. Los tres repos de código se clonan dentro de `hcd` y usan sus hooks y su `docs/`. Ver [plan.md](plan.md#11-estructura-de-repositorios).
+
 ## 2026-10-03 · Se aceptan las propuestas del relevamiento de Franco · Franco (aceptado por el equipo)
 Detalle en el [relevamiento](../miembros/franco/relevamientos/2026-10-03-fees-wallet-antifalsificacion.md). Aplicado en [plan.md](plan.md) y [arquitectura.md](arquitectura.md).
 - **Solo el médico verificado carga estudios**, cada uno firmado con su propia wallet. Se elimina el rol "personal de clínica que carga".

@@ -1,25 +1,41 @@
 #!/bin/sh
-# Blocks commits that change code without updating the member's log in docs/.
+# Blocks commits that change code without updating the member's log in hcd/docs/.
+# Works in the hcd repo and in the code repos cloned inside it (hcd_api, hcd_app, hcd_landing).
 # Rules: AGENTS.md section 4.
 
-member=$(git config hcd.member)
-if [ -z "$member" ]; then
-  echo "HCD: who are you? Run: git config hcd.member <misael|matias|maximiliano|franco|rodrigo>" >&2
+# In hcd, docs/ is here; in a code repo, it is in the parent hcd folder.
+if [ -d docs/miembros ]; then hcd=.; else hcd=..; fi
+if [ ! -d "$hcd/docs/miembros" ]; then
+  echo "HCD: can't find hcd/docs/. Code repos must be cloned inside the hcd folder (see README)." >&2
   exit 1
 fi
-if [ ! -d "docs/miembros/$member" ]; then
-  echo "HCD: unknown member '$member' (no docs/miembros/$member/). See docs/equipo.md." >&2
+
+member=$(git config hcd.member || git -C "$hcd" config hcd.member)
+if [ -z "$member" ]; then
+  echo "HCD: who are you? Run in the hcd folder: git config hcd.member <misael|matias|maximiliano|franco|rodrigo>" >&2
+  exit 1
+fi
+log="docs/miembros/$member/bitacora.md"
+if [ ! -f "$hcd/$log" ]; then
+  echo "HCD: unknown member '$member' (no $log). See docs/equipo.md." >&2
   exit 1
 fi
 
 staged=$(git diff --cached --name-only --diff-filter=ACMRD)
 [ -z "$staged" ] && exit 0
 
-# Docs-only commits are always fine.
-echo "$staged" | grep -qv '^docs/' || exit 0
-
-if ! echo "$staged" | grep -qx "docs/miembros/$member/bitacora.md"; then
-  echo "HCD: this commit changes code but docs/miembros/$member/bitacora.md is not staged." >&2
+if [ "$hcd" = "." ]; then
+  # hcd repo: docs-only commits are fine; otherwise the log must be in this commit.
+  echo "$staged" | grep -qv '^docs/' || exit 0
+  echo "$staged" | grep -qx "$log" && exit 0
+  echo "HCD: this commit changes files outside docs/ but $log is not staged." >&2
   echo "     Add a log entry (and update estado.md), then stage it. See AGENTS.md section 4." >&2
+  exit 1
+fi
+
+# Code repo: the log entry lives in the parent hcd repo and must be pending there.
+if [ -z "$(git -C .. status --porcelain -- "$log")" ]; then
+  echo "HCD: update ../$log (and estado.md) before committing code." >&2
+  echo "     Then commit and push them in the hcd repo too. See AGENTS.md section 4." >&2
   exit 1
 fi

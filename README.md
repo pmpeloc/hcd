@@ -39,14 +39,37 @@ git config core.hooksPath .githooks
 git config hcd.member rodrigo
 ```
 
-**4. Check it works**
+**4. Clone the code repos inside `hcd` and turn on the hooks in each one**
 
 ```sh
-git config hcd.member          # should print your slug
-git config core.hooksPath      # should print .githooks
+git clone https://github.com/pmpeloc/hcd_api.git
+git clone https://github.com/pmpeloc/hcd_app.git
+git clone https://github.com/pmpeloc/hcd_landing.git
+git -C hcd_api config core.hooksPath ../.githooks
+git -C hcd_app config core.hooksPath ../.githooks
+git -C hcd_landing config core.hooksPath ../.githooks
 ```
 
-**5. Read the rules:** [`AGENTS.md`](AGENTS.md) and [`docs/README.md`](docs/README.md).
+They must live inside the `hcd` folder: the hooks and the docs are shared from here. `hcd` ignores them in its `.gitignore`.
+
+**5. Check it works**
+
+```sh
+git config hcd.member                      # should print your slug
+git config core.hooksPath                  # should print .githooks
+git -C hcd_api config core.hooksPath       # should print ../.githooks
+```
+
+**6. Read the rules:** [`AGENTS.md`](AGENTS.md) and [`docs/README.md`](docs/README.md).
+
+### Repositories
+
+| Repo | What |
+|---|---|
+| [hcd](https://github.com/pmpeloc/hcd) | Docs, rules and hooks (this repo) |
+| [hcd_api](https://github.com/pmpeloc/hcd_api) | NestJS backend + Anchor program |
+| [hcd_app](https://github.com/pmpeloc/hcd_app) | Next.js app for patients, doctors and clinics |
+| [hcd_landing](https://github.com/pmpeloc/hcd_landing) | Landing page |
 
 If you use an AI coding agent (Claude Code, Codex, Cursor, Devin, Copilot, Gemini…), it reads `AGENTS.md` and follows these rules on its own. Just ask it to work and commit as usual.
 
@@ -54,7 +77,8 @@ If you use an AI coding agent (Claude Code, Codex, Cursor, Devin, Copilot, Gemin
 
 - **English everywhere** (code, comments, commits, PRs). Only `docs/` is in Spanish.
 - **Commit messages:** [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat(consent): add time-bound access grant`. No accents or ñ.
-- **Every commit that touches code also updates your docs:** `docs/miembros/<you>/bitacora.md` (one entry per commit, newest first) and `estado.md` (what you are working on). Ideas go in `ideas.md`.
+- **Every commit that touches code also updates your docs:** `docs/miembros/<you>/bitacora.md` (one entry per commit, newest first) and `estado.md` (what you are working on). Ideas go in `ideas.md`. When you commit in a code repo, commit the docs in `hcd` too.
+- **Package manager: npm.** Stack: [`docs/proyecto/stack.md`](docs/proyecto/stack.md).
 - The hooks block commits that break these rules. **Never use `--no-verify`.**
 - **No medical data on-chain, and never real patient data in the repo.**
 

@@ -1,0 +1,4 @@
+# Code repos are cloned inside hcd but versioned on their own.
+/hcd_api/
+/hcd_app/
+/hcd_landing/

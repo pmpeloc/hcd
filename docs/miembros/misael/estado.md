@@ -8,7 +8,7 @@ Arranque del proyecto: investigación con Colosseum Copilot, presentación para 
 ## Próximo paso
 - Invitar al equipo al repo https://github.com/pmpeloc/hcd.
 - Que cada uno haga el onboarding del [README](../../../README.md).
-- Arrancar el programa Anchor y el frontend.
+- Crear los repos hcd_api, hcd_app y hcd_landing en GitHub y arrancar el programa Anchor en hcd_api.
 
 ## Bloqueos
 Ninguno.

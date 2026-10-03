@@ -25,6 +25,7 @@ Se puede abrir como bóveda de Obsidian (abrir la carpeta `docs/` como vault). L
 | [equipo.md](equipo.md) | Integrantes, alias, roles y carpeta de cada uno |
 | [proyecto/vision.md](proyecto/vision.md) | Qué es HCD, para quién y modelo de negocio |
 | [proyecto/plan.md](proyecto/plan.md) | **Plan del proyecto** (PDF v1 + cambios aceptados): alcance, cuentas, endpoints, plan de 10 días |
+| [proyecto/stack.md](proyecto/stack.md) | Stack tecnológico detallado, repo por repo, con versiones |
 | [proyecto/arquitectura.md](proyecto/arquitectura.md) | Arquitectura: capas, quién hace qué, estados, cifrado y fee payer |
 | [proyecto/investigacion.md](proyecto/investigacion.md) | Herramientas de Solana, precedentes en Colosseum y marco legal |
 | [proyecto/decisiones.md](proyecto/decisiones.md) | Registro de decisiones del equipo |
@@ -38,7 +39,20 @@ git config core.hooksPath .githooks   # activa los hooks del equipo
 git config hcd.member <tu-slug>       # misael, matias, maximiliano, franco o rodrigo
 ```
 
+Después, **dentro de la carpeta `hcd`**, clonar los repos de código y activarles los hooks:
+
+```sh
+git clone https://github.com/pmpeloc/hcd_api.git
+git clone https://github.com/pmpeloc/hcd_app.git
+git clone https://github.com/pmpeloc/hcd_landing.git
+git -C hcd_api config core.hooksPath ../.githooks
+git -C hcd_app config core.hooksPath ../.githooks
+git -C hcd_landing config core.hooksPath ../.githooks
+```
+
 Para verificar: `git config hcd.member` tiene que mostrar tu slug y `git config core.hooksPath` tiene que mostrar `.githooks`. Detalle completo en el [README del repo](../README.md).
+
+**Cuando commiteás en un repo de código**, tu bitácora y tu estado se actualizan acá, en `hcd/docs/`, y después se commitean también en `hcd`. El hook del repo de código no te deja commitear si no los actualizaste.
 
 ## Recursos
 

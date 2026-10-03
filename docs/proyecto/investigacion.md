@@ -84,7 +84,7 @@ Precio de SOL: USD 119,80 según CoinGecko el 2026-10-03. Los bytes salen del es
 ## Wallet y proveedores
 
 - **Privy:** [Stripe lo compró en junio de 2025](https://siliconangle.com/2025/06/11/stripe-acquires-crypto-wallet-infrastructure-provider-privy/) y sigue operando como producto independiente.
-- **Cavos:** según su [README](https://github.com/cavos-labs/kit), en Solana usa llaves Ed25519 derivadas de una MasterDEK. El "P-256" de su [sitio](https://cavos.xyz/) habla de llaves de dispositivo. Además del `execute(amount, dest)`, el SDK tiene `executeInstructions(instructions)` para instrucciones arbitrarias. Sigue sin confirmarse que acepte un fee payer externo. Clientes que nombra su sitio: Jokers of Neon y CofiBlocks. Gratis hasta 1.000 wallets, después tarifa plana por organización.
+- **Cavos:** según su [README](https://github.com/cavos-labs/kit), en Solana usa llaves Ed25519 derivadas de una MasterDEK. El "P-256" de su [sitio](https://cavos.xyz/) habla de llaves de dispositivo. Además del `execute(amount, dest)`, el SDK tiene `executeInstructions(instructions)` para instrucciones arbitrarias. Su README no documenta firmar transacciones armadas afuera ni usar un fee payer propio (solo su relayer), ni verificar usuarios en el backend: ver [por qué Privy y no Cavos](stack.md#por-qué-privy-y-no-cavos). Clientes que nombra su sitio: Jokers of Neon y CofiBlocks. Gratis hasta 1.000 wallets, después tarifa plana por organización.
 - **Anchor en Windows:** la [guía oficial](https://www.anchor-lang.com/docs/installation) exige WSL.
 
 ## Plazos

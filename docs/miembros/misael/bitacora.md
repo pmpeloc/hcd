@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-03 · chore: split project into docs and code repos and define the stack
+- **Qué hice:** definimos cuatro repos (`hcd` docs, `hcd_api` backend + programa, `hcd_app`, `hcd_landing`), los tres de código clonados dentro de `hcd`. Adapté el hook `pre-commit` para que funcione en los repos de código y exija la bitácora pendiente en `hcd/docs` (probado), agregué `.gitignore`, plantilla de `AGENTS.md` para los repos de código y el onboarding. Armé `stack.md` con versiones verificadas: NestJS 12, supabase-js sin ORM, npm, TypeScript 6. Revisé Cavos contra Privy: Cavos no permite fee payer propio ni verificar usuarios en el backend, así que seguimos con Privy. Registré el caso Pepito (MVP: origen y emisor en el visor; resto a la hoja de ruta).
+- **Archivos clave:** `.githooks/pre-commit`, `.gitignore`, `AGENTS.md`, `README.md`, `templates/code-repo/`, `docs/proyecto/stack.md`, `plan.md`, `decisiones.md`.
+- **Próximo paso:** crear los tres repos en GitHub y arrancar `hcd_api` con el programa Anchor.
+
 ## 2026-10-03 · docs: note pitch deck is updated with accepted roles
 - **Qué hice:** actualicé la presentación con los roles aceptados: diagrama del sistema (médico carga, clínica avala, backend con API, servicio de llaves e indexer; Privy en datos), flujo con "no es mío" y verificación de hash, y la tarjeta "Firmado por el médico". Saqué de `arquitectura.md` la advertencia de que estaba desactualizada.
 - **Archivos clave:** `docs/proyecto/arquitectura.md`, presentación (diapositivas 2, 5 y 6).
