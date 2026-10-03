@@ -7,7 +7,7 @@ Diseño del programa Anchor: quién paga los fees de red, wallet (Privy vs Cavos
 
 ## Próximo paso
 - Empezar el programa Anchor (en Solana Playground mientras instala el toolchain local).
-- Que el equipo decida las propuestas de roles y estados del estudio.
+- Las propuestas de roles y estados del estudio fueron aceptadas: implementarlas en el programa.
 
 ## Bloqueos
 - Le falta el toolchain local: WSL, Rust, Solana CLI, Anchor y pnpm.

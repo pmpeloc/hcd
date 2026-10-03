@@ -8,9 +8,11 @@
 
 ## Notas de integración (Misael, 2026-10-03)
 
-Cruce con lo que ya estaba en `docs/`. Lo que sigue son **propuestas**: nada de esto pasó todavía a [decisiones.md](../../../proyecto/decisiones.md).
+> ✅ **2026-10-03: el equipo aceptó todas las "Decisiones sugeridas".** Están en [decisiones.md](../../../proyecto/decisiones.md) y aplicadas en [plan.md](../../../proyecto/plan.md) y [arquitectura.md](../../../proyecto/arquitectura.md). Las cifras se verificaron: ver la sección [Datos verificados](#datos-verificados-2026-10-03) al final.
 
-**Choca con lo que ya teníamos (hay que decidir en equipo):**
+Cruce con lo que ya estaba en `docs/` antes de la decisión.
+
+**Chocaba con lo que ya teníamos (resuelto a favor de esta propuesta):**
 1. **Quién carga estudios.** Franco propone que solo los médicos carguen estudios y que el paciente nunca escriba. En [arquitectura.md](../../../proyecto/arquitectura.md) el paso 2 del flujo dice que carga "la clínica". La propuesta de carga inicial de Misael (médico de cabecera que certifica los papeles) encaja, pero su "nivel C · cargado por el paciente" quedaría descartado.
 2. **Aprobación del paciente.** Antes estaba previsto que el paciente co-firmara cada estudio (como CareChain). Franco propone que el estudio quede Active al cargarse y que el paciente solo pueda marcarlo como "no es mío" (Disputed → Voided).
 3. **Rol de la clínica.** Franco propone que la clínica no cargue estudios y quede, como mucho, avalando qué médicos le pertenecen.
@@ -20,13 +22,7 @@ Cruce con lo que ya estaba en `docs/`. Lo que sigue son **propuestas**: nada de 
 - Que el visor verifique el hash antes de descifrar: completa el principio "en la cadena va lo que prueba algo".
 - Que el fee payer y la autoridad `key_service` sean keypairs distintos.
 
-**Referencia faltante:** Franco partió de un "plan en PDF" (habla de la página 5 y de un deploy en devnet el día 4) que no está en el repo. Conviene subirlo a `docs/proyecto/` para que todos los agentes lo tengan.
-
-**Datos que figuran abajo como "sin verificar" pero que ya verificamos en [investigacion.md](../../../proyecto/investigacion.md):**
-- Cierre de la hackatón: 13/10/2026 06:59 UTC (hub de Colosseum).
-- 248 proyectos de salud en 5 hackatones y 6 reconocidos (datos de Colosseum Copilot).
-- Leyes 25.326, 26.529 y 27.706 (búsqueda web con fuentes).
-- REFEPS/SISA como registro nacional de matrículas: verificado en la consulta sobre carga inicial (https://sisa.msal.gov.ar/sisadoc/docs/050102/refeps_intro.jsp).
+**El "plan en PDF"** del que partió Franco ya está en el repo: [plan-v1.pdf](../../../proyecto/plan-v1.pdf), resumido en [plan.md](../../../proyecto/plan.md).
 
 **Pregunta resuelta:** "Dónde se crea el repo". Ya existe: https://github.com/pmpeloc/hcd
 
@@ -143,17 +139,33 @@ Son sugerencias de la conversación, no decisiones del equipo. Los puntos marcad
 - https://privy.io/blog/introducing-privy-native-gas-sponsorship — Anuncio del sponsorship nativo de gas en Privy.
 - https://squads.xyz/blog/privy-enables-gasless-transactions-on-solana-powered-by-grid — Privy habilita transacciones sin gas en Solana con Grid de Squads.
 
-## Datos sin verificar
-- Fee de 5.000 lamports por firma en Solana.
-- Fórmula de rent: (128 + bytes) × 6.960 lamports.
-- Tamaños y rent estimados: PatientProfile ~49 bytes / ~0,0012 SOL; Provider ~75 / ~0,0014; Record ~154 / ~0,0020; AccessGrant ~90 / ~0,0015.
-- Costo estimado de ~0,05 SOL por paciente por año (10 estudios, 20 permisos y 40 accesos), de los cuales ~0,03 SOL serían recuperables.
-- Precio de SOL de USD 150: supuesto ilustrativo, no es la cotización real.
-- Que Stripe compró Privy en 2025.
-- Que Anchor en Windows nativo da problemas y requiere WSL.
-- Que instalar WSL, Rust, Solana y Anchor lleva entre 1 y 2 horas.
-- Discrepancia en Cavos: el sitio habla de llaves P-256 y el README dice que en Solana usa Ed25519 derivado de una MasterDEK.
-- Clientes de Cavos mencionados en su sitio: Jokers of Neon y CofiBlocks.
-- PAdES como formato de firma de PDF.
-- Ley 25.506 (firma digital): citada sin comprobar.
-- (Ya verificados en `investigacion.md`, ver notas arriba: cierre del hackathon, 248 proyectos de salud, leyes 25.326, 26.529 y 27.706, REFEPS/SISA.)
+## Datos verificados (2026-10-03)
+
+Verificados por Misael el 2026-10-03. Detalle y tabla de costos en [investigacion.md](../../../proyecto/investigacion.md#costos-on-chain-verificados).
+
+| Dato original | Resultado | Cómo se verificó |
+|---|---|---|
+| Fee de 5.000 lamports por firma | ✅ **Correcto** | [Documentación de fees de Solana](https://solana.com/docs/core/fees) |
+| Rent: (128 + bytes) × 6.960 lamports | ❌ **Desactualizado.** La red hoy cobra (128 + bytes) × **5.080** lamports. La documentación todavía dice 6.960. | Consulta `getMinimumBalanceForRentExemption` a mainnet y devnet |
+| PatientProfile ~49 bytes / ~0,0012 SOL | ⚠️ Con el esqueleto del plan son **57 bytes / 0,00094 SOL** | Cálculo desde el plan + consulta a la red |
+| Provider ~75 bytes / ~0,0014 SOL | ✅ 75 bytes; ❌ el depósito real es **0,00103 SOL** | Ídem |
+| Record ~154 bytes / ~0,0020 SOL | ✅ 154 bytes (plan v1); ❌ el depósito real es **0,00143 SOL**. Con `rent_payer` + `supersedes`: 219 bytes / 0,00176 SOL | Ídem |
+| AccessGrant ~90 bytes / ~0,0015 SOL | ❌ **Son 118 bytes** (3 Pubkey + i64 + estado + u32 + bump + discriminador) / 0,00125 SOL. Con `rent_payer`: 150 bytes / 0,00141 SOL | Ídem |
+| ~0,05 SOL por paciente por año, ~0,03 recuperables | ⚠️ **0,041 SOL (plan v1) o 0,0475 SOL (con campos propuestos).** De eso, solo 0,00071 SOL son comisiones; el resto son depósitos, recuperables solo si se cierran las cuentas (el plan no las cierra, por auditoría) | Cálculo con valores de la red |
+| Precio de SOL USD 150 | ❌ Era un supuesto. **USD 119,80** el 2026-10-03 | CoinGecko |
+| "Menos que un café por paciente por año" | ⚠️ **Solo vale para las comisiones** (≈ USD 0,09). Con depósitos son USD 5 a 6 | Cálculo anterior |
+| Stripe compró Privy en 2025 | ✅ **Correcto**, junio de 2025; Privy sigue como producto independiente | [SiliconANGLE](https://siliconangle.com/2025/06/11/stripe-acquires-crypto-wallet-infrastructure-provider-privy/) |
+| Anchor en Windows requiere WSL | ✅ **Correcto**: la guía oficial lo exige | [Guía de instalación de Anchor](https://www.anchor-lang.com/docs/installation) |
+| Cavos: P-256 en el sitio vs Ed25519 en el README | ✅ **Resuelto**: en Solana usa Ed25519 derivado de una MasterDEK; el P-256 del sitio se refiere a llaves de dispositivo | [README de Cavos](https://github.com/cavos-labs/kit) y [sitio](https://cavos.xyz/) |
+| Riesgo: Cavos solo muestra `execute(amount, dest)` | ⚠️ **Corregido**: el SDK también tiene `executeInstructions(instructions)` para instrucciones arbitrarias. Sigue sin confirmarse el fee payer externo. No cambia la decisión de usar Privy | [README de Cavos](https://github.com/cavos-labs/kit) |
+| Clientes de Cavos: Jokers of Neon y CofiBlocks | ✅ Los nombra su sitio | [cavos.xyz](https://cavos.xyz/) |
+| PAdES como formato de firma de PDF | ✅ Estándar ETSI EN 319 142 | [PAdES](https://en.wikipedia.org/wiki/PAdES) |
+| Ley 25.506 (firma digital) | ✅ Solo es firma digital con certificado de un certificador licenciado. Una firma de wallet es firma electrónica | [InfoLEG](https://servicios.infoleg.gob.ar/infolegInternet/anexos/80000-84999/80733/texact.htm), [Identik](https://identik.me/blog/firma-digital-vs-electronica/) |
+| Leyes 25.326, 26.529 y 27.706 | ✅ Verificadas | [investigacion.md](../../../proyecto/investigacion.md#marco-legal-en-argentina) |
+| REFEPS/SISA como registro de matrículas | ✅ Verificado | [SISA](https://sisa.msal.gov.ar/sisadoc/docs/050102/refeps_intro.jsp) |
+| Cierre 13/10/2026 06:59 UTC | ✅ Verificado | Hub de recursos de Colosseum |
+| 248 proyectos de salud, 6 reconocidos; más de 25 de historia clínica sin premio | ✅ Verificado | Datos de Colosseum Copilot |
+
+**Sigue sin verificar:**
+- Que instalar WSL, Rust, Solana y Anchor lleve entre 1 y 2 horas. Es una estimación; depende de la máquina y la conexión.
+- Los tamaños finales de las cuentas: reconfirmar con `solana rent <bytes>` cuando exista el código.

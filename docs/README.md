@@ -24,7 +24,8 @@ Se puede abrir como bóveda de Obsidian (abrir la carpeta `docs/` como vault). L
 |---|---|
 | [equipo.md](equipo.md) | Integrantes, alias, roles y carpeta de cada uno |
 | [proyecto/vision.md](proyecto/vision.md) | Qué es HCD, para quién y modelo de negocio |
-| [proyecto/arquitectura.md](proyecto/arquitectura.md) | Arquitectura propuesta: capas, servicios, datos y flujo |
+| [proyecto/plan.md](proyecto/plan.md) | **Plan del proyecto** (PDF v1 + cambios aceptados): alcance, cuentas, endpoints, plan de 10 días |
+| [proyecto/arquitectura.md](proyecto/arquitectura.md) | Arquitectura: capas, quién hace qué, estados, cifrado y fee payer |
 | [proyecto/investigacion.md](proyecto/investigacion.md) | Herramientas de Solana, precedentes en Colosseum y marco legal |
 | [proyecto/decisiones.md](proyecto/decisiones.md) | Registro de decisiones del equipo |
 

@@ -5,7 +5,7 @@ La más nueva arriba.
 ## 2026-10-03 · Del relevamiento de fees, wallet y antifalsificación
 Detalle y contexto en [relevamientos/2026-10-03-fees-wallet-antifalsificacion.md](relevamientos/2026-10-03-fees-wallet-antifalsificacion.md).
 
-**Diseño (propuestas para decidir en equipo):**
+**Diseño (aceptado por el equipo el 2026-10-03, ver [decisiones.md](../../proyecto/decisiones.md)):**
 - Solo el médico verificado carga estudios, con su propia wallet; el paciente solo lee.
 - Estados del estudio: Active → Disputed (paciente: "no es mío") → Voided (lo anula el emisor y lo vuelve a emitir).
 - La clínica no carga estudios; como mucho avala qué médicos le pertenecen.
@@ -17,7 +17,7 @@ Detalle y contexto en [relevamientos/2026-10-03-fees-wallet-antifalsificacion.md
 - Escena: modificar un byte del archivo y mostrar que el visor marca "Estudio alterado".
 - Mostrar emisor, profesional, fecha on-chain y link al explorador.
 - "No certificamos que el contenido sea verdadero; certificamos quién lo emitió, cuándo, y que nadie lo tocó después."
-- "El costo on-chain por paciente por año es menor a un café." (Cifras sin verificar todavía.)
+- "Las comisiones de red cuestan menos de 10 centavos de dólar por paciente por año." (Verificado. "Menos que un café" solo vale para las comisiones, no para los depósitos: ver [costos](../../proyecto/investigacion.md#costos-on-chain-verificados).)
 
 **Hoja de ruta:**
 - Página para verificar copias de un estudio que circulan por fuera.
