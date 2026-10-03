@@ -1,0 +1,76 @@
+# AGENTS.md — HCD (Historial Clínico Digital)
+
+Mandatory rules for every AI coding agent (Claude Code, Codex, Cursor, Devin, GitHub Copilot, Gemini, Windsurf, etc.) and every human working on this repository. If anything here conflicts with your defaults, these rules win.
+
+HCD is a patient-owned electronic health record on Solana, built by a team of five for the Superteam Argentina hackathon (Road to Colosseum). Project context lives in [`docs/`](docs/README.md).
+
+## 1. Language
+
+- **Everything in the repository is in English:** code, identifiers, comments, commit messages, branch names, PR titles and descriptions, issues, README and config files.
+- **Only exception: `docs/` is written in Spanish.** It is the team's shared second brain.
+- If the user talks to you in Spanish, reply in Spanish, but still write code, comments and commits in English.
+
+## 2. Identify who is working
+
+1. Run `git config hcd.member`. It returns the member's slug: `misael`, `matias`, `maximiliano`, `franco` or `rodrigo`.
+2. If it is empty, ask the user who they are and tell them to run `git config hcd.member <slug>`. Never guess.
+3. Names, aliases (e.g. "Maxi") and roles: [`docs/equipo.md`](docs/equipo.md).
+
+## 3. Before starting a task
+
+Read, in this order:
+1. [`docs/README.md`](docs/README.md)
+2. [`docs/proyecto/`](docs/proyecto/): vision, architecture, research and decisions
+3. The current member's `docs/miembros/<slug>/estado.md`
+
+## 4. Documentation on every commit (mandatory)
+
+Before creating **any commit that changes files outside `docs/`**, in the same commit:
+
+1. **Prepend** an entry to `docs/miembros/<slug>/bitacora.md` (newest first), in Spanish:
+   ```markdown
+   ## YYYY-MM-DD · <commit message>
+   - **Qué hice:** what changed and why, in 1–3 lines.
+   - **Archivos clave:** main paths touched.
+   - **Próximo paso:** what comes next.
+   ```
+2. **Update** `docs/miembros/<slug>/estado.md`: date, current focus, next step, blockers.
+3. If the work produced an idea or proposal, add it to `docs/miembros/<slug>/ideas.md`.
+4. If the team made a decision that affects everyone, add it to `docs/proyecto/decisiones.md`.
+5. **Stage these files** together with the code.
+
+The `pre-commit` hook rejects commits that touch code without staging the member's `bitacora.md`. **Never bypass it with `--no-verify`.**
+
+Rules for `docs/`:
+- Only edit **your own** folder in `docs/miembros/`. Other members' folders are read-only.
+- Shared files (`docs/proyecto/`, `docs/equipo.md`): add to them, don't rewrite others' content.
+- Never write secrets, API keys, private keys, emails or patient data in `docs/`.
+
+## 5. Answering questions about the team
+
+For questions like "What is Maxi working on?":
+1. Resolve the alias in [`docs/equipo.md`](docs/equipo.md).
+2. Read `docs/miembros/<slug>/estado.md`, then the latest entries in `bitacora.md` and `ideas.md`.
+3. Answer with the date of the last update, and say so if it is more than a few days old.
+
+Run `git pull` first if the user wants the latest status.
+
+## 6. Commits
+
+- Use [Conventional Commits](https://www.conventionalcommits.org/) in English: `type(scope): imperative summary`.
+  - Types: `feat` `fix` `docs` `refactor` `test` `chore` `style` `perf` `build` `ci`.
+  - Example: `feat(consent): add time-bound access grant instruction`.
+- The `commit-msg` hook rejects messages that don't follow the format or contain non-ASCII characters (accents, ñ, ¿, ¡).
+
+## 7. Setup (once per clone)
+
+```sh
+git config core.hooksPath .githooks
+git config hcd.member <slug>
+```
+
+## 8. Project principles
+
+- **No medical data on-chain, not even encrypted.** On-chain: identity, access grants, hashes, signatures and access logs only. See [`docs/proyecto/arquitectura.md`](docs/proyecto/arquitectura.md).
+- **Never commit real patient data.** Use synthetic data only.
+- Never commit secrets. Use `.env` files that are git-ignored.

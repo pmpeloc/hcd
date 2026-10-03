@@ -1,0 +1,22 @@
+#!/bin/sh
+# Enforces English Conventional Commits. Rules: AGENTS.md section 6.
+
+subject=$(head -n 1 "$1")
+
+# Let git's own merge/revert/fixup messages through.
+case "$subject" in
+  Merge*|Revert*|fixup!*|squash!*) exit 0 ;;
+esac
+
+if ! echo "$subject" | grep -Eq '^(feat|fix|docs|refactor|test|chore|style|perf|build|ci)(\([a-z0-9._/-]+\))?!?: .+'; then
+  echo "HCD: commit message must be an English Conventional Commit, e.g." >&2
+  echo "     feat(consent): add time-bound access grant" >&2
+  echo "     got: $subject" >&2
+  exit 1
+fi
+
+# ponytail: non-ASCII check is a cheap proxy for "not Spanish"; it won't catch Spanish without accents.
+if LC_ALL=C grep -q '[^ -~]' "$1"; then
+  echo "HCD: commit message contains non-ASCII characters (accents, n tilde, inverted marks). Write it in English." >&2
+  exit 1
+fi

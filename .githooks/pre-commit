@@ -1,0 +1,25 @@
+#!/bin/sh
+# Blocks commits that change code without updating the member's log in docs/.
+# Rules: AGENTS.md section 4.
+
+member=$(git config hcd.member)
+if [ -z "$member" ]; then
+  echo "HCD: who are you? Run: git config hcd.member <misael|matias|maximiliano|franco|rodrigo>" >&2
+  exit 1
+fi
+if [ ! -d "docs/miembros/$member" ]; then
+  echo "HCD: unknown member '$member' (no docs/miembros/$member/). See docs/equipo.md." >&2
+  exit 1
+fi
+
+staged=$(git diff --cached --name-only --diff-filter=ACMRD)
+[ -z "$staged" ] && exit 0
+
+# Docs-only commits are always fine.
+echo "$staged" | grep -qv '^docs/' || exit 0
+
+if ! echo "$staged" | grep -qx "docs/miembros/$member/bitacora.md"; then
+  echo "HCD: this commit changes code but docs/miembros/$member/bitacora.md is not staged." >&2
+  echo "     Add a log entry (and update estado.md), then stage it. See AGENTS.md section 4." >&2
+  exit 1
+fi
