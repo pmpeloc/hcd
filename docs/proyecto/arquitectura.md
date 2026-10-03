@@ -2,7 +2,7 @@
 
 > Actualizada el 2026-10-03 con el [plan v1](plan.md) y las [decisiones aceptadas](decisiones.md). El detalle completo (cuentas, instrucciones, endpoints, tablas) está en [plan.md](plan.md).
 >
-> 📊 Diagrama visual (diapositiva 5) y flujo (diapositiva 6) en la [presentación](https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S). La presentación es anterior a las decisiones de Franco: donde no coincida, manda este archivo.
+> 📊 Diagrama visual (diapositiva 5) y flujo (diapositiva 6) en la [presentación](https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S), actualizadas el 2026-10-03 con las decisiones de Franco. Si algo no coincide, manda este archivo.
 
 ## Principio de diseño
 
