@@ -4,6 +4,8 @@ Patient-owned health records on Solana. Doctors get time-bound access via QR con
 
 Built for the Superteam Argentina hackathon (Road to Colosseum).
 
+📊 **Pitch deck (Spanish):** https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S — idea, architecture diagram, user flow, Solana stack, prior Colosseum projects and legal framework.
+
 > 🚧 Early stage: the repository currently holds the team's rules and project docs. Code is coming.
 
 ## Team

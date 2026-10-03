@@ -1,6 +1,8 @@
 # Arquitectura propuesta
 
 > Propuesta inicial (2026-10-03). Si se cambia algo, registrarlo en [decisiones.md](decisiones.md).
+>
+> 📊 Diagrama visual del sistema (diapositiva 5) y flujo paso a paso (diapositiva 6) en la [presentación](https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S).
 
 ## Principio de diseño
 

@@ -2,6 +2,9 @@
 
 Esta carpeta es la memoria compartida del proyecto **HCD · Historial Clínico Digital**. Es lo único del repo que está en español; código, comentarios y commits van en inglés (ver [AGENTS.md](../AGENTS.md)).
 
+📊 **Presentación del proyecto:** https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S
+Idea, diagrama de arquitectura, flujo de uso, herramientas de Solana, precedentes en Colosseum y marco legal. Es la mejor forma de entender el proyecto en 10 minutos; el contenido también está en texto en [`proyecto/`](proyecto/).
+
 Se puede abrir como bóveda de Obsidian (abrir la carpeta `docs/` como vault). Los links son relativos para que también funcionen en GitHub.
 
 ## Cómo funciona
