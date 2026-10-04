@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · style(demo): bump all font sizes one more step
+- **Qué hice:** segundo aumento de la escala tipográfica del demo (base 16→18px, textos chicos +2px más). Feedback de Misael: las fuentes seguían chicas para presentar. Sin overflow verificado en mobile y desktop.
+- **Archivos clave:** `demo/styles.css`.
+- **Próximo paso:** ensayo final del guion bilingüe.
+
 ## 2026-10-04 · feat(demo): add real logo, ES/EN language switch and larger type
 - **Qué hice:** integré el logo oficial (`demo/assets/logo-salua.jpeg`) en sidebar, topbar móvil y favicon; subí toda la escala tipográfica (~+2-4px en textos chicos); agregué toggle ES/EN en la topbar con diccionario completo en `app.js` (~120 strings), persistencia en localStorage y locale de fechas. Log, notificaciones y panel on-chain se re-traducen al cambiar de idioma.
 - **Archivos clave:** `demo/app.js`, `demo/styles.css`, `demo/index.html`, `demo/assets/`.
