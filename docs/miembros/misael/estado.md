@@ -1,14 +1,12 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-03
+**Última actualización:** 2026-10-04
 
 ## En qué estoy
-Arranque del proyecto: investigación con Colosseum Copilot, presentación para el equipo, nombre y descripción del repo, y la estructura de `docs/` con las reglas para agentes.
+Reglas para agentes en los cuatro repos: cada repo de código tiene su `AGENTS.md` y los agentes leen el plan, el stack, las decisiones y la tarea de cada integrante antes de trabajar.
 
 ## Próximo paso
-- Invitar al equipo al repo https://github.com/pmpeloc/hcd.
-- Que cada uno haga el onboarding del [README](../../../README.md).
-- Crear los repos hcd_api, hcd_app y hcd_landing en GitHub y arrancar el programa Anchor en hcd_api.
+- Programa Anchor en `hcd_api`: esquema de las 5 PDAs y toolchain (WSL + Rust + Solana CLI + Anchor 1.2), según `docs/tareas/misael.md`.
 
 ## Bloqueos
 Ninguno.
