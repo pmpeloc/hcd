@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · chore(config): move API dev port to 3001
+- **Qué hice:** la API y la app usaban los dos el puerto 3000 y no podían correr a la vez. La API pasa a 3001 (`.env.example` y default de `main.ts`) y la app apunta a `http://localhost:3001`. Toqué archivos de Matías y Maximiliano con su aviso pendiente; decisión registrada en `decisiones.md`.
+- **Archivos clave:** `hcd_api/.env.example`, `hcd_api/src/main.ts`, `hcd_app/.env.example`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** completar las credenciales de Supabase, Helius y Privy en los `.env` locales; seguir con el programa Anchor.
+
 ## 2026-10-04 · chore(agents): add agent instruction files pointing to hcd rules
 - **Qué hice:** los repos de código no tenían `AGENTS.md`, y Codex y otros agentes buscan las reglas solo hasta la raíz del repo, así que no las veían. Copié la plantilla (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`) a `hcd_api`, `hcd_app` y `hcd_landing`. Además, `AGENTS.md` ahora pide leer `plan.md`, `stack.md`, `decisiones.md` y `docs/tareas/<slug>.md` antes de cada tarea; con eso el prompt de arranque se reduce a "Soy `<slug>`".
 - **Archivos clave:** `AGENTS.md`, `templates/code-repo/`, y en cada repo de código `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`.
