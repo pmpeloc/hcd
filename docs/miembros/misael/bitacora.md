@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · feat(program): implement config, provider and patient registration
+- **Qué hice:** cerré el esquema de las 5 PDAs (semillas como constantes `SEED`) e implementé `initialize_config` (solo la upgrade authority), `register_provider` (clínica o médico, nace sin verificar), `set_provider_verified` (solo admin; sirve para verificar y suspender) y `register_patient`. El rent lo paga un `payer` aparte, así el usuario no necesita SOL. 13 tests (positivos y negativos) con `node:test`, sin dependencias nuevas. `Anchor.toml` pasa a `localnet` por defecto: `anchor test` había desplegado en devnet por error; el deploy a devnet queda explícito (`npm run anchor:deploy`).
+- **Archivos clave:** `programs/hcd/src/instructions/`, `programs/hcd/src/state/`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `Anchor.toml`.
+- **Próximo paso:** las 6 instrucciones del ciclo del estudio y el IDL v0 (lunes 5).
+
 ## 2026-10-04 · build(program): sync program id and target Solana 3.1.10
 - **Qué hice:** instalé el toolchain en WSL (Rust, Solana CLI 3.1.10, Anchor 1.2.0 con avm) y dejé `anchor build` funcionando. `Anchor.toml` pedía Solana 1.18.26, que no entiende el formato de Anchor 1.2; lo pasé a 3.1.10 y saqué `registry`. `anchor keys sync` reemplazó el ID placeholder por el real (`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`). Versiono `Cargo.lock` para compilar todos con las mismas dependencias. En WSL hizo falta `options = "metadata"` en `/etc/wsl.conf` para compilar sobre `/mnt/c`.
 - **Archivos clave:** `hcd_api/Anchor.toml`, `hcd_api/programs/hcd/src/lib.rs`, `hcd_api/Cargo.lock`.

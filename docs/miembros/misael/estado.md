@@ -3,10 +3,11 @@
 **Última actualización:** 2026-10-04
 
 ## En qué estoy
-Programa `hcd` desplegado en devnet (`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`) con su IDL publicado on-chain. Entorno listo: `.env` de `hcd_api` y `hcd_app` completos y toolchain en WSL.
+Día 2 completo en la rama `feat/program-config-provider-patient`: esquema de las 5 PDAs cerrado (semillas como constantes) e implementadas `initialize_config`, `register_provider`, `set_provider_verified` y `register_patient`, con 13 tests pasando en validador local (`anchor test`).
 
 ## Próximo paso
-- Programa Anchor en `hcd_api`: esquema de las 5 PDAs, según `docs/tareas/misael.md`. Redeploy con `anchor build` + `anchor program deploy`.
+- Lunes 5: las 6 instrucciones del ciclo (`issue_record` → `log_access`) con tests negativos y publicar el IDL v0 a la noche.
+- Decidir con el equipo si `issue_record` exige la firma de `key_service` (recomiendo que sí).
 
 ## Bloqueos
 Ninguno.
