@@ -3,7 +3,7 @@
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
 ## 2026-10-04 · Program ID del programa `hcd` y Solana 3.1.10 · Misael
-- El programa usa el ID **`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`** (antes había un placeholder). Va en `PROGRAM_ID` (`hcd_api/.env`) y `NEXT_PUBLIC_PROGRAM_ID` (`hcd_app/.env`). Todavía no está desplegado en devnet.
+- El programa usa el ID **`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`** (antes había un placeholder). Va en `PROGRAM_ID` (`hcd_api/.env`) y `NEXT_PUBLIC_PROGRAM_ID` (`hcd_app/.env`). Desplegado en devnet el 2026-10-04; la upgrade authority es la wallet de desarrollo de Misael.
 - El toolchain del programa es **Anchor 1.2.0 + Solana CLI 3.1.10** (`Anchor.toml`). Solana 1.18 no compila con Anchor 1.2.
 
 ## 2026-10-04 · Puertos locales: API en 3001, app en 3000 · Misael
