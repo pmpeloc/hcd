@@ -29,6 +29,8 @@
 - Kickoff técnico: congelar cuentas y contratos con el equipo (Franco coordina).
 - `initialize_config` (admin, key_service, duración máxima de permisos), `register_provider` / `set_provider_verified` (solo admin verifica) y `register_patient` (con `next_record_id`), con sus primeros tests.
 
+> **Actualizado 2026-10-04:** las 6 instrucciones de los días 3 y 4 entran todas el **lunes 5**, con el IDL v0 esa noche (ver `decisiones.md`).
+
 ### Día 3 · lun 5/10 (ciclo del estudio)
 - `issue_record` (solo médico verificado; Record nace **Active**; guarda `content_hash`, `storage_ref`, `issuer`, `rent_payer`).
 - `dispute_record` (paciente: Active → Disputed) y `void_record` (emisor: Disputed → Voided; la reemisión es un Record nuevo con `supersedes`).
