@@ -2,6 +2,10 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-04 · Program ID del programa `hcd` y Solana 3.1.10 · Misael
+- El programa usa el ID **`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`** (antes había un placeholder). Va en `PROGRAM_ID` (`hcd_api/.env`) y `NEXT_PUBLIC_PROGRAM_ID` (`hcd_app/.env`). Todavía no está desplegado en devnet.
+- El toolchain del programa es **Anchor 1.2.0 + Solana CLI 3.1.10** (`Anchor.toml`). Solana 1.18 no compila con Anchor 1.2.
+
 ## 2026-10-04 · Puertos locales: API en 3001, app en 3000 · Misael
 `hcd_api` y `hcd_app` (`next dev`) usaban los dos el puerto 3000 y no podían correr a la vez. La API pasa a `PORT=3001`; la app queda en 3000 y apunta a `NEXT_PUBLIC_API_URL=http://localhost:3001`. `CORS_ORIGIN` de la API sigue en `http://localhost:3000`. Falta actualizar `hcd_api/.env.example` y el default de `src/main.ts` (Matías) y `hcd_app/.env.example` (Maximiliano).
 

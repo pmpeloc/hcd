@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · build(program): sync program id and target Solana 3.1.10
+- **Qué hice:** instalé el toolchain en WSL (Rust, Solana CLI 3.1.10, Anchor 1.2.0 con avm) y dejé `anchor build` funcionando. `Anchor.toml` pedía Solana 1.18.26, que no entiende el formato de Anchor 1.2; lo pasé a 3.1.10 y saqué `registry`. `anchor keys sync` reemplazó el ID placeholder por el real (`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`). Versiono `Cargo.lock` para compilar todos con las mismas dependencias. En WSL hizo falta `options = "metadata"` en `/etc/wsl.conf` para compilar sobre `/mnt/c`.
+- **Archivos clave:** `hcd_api/Anchor.toml`, `hcd_api/programs/hcd/src/lib.rs`, `hcd_api/Cargo.lock`.
+- **Próximo paso:** cargar SOL de devnet en mi wallet de desarrollo y hacer `anchor deploy`; después, el esquema de las 5 PDAs.
+
 ## 2026-10-04 · chore(deps): prune extraneous entries from package-lock
 - **Qué hice:** npm quitó del `package-lock.json` entradas `extraneous` (dependencias anidadas sin uso, p. ej. copias de `typescript` y `zod`). No cambia ninguna versión instalada.
 - **Archivos clave:** `hcd_api/package-lock.json`, `hcd_app/package-lock.json`.
