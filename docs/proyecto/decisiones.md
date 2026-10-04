@@ -2,6 +2,13 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-04 · Programa: calendario, re-otorgar permisos y cuentas pagadas por el sponsor · Misael
+- **Las 6 instrucciones del ciclo** (`issue_record`, `dispute_record`, `void_record`, `grant_access`, `revoke_access`, `log_access`) entran el **lunes 5**, con el IDL v0 esa noche, como dice el plan de Franco (`Plan_Completo_Salua.pdf`). Deploy con tests negativos el martes 6.
+- **Re-otorgar un permiso revocado o vencido:** se reactiva el **mismo** AccessGrant (`["grant", record, doctor]`) con un vencimiento nuevo; `access_count` sigue sumando. Sin esto, un paciente no podía volver a darle acceso al mismo médico, porque la cuenta revocada no se cierra.
+- **`register_provider` y `register_patient` tienen un `payer` aparte del `authority`:** el fee payer del backend paga el rent y el usuario solo firma, así nunca necesita SOL.
+- **`initialize_config` solo lo puede llamar la upgrade authority del programa**, para que nadie se adelante después del deploy y se quede con el rol de admin.
+- **Pendiente:** exigir la firma de `key_service` en `issue_record` para cerrar el hueco de carga. Misael recomienda que sí; hay que decidirlo antes del IDL v0.
+
 ## 2026-10-04 · Program ID del programa `hcd` y Solana 3.1.10 · Misael
 - El programa usa el ID **`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`** (antes había un placeholder). Va en `PROGRAM_ID` (`hcd_api/.env`) y `NEXT_PUBLIC_PROGRAM_ID` (`hcd_app/.env`). Desplegado en devnet el 2026-10-04; la upgrade authority es la wallet de desarrollo de Misael.
 - El toolchain del programa es **Anchor 1.2.0 + Solana CLI 3.1.10** (`Anchor.toml`). Solana 1.18 no compila con Anchor 1.2.
