@@ -2,6 +2,9 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-04 · Puertos locales: API en 3001, app en 3000 · Misael
+`hcd_api` y `hcd_app` (`next dev`) usaban los dos el puerto 3000 y no podían correr a la vez. La API pasa a `PORT=3001`; la app queda en 3000 y apunta a `NEXT_PUBLIC_API_URL=http://localhost:3001`. `CORS_ORIGIN` de la API sigue en `http://localhost:3000`. Falta actualizar `hcd_api/.env.example` y el default de `src/main.ts` (Matías) y `hcd_app/.env.example` (Maximiliano).
+
 ## 2026-10-03 · Login con Supabase Auth, wallet con Privy y aislamiento con RLS · Misael
 - **Supabase Auth** hace el login (email y Google). **Privy** solo crea y maneja la wallet embebida de Solana, aceptando el token de Supabase (modo "custom auth").
 - Así Supabase reconoce al usuario y **RLS aísla los datos entre organizaciones** con una tabla `app_user` y `get_my_organization_id()`. El backend lee con un cliente por request con el token del usuario y solo él escribe.
