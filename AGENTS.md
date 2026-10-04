@@ -15,6 +15,7 @@ HCD is a patient-owned electronic health record on Solana, built by a team of fi
 
 - The code repos are **always cloned inside the `hcd` folder**. `hcd` ignores them in its `.gitignore`.
 - These rules apply to **all four repos**. Each code repo has a short `AGENTS.md` pointing here.
+- Code repos get their agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`) from [`templates/code-repo/`](templates/code-repo/).
 - **Stack:** [`docs/proyecto/stack.md`](docs/proyecto/stack.md). Don't add a library outside it without recording the decision in `docs/proyecto/decisiones.md`. Package manager: **npm** only.
 
 ## 1. Language
@@ -33,8 +34,9 @@ HCD is a patient-owned electronic health record on Solana, built by a team of fi
 
 Read, in this order:
 1. [`docs/README.md`](docs/README.md)
-2. [`docs/proyecto/`](docs/proyecto/): vision, architecture, research and decisions
-3. The current member's `docs/miembros/<slug>/estado.md`
+2. [`docs/proyecto/plan.md`](docs/proyecto/plan.md), [`stack.md`](docs/proyecto/stack.md) and [`decisiones.md`](docs/proyecto/decisiones.md); the rest of [`docs/proyecto/`](docs/proyecto/) when the task needs it
+3. `docs/tareas/<slug>.md`: the member's work plan and the files they own. Don't touch files owned by other members.
+4. The current member's `docs/miembros/<slug>/estado.md`
 
 ## 4. Documentation on every commit (mandatory)
 

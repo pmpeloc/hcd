@@ -8,4 +8,6 @@ This repository is part of **HCD · Historial Clínico Digital**. All rules are 
 Read it before doing anything. In short:
 - Code, comments and commit messages in English (Conventional Commits). Only `hcd/docs/` is in Spanish.
 - Before every commit, update `../docs/miembros/<member>/bitacora.md` and `estado.md` (member = `git config hcd.member` in `hcd`), then commit and push the `hcd` repo too.
+- Before starting a task, read `../docs/proyecto/plan.md`, `stack.md`, `decisiones.md` and `../docs/tareas/<member>.md` (your work plan and the files you own).
 - Stack: `../docs/proyecto/stack.md`. Package manager: npm.
+- No medical data on-chain, not even encrypted.

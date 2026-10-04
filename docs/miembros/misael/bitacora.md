@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · chore(agents): add agent instruction files pointing to hcd rules
+- **Qué hice:** los repos de código no tenían `AGENTS.md`, y Codex y otros agentes buscan las reglas solo hasta la raíz del repo, así que no las veían. Copié la plantilla (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`) a `hcd_api`, `hcd_app` y `hcd_landing`. Además, `AGENTS.md` ahora pide leer `plan.md`, `stack.md`, `decisiones.md` y `docs/tareas/<slug>.md` antes de cada tarea; con eso el prompt de arranque se reduce a "Soy `<slug>`".
+- **Archivos clave:** `AGENTS.md`, `templates/code-repo/`, y en cada repo de código `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`.
+- **Próximo paso:** arrancar el esquema de cuentas del programa Anchor (`docs/tareas/misael.md`, día 1).
+
 ## 2026-10-03 · docs: use Supabase Auth for login, Privy for wallets and RLS per organization
 - **Qué hice:** decidimos que el login lo haga Supabase Auth y que Privy solo cree la wallet (modo "custom auth"), para poder aislar organizaciones con RLS. Documenté el patrón multi-organización completo en `stack.md` (guard con `getClaims`, cliente por request con el token del usuario, `app_user` + `get_my_organization_id()`, solo el backend escribe, cuidado con las RPC `security definer`, tests con pgTAP), sin depender de conocer otros proyectos. Confirmado: solo Privy, no Cavos.
 - **Archivos clave:** `docs/proyecto/stack.md`, `decisiones.md`, `plan.md`, `arquitectura.md`.
