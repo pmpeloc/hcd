@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-04 · style(demo): center sidebar brand and nav, align mobile logo
+- **Qué hice:** centré el bloque de marca de la sidebar (logo, tagline, etiqueta de rol), los ítems de navegación y la nota de privacidad; corregí la alineación vertical del logo móvil y ajusté el recorte para que muestre solo el isotipo.
+- **Archivos clave:** `demo/styles.css`.
+- **Próximo paso:** ensayo final del guion bilingüe.
+
 ## 2026-10-04 · style(demo): bump all font sizes one more step
 - **Qué hice:** segundo aumento de la escala tipográfica del demo (base 16→18px, textos chicos +2px más). Feedback de Misael: las fuentes seguían chicas para presentar. Sin overflow verificado en mobile y desktop.
 - **Archivos clave:** `demo/styles.css`.
