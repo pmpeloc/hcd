@@ -7,7 +7,7 @@ Día 2 completo en la rama `feat/program-config-provider-patient`: esquema de la
 
 ## Próximo paso
 - Lunes 5: las 6 instrucciones del ciclo (`issue_record` → `log_access`) con tests negativos y publicar el IDL v0 a la noche.
-- Decidir con el equipo si `issue_record` exige la firma de `key_service` (recomiendo que sí).
+- `issue_record` con doble firma (médico + `key_service`), decidido el 2026-10-04.
 
 ## Bloqueos
 Ninguno.
