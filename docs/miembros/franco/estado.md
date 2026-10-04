@@ -1,13 +1,14 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-03 (cargado por Misael a partir del relevamiento de Franco)
+**Última actualización:** 2026-10-03
 
 ## En qué estoy
-Diseño del programa Anchor: quién paga los fees de red, wallet (Privy vs Cavos), antifalsificación de estudios y roles. Ver el [relevamiento](relevamientos/2026-10-03-fees-wallet-antifalsificacion.md).
+Dejé andando la base de los tres repos de código: `hcd_api` (NestJS + esqueleto Anchor + migración con RLS), `hcd_app` (Next.js con rutas por rol y `lib/crypto/` con WebCrypto) y `hcd_landing` (export estático). Builds verificados. Antes: tareas individuales en `docs/tareas/` y coordinación de la preselección.
 
 ## Próximo paso
-- Empezar el programa Anchor (en Solana Playground mientras instala el toolchain local).
-- Las propuestas de roles y estados del estudio fueron aceptadas: implementarlas en el programa.
+- Enviar los pasos 3 y 4 de la preselección antes del domingo 4/10 a las 13:00.
+- Kickoff técnico del domingo: congelar cuentas del programa y contratos de API.
+- Diseño del servicio de llaves y spec del módulo tx (lunes 5).
 
 ## Bloqueos
-- Le falta el toolchain local: WSL, Rust, Solana CLI, Anchor y pnpm.
+- Los formularios de los pasos 3 y 4 hay que leerlos hoy para saber qué piden exactamente.
