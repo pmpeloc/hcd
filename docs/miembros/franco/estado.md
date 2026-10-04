@@ -3,7 +3,7 @@
 **Última actualización:** 2026-10-03
 
 ## En qué estoy
-Coordinación de la preselección (formularios 3 y 4, renombrado a Salua) y organización del trabajo: documenté las tareas individuales del equipo en `docs/tareas/` (plan día por día, entregables y DoD). Mis responsabilidades de código: `hcd_api/src/keys/`, `src/tx/` y `hcd_app/lib/crypto/`.
+Dejé andando la base de los tres repos de código: `hcd_api` (NestJS + esqueleto Anchor + migración con RLS), `hcd_app` (Next.js con rutas por rol y `lib/crypto/` con WebCrypto) y `hcd_landing` (export estático). Builds verificados. Antes: tareas individuales en `docs/tareas/` y coordinación de la preselección.
 
 ## Próximo paso
 - Enviar los pasos 3 y 4 de la preselección antes del domingo 4/10 a las 13:00.
