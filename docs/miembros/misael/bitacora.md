@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(agents): require PR approval on main and staging
+- **Qué hice:** copié la plantilla actualizada de `AGENTS.md` en `hcd_api`, `hcd_app` y `hcd_landing`: suma la regla de trabajar en una rama desde `staging` y mergear por PR con 1 aprobación de otro integrante. Un PR por repo.
+- **Archivos clave:** `AGENTS.md` de `hcd_api`, `hcd_app` y `hcd_landing`.
+- **Próximo paso:** que alguien del equipo apruebe los PRs; redeploy del programa en devnet.
+
 ## 2026-10-05 · docs(rules): require PR approval on main and staging
 - **Qué hice:** creé en GitHub un ruleset en los 4 repos que protege `main` y `staging`: solo se entra por PR con 1 aprobación de otro integrante, sin excepciones (tampoco el dueño), y sin push directo, force push ni borrado. Lo documenté en `AGENTS.md` (sección 6), en la plantilla de los repos de código y en `decisiones.md`.
 - **Archivos clave:** `AGENTS.md`, `templates/code-repo/AGENTS.md`, `docs/proyecto/decisiones.md`.
