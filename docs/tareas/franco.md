@@ -11,11 +11,11 @@ Para no pisarse con el resto, vos tocas esto y nadie más:
 - `hcd_api/src/keys/` — servicio de llaves: envoltura de DEK, endpoint `/keys/release`.
 - `hcd_api/src/tx/` — armado, verificación byte a byte y co-firma de transacciones; fee payer y sus límites.
 - `hcd_app/lib/crypto/` — AES-256-GCM, SHA-256 y utilidades de cifrado/descifrado en el navegador.
-- Integración entre el cliente Codama, la API y la app (junto a Maximiliano en `lib/hcd-client/`).
+- Integración entre el cliente Codama, la API y la app (junto a Matías en `lib/hcd-client/`).
 - `hcd/README.md` (con Rodrigo), `docs/proyecto/decisiones.md`, `.githooks/`.
 - Revisión cruzada del programa Anchor de Misael (no escribís el programa, lo revisás).
 
-**No tocar:** `programs/`, `tests/`, `idl/` (Misael); `supabase/`, `src/auth|organizations|records|access|indexer` (Matías); pantallas y componentes de `hcd_app` (Maximiliano); `pitch/`, `demo/`, landing (Rodrigo).
+**No tocar:** `programs/`, `tests/`, `idl/` (Misael); `supabase/`, `src/auth|organizations|records|access|indexer` (Matías); pantallas y componentes de `hcd_app` (Maximiliano: `(paciente)`, `(medico)`, `components/`; Matías: `(auth)`, `(clinica)`, `(admin)`, `lib/api|supabase|privy|schemas|hcd-client`, PWA); `pitch/`, `demo/`, landing (Rodrigo).
 
 ## Plan día por día
 
@@ -47,7 +47,7 @@ Calendario: Día 1 = sáb 3/10 → Día 10 = lun 12/10. Puertas de control en [P
 ### Día 6 · jue 8/10 (servicio de llaves v0)
 - `src/keys/`: guardar la DEK envuelta (nunca en claro), `/keys/release` que lee el Record y el AccessGrant en Solana y entrega DEK + URL firmada de 60 s solo si corresponde (paciente, emisor o grant vigente).
 - Cada entrega llama a `log_access` (keypair `key_service`, distinto del fee payer) y escribe en `key_releases`.
-- Generar el cliente Codama desde `hcd_api/idl/` para la API y ayudar a Maximiliano con el de la app.
+- Generar el cliente Codama desde `hcd_api/idl/` para la API y ayudar a Matías con el de la app.
 
 ### Día 7 · vie 9/10 (integración de punta a punta) — puerta G4
 - Visor: verificación del hash contra el on-chain antes de descifrar; si no coincide, "Estudio alterado".
