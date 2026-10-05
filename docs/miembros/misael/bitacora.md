@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(rules): require PR approval on main and staging
+- **Qué hice:** creé en GitHub un ruleset en los 4 repos que protege `main` y `staging`: solo se entra por PR con 1 aprobación de otro integrante, sin excepciones (tampoco el dueño), y sin push directo, force push ni borrado. Lo documenté en `AGENTS.md` (sección 6), en la plantilla de los repos de código y en `decisiones.md`.
+- **Archivos clave:** `AGENTS.md`, `templates/code-repo/AGENTS.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** avisar al equipo del flujo nuevo; redeploy del programa en devnet.
+
 ## 2026-10-05 · feat(program): implement access grants and publish IDL v0
 - **Qué hice:** `grant_access` (paciente; solo a médico verificado; Record Active; vencimiento futuro y dentro del máximo contra `Clock`; re-otorgar reactiva la misma cuenta con `init_if_needed` y conserva `access_count`), `revoke_access` (paciente; Revoked sin cerrar) y `log_access` (solo `key_service`; grant Active y vigente, estudio no disputado ni anulado y médico todavía verificado). Las 9 instrucciones quedan completas, 43 tests pasando, y publiqué el IDL v0 en `idl/hcd.json`. Saqué el error `Unimplemented`.
 - **Archivos clave:** `programs/hcd/src/instructions/{grant_access,revoke_access,log_access}.rs`, `programs/hcd/Cargo.toml`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `idl/hcd.json`.
