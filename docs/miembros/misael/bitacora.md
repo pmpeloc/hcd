@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · test(program): run the suite against devnet
+- **Qué hice:** `npm run anchor:test:devnet` corre la misma suite contra el programa desplegado, sin redeploy. En devnet saltea los tests que crean la Config (ya existe), firma con la `key_service` real (`KEY_SERVICE_SECRET` del `.env`), usa el RPC de `SOLANA_RPC_URL` (con chequeo de que sea devnet) y fondea con transferencias en vez de airdrop. Sumé el caso "médico verificado sin permiso". En el camino aparecieron dos problemas de devnet: dos `log_access` idénticos se deduplican en la red (lo resolví en los tests y lo dejé como propuesta para Franco en `ideas.md`) y el test del permiso vencido tenía un margen de 2 s más chico que el desfase del reloj. Resultado: 44/44 en local y 3 corridas seguidas en devnet con 42 OK, 0 fallas y 3 salteados (~0,07 SOL por corrida).
+- **Archivos clave:** `hcd_api/tests/hcd.test.mts`, `hcd_api/package.json`, `hcd_api/README.md`, `docs/miembros/misael/ideas.md`.
+- **Próximo paso:** script de admin para verificar prestadores (`set_provider_verified`).
+
 ## 2026-10-05 · feat(scripts): add initialize-config script and set up devnet config
 - **Qué hice:** script `scripts/initialize-config.mts` (recibe la pubkey de `key_service` y los días máximos; firma la upgrade authority; se niega a correr si la Config ya existe o si `key_service` es el admin). Lo corrí en devnet con la pubkey que pasó Franco y 7 días (tx `48ALdjywBEbLtFSkD6ZHEvPaFzbboXL2yWCXmgzk2fwWyp4tk6v4FmqbHjA793SA6LL1BKgox6rDL9mQUPnv2Sz6`). Antes verifiqué que la pubkey coincide con `KEY_SERVICE_SECRET` de mi `.env` local y no con el fee payer. Datos en el README y en `decisiones.md`.
 - **Archivos clave:** `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`, `docs/proyecto/decisiones.md`.
