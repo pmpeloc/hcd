@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(program): record devnet redeploy of the full program
+- **Qué hice:** redeploy en devnet del programa completo (9 instrucciones) desde `staging` (`4a58133`), mismo program id. El binario creció de 236 KB a 314 KB y se extendió solo; hizo falta cargar SOL de devnet por el faucet web porque el airdrop por CLI estaba limitado. Verifiqué que el binario on-chain es idéntico al compilado y que el IDL on-chain es igual a `idl/hcd.json`. En devnet todavía no hay cuentas: falta `initialize_config`. Documenté en el README el program id, la autoridad, el explorer y cuánto SOL pide un upgrade.
+- **Archivos clave:** `hcd_api/README.md`.
+- **Próximo paso:** `initialize_config` en devnet (necesito la pubkey de `key_service` de Franco) y tests negativos contra devnet.
+
 ## 2026-10-05 · docs(agents): require PR approval on main and staging
 - **Qué hice:** copié la plantilla actualizada de `AGENTS.md` en `hcd_api`, `hcd_app` y `hcd_landing`: suma la regla de trabajar en una rama desde `staging` y mergear por PR con 1 aprobación de otro integrante. Un PR por repo.
 - **Archivos clave:** `AGENTS.md` de `hcd_api`, `hcd_app` y `hcd_landing`.
