@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(tasks): split hcd_app between Maxi and Mati
+- **Qué hice:** redistribuí `hcd_app` porque toda la app estaba en una sola persona. Maxi se queda con lo que ve el jurado (`(paciente)`, `(medico)`, `components/`, marca y demo); Mati suma la plomería que empalma con su backend (`(auth)/login`, `(clinica)`, `(admin)`, `lib/api|supabase|privy|schemas|hcd-client`, guards y PWA). Actualicé los planes de ambos, `franco.md`, `equipo.md` y la decisión en `decisiones.md`.
+- **Archivos clave:** `docs/tareas/maximiliano.md`, `docs/tareas/matias.md`, `docs/tareas/franco.md`, `docs/proyecto/decisiones.md`, `docs/equipo.md`.
+- **Próximo paso:** avisar en el grupo antes de mergear; arrancar Día 1 (diseño del servicio de llaves + prueba Privy).
+
 ## 2026-10-04 · feat(demo): add real logo, ES/EN language switch and larger type
 - **Qué hice:** integré el logo oficial (`demo/assets/logo-salua.jpeg`) en sidebar, topbar móvil y favicon; subí toda la escala tipográfica (~+2-4px en textos chicos); agregué toggle ES/EN en la topbar con diccionario completo en `app.js` (~120 strings), persistencia en localStorage y locale de fechas. Log, notificaciones y panel on-chain se re-traducen al cambiar de idioma.
 - **Archivos clave:** `demo/app.js`, `demo/styles.css`, `demo/index.html`, `demo/assets/`.
