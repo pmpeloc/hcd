@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · feat(scripts): add initialize-config script and set up devnet config
+- **Qué hice:** script `scripts/initialize-config.mts` (recibe la pubkey de `key_service` y los días máximos; firma la upgrade authority; se niega a correr si la Config ya existe o si `key_service` es el admin). Lo corrí en devnet con la pubkey que pasó Franco y 7 días (tx `48ALdjywBEbLtFSkD6ZHEvPaFzbboXL2yWCXmgzk2fwWyp4tk6v4FmqbHjA793SA6LL1BKgox6rDL9mQUPnv2Sz6`). Antes verifiqué que la pubkey coincide con `KEY_SERVICE_SECRET` de mi `.env` local y no con el fee payer. Datos en el README y en `decisiones.md`.
+- **Archivos clave:** `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** tests negativos contra devnet (puerta G3).
+
 ## 2026-10-05 · chore(scripts): use anchor program deploy for devnet
 - **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL. Lo probé con un redeploy en devnet (tx `9YaFMRhMEsGgJrxxA6H1Uh99D2MUazmMnPsLkqJcUrdWATzWkCjNt3nzBReincYHmzQ7S4WpQ4ATzdnDBRX88xe`): costó ~0,002 SOL porque el buffer se devuelve, y el binario y el IDL on-chain siguen iguales al repo.
 - **Archivos clave:** `hcd_api/package.json`.
