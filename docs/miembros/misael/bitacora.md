@@ -3,7 +3,7 @@
 Una entrada por commit, la más nueva arriba.
 
 ## 2026-10-05 · chore(scripts): use anchor program deploy for devnet
-- **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL; no lo volví a correr para no gastar SOL en un redeploy idéntico.
+- **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL. Lo probé con un redeploy en devnet (tx `9YaFMRhMEsGgJrxxA6H1Uh99D2MUazmMnPsLkqJcUrdWATzWkCjNt3nzBReincYHmzQ7S4WpQ4ATzdnDBRX88xe`): costó ~0,002 SOL porque el buffer se devuelve, y el binario y el IDL on-chain siguen iguales al repo.
 - **Archivos clave:** `hcd_api/package.json`.
 - **Próximo paso:** `initialize_config` en devnet cuando Franco pase la pubkey de `key_service`.
 
