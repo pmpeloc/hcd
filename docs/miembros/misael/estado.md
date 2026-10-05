@@ -3,12 +3,12 @@
 **Última actualización:** 2026-10-05
 
 ## En qué estoy
-Rama `feat/program-config-provider-patient`: además de config, provider y patient, ya están `issue_record` (doble firma médico + `key_service`, reemisión con `superseded_record`), `dispute_record` y `void_record`. 29 tests pasando en validador local (`anchor test`).
+Las 9 instrucciones del programa están implementadas en la rama `feat/program-config-provider-patient` (43 tests pasando en local) y el IDL v0 está publicado en `hcd_api/idl/hcd.json` (puerta G2).
 
 ## Próximo paso
-- Hoy: `grant_access`, `revoke_access` y `log_access` con tests negativos.
-- Publicar el IDL v0 (`idl/hcd.json`) esta noche y avisar al grupo.
-- Aviso a Franco (`tx`): `issue_record` lleva las cuentas `payer`, `issuer`, `keyService` y opcional `supersededRecord`.
+- Avisar al grupo del IDL v0 para que regeneren clientes; las cuentas que pasa el backend están en `decisiones.md` (2026-10-05).
+- PR a `main` con revisión de Franco.
+- Redeploy en devnet y tests negativos contra devnet (puerta G3).
 
 ## Bloqueos
 Ninguno.

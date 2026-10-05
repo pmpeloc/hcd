@@ -2,6 +2,11 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · Programa: permisos solo a médicos verificados y suspensión inmediata · Misael
+- **`grant_access` solo acepta como destinatario a un médico verificado** (no clínicas ni wallets sueltas).
+- **`log_access` vuelve a chequear que el médico siga verificado y que el estudio no esté disputado ni anulado.** Suspender a un prestador con `set_provider_verified(false)` corta el acceso al instante, sin tener que revocar permiso por permiso. Impacto para el servicio de llaves (Franco): si `log_access` falla, no entregar la DEK.
+- **Cuentas que pasa el backend:** `issue_record` (`payer`, `issuer`, `keyService`, opcional `supersededRecord`), `grant_access` (`payer`, `patient`, `record`, `doctorProvider`, `grant`), `log_access` (`keyService`, `grant`, `record`, `doctorProvider`). Detalle en `hcd_api/idl/hcd.json`.
+
 ## 2026-10-04 · Programa: calendario, re-otorgar permisos y cuentas pagadas por el sponsor · Misael
 - **Las 6 instrucciones del ciclo** (`issue_record`, `dispute_record`, `void_record`, `grant_access`, `revoke_access`, `log_access`) entran el **lunes 5**, con el IDL v0 esa noche, como dice el plan de Franco (`Plan_Completo_Salua.pdf`). Deploy con tests negativos el martes 6.
 - **Re-otorgar un permiso revocado o vencido:** se reactiva el **mismo** AccessGrant (`["grant", record, doctor]`) con un vencimiento nuevo; `access_count` sigue sumando. Sin esto, un paciente no podía volver a darle acceso al mismo médico, porque la cuenta revocada no se cierra.
