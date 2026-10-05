@@ -46,8 +46,8 @@ formato legado de esa key en particular, no del signing del proyecto.)
 ## Pasos para Mati (plan A)
 
 1. ~~Supabase: verificar JWKS~~ — ya verificado, firma ES256 activa; no hay que rotar nada.
-2. Privy dashboard (app `cmutcaaq...`, la del `.env`): Integrations > Plugins → pedir Custom Auth;
-   luego User management > Authentication > JWT-based auth: origen **client-side**, JWKS URL
+2. ~~Privy dashboard: pedir Custom Auth~~ — **ya hecho por Misael (5/10)**. Configurar en
+   User management > Authentication > JWT-based auth: origen **client-side**, JWKS URL
    `$SUPABASE_URL/auth/v1/.well-known/jwks.json`, claim de usuario **`sub`**.
 3. `hcd_app/.env`: `NEXT_PUBLIC_PRIVY_APP_ID` (el mismo app id) — el secret solo va en la API.
 4. Config del provider (`lib/privy.ts`): `SupabaseProvider` afuera, `PrivyProvider` adentro, y un
