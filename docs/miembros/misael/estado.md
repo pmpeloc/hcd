@@ -3,11 +3,11 @@
 **Última actualización:** 2026-10-05
 
 ## En qué estoy
-Programa completo (9 instrucciones, 43 tests) e IDL v0 mergeados a `staging`. `main` y `staging` quedaron protegidas en los 4 repos: todo entra por PR con 1 aprobación de otro integrante.
+Puerta G3 cumplida: programa completo desplegado y configurado en devnet (`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`), y la suite completa pasa contra devnet (`npm run anchor:test:devnet`: 42 OK, 3 salteados, estable en 3 corridas seguidas).
 
 ## Próximo paso
-- Avisar al equipo del flujo con PR obligatorio (también para los docs de `hcd`).
-- Redeploy en devnet y tests negativos contra devnet (puerta G3).
+- Script de admin para verificar prestadores (`set_provider_verified`).
+- Avisar a Franco que cada `log_access` tiene que ser una transacción única (ver `ideas.md`).
 
 ## Bloqueos
 Ninguno.

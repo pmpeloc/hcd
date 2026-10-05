@@ -2,6 +2,26 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · test(program): run the suite against devnet
+- **Qué hice:** `npm run anchor:test:devnet` corre la misma suite contra el programa desplegado, sin redeploy. En devnet saltea los tests que crean la Config (ya existe), firma con la `key_service` real (`KEY_SERVICE_SECRET` del `.env`), usa el RPC de `SOLANA_RPC_URL` (con chequeo de que sea devnet) y fondea con transferencias en vez de airdrop. Sumé el caso "médico verificado sin permiso". En el camino aparecieron dos problemas de devnet: dos `log_access` idénticos se deduplican en la red (lo resolví en los tests y lo dejé como propuesta para Franco en `ideas.md`) y el test del permiso vencido tenía un margen de 2 s más chico que el desfase del reloj. Resultado: 44/44 en local y 3 corridas seguidas en devnet con 42 OK, 0 fallas y 3 salteados (~0,07 SOL por corrida).
+- **Archivos clave:** `hcd_api/tests/hcd.test.mts`, `hcd_api/package.json`, `hcd_api/README.md`, `docs/miembros/misael/ideas.md`.
+- **Próximo paso:** script de admin para verificar prestadores (`set_provider_verified`).
+
+## 2026-10-05 · feat(scripts): add initialize-config script and set up devnet config
+- **Qué hice:** script `scripts/initialize-config.mts` (recibe la pubkey de `key_service` y los días máximos; firma la upgrade authority; se niega a correr si la Config ya existe o si `key_service` es el admin). Lo corrí en devnet con la pubkey que pasó Franco y 7 días (tx `48ALdjywBEbLtFSkD6ZHEvPaFzbboXL2yWCXmgzk2fwWyp4tk6v4FmqbHjA793SA6LL1BKgox6rDL9mQUPnv2Sz6`). Antes verifiqué que la pubkey coincide con `KEY_SERVICE_SECRET` de mi `.env` local y no con el fee payer. Datos en el README y en `decisiones.md`.
+- **Archivos clave:** `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** tests negativos contra devnet (puerta G3).
+
+## 2026-10-05 · chore(scripts): use anchor program deploy for devnet
+- **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL. Lo probé con un redeploy en devnet (tx `9YaFMRhMEsGgJrxxA6H1Uh99D2MUazmMnPsLkqJcUrdWATzWkCjNt3nzBReincYHmzQ7S4WpQ4ATzdnDBRX88xe`): costó ~0,002 SOL porque el buffer se devuelve, y el binario y el IDL on-chain siguen iguales al repo.
+- **Archivos clave:** `hcd_api/package.json`.
+- **Próximo paso:** `initialize_config` en devnet cuando Franco pase la pubkey de `key_service`.
+
+## 2026-10-05 · docs(program): record devnet redeploy of the full program
+- **Qué hice:** redeploy en devnet del programa completo (9 instrucciones) desde `staging` (`4a58133`), mismo program id. El binario creció de 236 KB a 314 KB y se extendió solo; hizo falta cargar SOL de devnet por el faucet web porque el airdrop por CLI estaba limitado. Verifiqué que el binario on-chain es idéntico al compilado y que el IDL on-chain es igual a `idl/hcd.json`. En devnet todavía no hay cuentas: falta `initialize_config`. Documenté en el README el program id, la autoridad, el explorer y cuánto SOL pide un upgrade.
+- **Archivos clave:** `hcd_api/README.md`.
+- **Próximo paso:** `initialize_config` en devnet (necesito la pubkey de `key_service` de Franco) y tests negativos contra devnet.
+
 ## 2026-10-05 · docs(agents): require PR approval on main and staging
 - **Qué hice:** copié la plantilla actualizada de `AGENTS.md` en `hcd_api`, `hcd_app` y `hcd_landing`: suma la regla de trabajar en una rama desde `staging` y mergear por PR con 1 aprobación de otro integrante. Un PR por repo.
 - **Archivos clave:** `AGENTS.md` de `hcd_api`, `hcd_app` y `hcd_landing`.

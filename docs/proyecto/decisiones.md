@@ -2,6 +2,12 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · Config del programa en devnet · Franco y Misael
+- **`key_service`:** `DmiHb7zTyWhaLtRCXhCTNkM8Ga1G2S36XzCUx1GUH4yG`, la del `.env` definitivo del backend. Es distinta del fee payer.
+- **Duración máxima de un permiso:** 7 días (604800 s).
+- **Admin:** la upgrade authority del programa (`6AdUWfFLkpBCHNSsnCLKbEPB8khvGcnFHZczx6zjTdiQ`, wallet de Misael).
+- Config PDA: `7tChRt4bpCXD8PAsREFpW82i4qrxZwXnfqYYmv2p1EZA`. **No se puede cambiar** sin agregar una instrucción nueva al programa. Si se rota `key_service`, hay que sumar esa instrucción primero.
+
 ## 2026-10-05 · `main` y `staging` protegidas: todo entra por PR con aprobación · Misael
 - En los 4 repos (`hcd`, `hcd_api`, `hcd_app`, `hcd_landing`) hay un ruleset de GitHub ("Require approval on main and staging") sobre `main` y `staging`: no se puede hacer push directo, force push ni borrar la rama.
 - Todo entra por PR con **1 aprobación de otro integrante**. Nadie está exento, tampoco el dueño de los repos.
