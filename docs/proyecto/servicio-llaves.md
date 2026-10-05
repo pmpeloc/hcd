@@ -94,7 +94,7 @@ Negativos:
 
 ## 8. Puntos abiertos (para discutir)
 
-1. `log_access` no puede registrar entregas a paciente/emisor (exige un grant de médico). ¿Aceptamos que esas entregas queden solo en `key_releases`, o Misael agrega una instrucción tipo `log_self_access`?
-2. `app_user` no tiene `wallet_pubkey` del paciente y se necesita para comparar contra `Record.patient`. Propuesta: columna `wallet_pubkey text` en `app_user`.
-3. Dueño de `GET /audit/:recordId` (§1).
+1. ~~`log_access` no puede registrar entregas a paciente/emisor~~ — **resuelto** ([decisión 2026-10-05](decisiones.md)): auditoría on-chain solo de accesos de terceros; paciente y emisor quedan solo en `key_releases`.
+2. `app_user` no tiene `wallet_pubkey` del paciente y se necesita para comparar contra `Record.patient`. Propuesta: columna `wallet_pubkey text` en `app_user` (Mati).
+3. Dueño de `GET /audit/:recordId` (§1) — propuesta: indexer de Mati.
 4. Reintentos de las `pending`: worker con backoff o reintento lazy en el próximo release.

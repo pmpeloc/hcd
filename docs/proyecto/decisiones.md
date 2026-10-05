@@ -2,6 +2,12 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · Auditoría on-chain solo de accesos de terceros · Franco y Misael
+- **`log_access` registra solo los accesos de médicos con permiso.** No se agrega `log_self_access`: la auditoría on-chain existe para mostrarle al paciente quién **más** accedió a sus datos.
+- Las lecturas del **propio paciente** no se registran on-chain: no aportan a la auditoría y costarían una transacción por lectura.
+- Las relecturas del **emisor** quedan solo en `key_releases` (Supabase), que el servicio de llaves escribe en cada entrega.
+- Si más adelante queremos al emisor on-chain: `log_issuer_access` (firma solo `key_service` y solo emite un evento). Es un cambio aditivo, no rompe el IDL.
+
 ## 2026-10-05 · Programa: permisos solo a médicos verificados y suspensión inmediata · Misael
 - **`grant_access` solo acepta como destinatario a un médico verificado** (no clínicas ni wallets sueltas).
 - **`log_access` vuelve a chequear que el médico siga verificado y que el estudio no esté disputado ni anulado.** Suspender a un prestador con `set_provider_verified(false)` corta el acceso al instante, sin tener que revocar permiso por permiso. Impacto para el servicio de llaves (Franco): si `log_access` falla, no entregar la DEK.
