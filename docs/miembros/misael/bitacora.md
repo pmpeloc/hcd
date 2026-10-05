@@ -2,6 +2,16 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · feat(program): implement access grants and publish IDL v0
+- **Qué hice:** `grant_access` (paciente; solo a médico verificado; Record Active; vencimiento futuro y dentro del máximo contra `Clock`; re-otorgar reactiva la misma cuenta con `init_if_needed` y conserva `access_count`), `revoke_access` (paciente; Revoked sin cerrar) y `log_access` (solo `key_service`; grant Active y vigente, estudio no disputado ni anulado y médico todavía verificado). Las 9 instrucciones quedan completas, 43 tests pasando, y publiqué el IDL v0 en `idl/hcd.json`. Saqué el error `Unimplemented`.
+- **Archivos clave:** `programs/hcd/src/instructions/{grant_access,revoke_access,log_access}.rs`, `programs/hcd/Cargo.toml`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `idl/hcd.json`.
+- **Próximo paso:** avisar al grupo del IDL v0, abrir PR a `main` para revisión de Franco y deploy en devnet.
+
+## 2026-10-05 · feat(program): implement issue, dispute and void record
+- **Qué hice:** `issue_record` exige la firma del médico verificado (no clínica) y la co-firma de `key_service`; usa `next_record_id` como semilla, guarda `rent_payer` y acepta un `superseded_record` opcional (debe estar Voided, mismo paciente y emisor) para la reemisión. `dispute_record` (paciente: Active → Disputed) y `void_record` (emisor: Disputed → Voided; un emisor suspendido igual puede anular). Emiten sus eventos. Errores nuevos: `NotADoctor`, `InvalidStorageRef`, `RecordNotVoided`, `RecordNotDisputed`. 29 tests pasando en local.
+- **Archivos clave:** `programs/hcd/src/instructions/{issue_record,dispute_record,void_record}.rs`, `programs/hcd/src/errors.rs`, `programs/hcd/src/state/record.rs`, `tests/hcd.test.mts`.
+- **Próximo paso:** `grant_access`, `revoke_access` y `log_access`; publicar el IDL v0 esta noche.
+
 ## 2026-10-04 · feat(program): implement config, provider and patient registration
 - **Qué hice:** cerré el esquema de las 5 PDAs (semillas como constantes `SEED`) e implementé `initialize_config` (solo la upgrade authority), `register_provider` (clínica o médico, nace sin verificar), `set_provider_verified` (solo admin; sirve para verificar y suspender) y `register_patient`. El rent lo paga un `payer` aparte, así el usuario no necesita SOL. 13 tests (positivos y negativos) con `node:test`, sin dependencias nuevas. `Anchor.toml` pasa a `localnet` por defecto: `anchor test` había desplegado en devnet por error; el deploy a devnet queda explícito (`npm run anchor:deploy`).
 - **Archivos clave:** `programs/hcd/src/instructions/`, `programs/hcd/src/state/`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `Anchor.toml`.

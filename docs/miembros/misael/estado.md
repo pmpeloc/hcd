@@ -1,13 +1,14 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-04
+**Última actualización:** 2026-10-05
 
 ## En qué estoy
-Día 2 completo en la rama `feat/program-config-provider-patient`: esquema de las 5 PDAs cerrado (semillas como constantes) e implementadas `initialize_config`, `register_provider`, `set_provider_verified` y `register_patient`, con 13 tests pasando en validador local (`anchor test`).
+Las 9 instrucciones del programa están implementadas en la rama `feat/program-config-provider-patient` (43 tests pasando en local) y el IDL v0 está publicado en `hcd_api/idl/hcd.json` (puerta G2).
 
 ## Próximo paso
-- Lunes 5: las 6 instrucciones del ciclo (`issue_record` → `log_access`) con tests negativos y publicar el IDL v0 a la noche.
-- `issue_record` con doble firma (médico + `key_service`), decidido el 2026-10-04.
+- Avisar al grupo del IDL v0 para que regeneren clientes; las cuentas que pasa el backend están en `decisiones.md` (2026-10-05).
+- PR a `main` con revisión de Franco.
+- Redeploy en devnet y tests negativos contra devnet (puerta G3).
 
 ## Bloqueos
 Ninguno.

@@ -2,6 +2,10 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · Programa: permisos solo a médicos verificados y suspensión inmediata · Misael
+- **`grant_access` solo acepta como destinatario a un médico verificado** (no clínicas ni wallets sueltas).
+- **`log_access` vuelve a chequear que el médico siga verificado y que el estudio no esté disputado ni anulado.** Suspender a un prestador con `set_provider_verified(false)` corta el acceso al instante, sin tener que revocar permiso por permiso. Impacto para el servicio de llaves (Franco): si `log_access` falla, no entregar la DEK.
+- **Cuentas que pasa el backend:** `issue_record` (`payer`, `issuer`, `keyService`, opcional `supersededRecord`), `grant_access` (`payer`, `patient`, `record`, `doctorProvider`, `grant`), `log_access` (`keyService`, `grant`, `record`, `doctorProvider`). Detalle en `hcd_api/idl/hcd.json`.
 ## 2026-10-05 · `hcd_app` se reparte entre Maxi y Mati · Franco (por confirmar con Mati y Maxi)
 - **Maxi** se queda con lo que ve el jurado: rutas `(paciente)` y `(medico)`, `components/` (visor, marca de agua, QR, listas), la marca Salua en lo visible y la publicación del demo.
 - **Mati** suma la plomería de la app: `app/(auth)/login`, `(clinica)/avalar-medicos`, `(admin)/verificar`, `lib/api.ts`, `lib/supabase.ts`, `lib/privy.ts`, `lib/schemas/` (copia de los esquemas Zod que él mismo escribe en la API), `lib/hcd-client/` (con Franco), guards de ruta, estados globales de carga/error y la PWA (manifest + Serwist + Web Push).
