@@ -1,14 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-03
+**Última actualización:** 2026-10-05
 
 ## En qué estoy
-Dejé andando la base de los tres repos de código: `hcd_api` (NestJS + esqueleto Anchor + migración con RLS), `hcd_app` (Next.js con rutas por rol y `lib/crypto/` con WebCrypto) y `hcd_landing` (export estático). Builds verificados. Antes: tareas individuales en `docs/tareas/` y coordinación de la preselección.
+Redistribuí `hcd_app` entre Maxi y Mati (decisión registrada en `decisiones.md`): Maxi queda con las rutas de paciente/médico y `components/`; Mati suma la plomería (login, Privy, `lib/api`, schemas, `hcd-client`, clínica/admin, PWA). Antes: demo navegable con logo, toggle ES/EN y tipografía legible; base de los tres repos de código; skills de Devin (`/review`, `/commit-docs`, `/anchor-check`, `/salua-ui`) publicadas en `.devin/skills/`.
 
 ## Próximo paso
-- Enviar los pasos 3 y 4 de la preselección antes del domingo 4/10 a las 13:00.
-- Kickoff técnico del domingo: congelar cuentas del programa y contratos de API.
-- Diseño del servicio de llaves y spec del módulo tx (lunes 5).
+- Día 1 del plan: diseño del servicio de llaves (`/keys/release`, DEK/KEK con HKDF, `key_releases`) + spec del módulo `tx` + prueba de 1 hora de Privy.
+- Mergear la PR de skills y esta de tareas; que el equipo confirme la reasignación.
+- Deploy del `demo/` en Vercel para el "enlace al producto en vivo" de la entrega.
 
 ## Bloqueos
-- Los formularios de los pasos 3 y 4 hay que leerlos hoy para saber qué piden exactamente.
+- La reasignación de tareas necesita el OK de Mati y Maxi antes de mergear.
+- `lib/hcd-client/` espera el IDL v0 de Misael (lunes 5 a la noche).

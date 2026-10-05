@@ -2,6 +2,21 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(tasks): split hcd_app between Maxi and Mati
+- **Qué hice:** redistribuí `hcd_app` porque toda la app estaba en una sola persona. Maxi se queda con lo que ve el jurado (`(paciente)`, `(medico)`, `components/`, marca y demo); Mati suma la plomería que empalma con su backend (`(auth)/login`, `(clinica)`, `(admin)`, `lib/api|supabase|privy|schemas|hcd-client`, guards y PWA). Actualicé los planes de ambos, `franco.md`, `equipo.md` y la decisión en `decisiones.md`.
+- **Archivos clave:** `docs/tareas/maximiliano.md`, `docs/tareas/matias.md`, `docs/tareas/franco.md`, `docs/proyecto/decisiones.md`, `docs/equipo.md`.
+- **Próximo paso:** avisar en el grupo antes de mergear; arrancar Día 1 (diseño del servicio de llaves + prueba Privy).
+
+## 2026-10-04 · feat(demo): add real logo, ES/EN language switch and larger type
+- **Qué hice:** integré el logo oficial (`demo/assets/logo-salua.jpeg`) en sidebar, topbar móvil y favicon; subí toda la escala tipográfica (~+2-4px en textos chicos); agregué toggle ES/EN en la topbar con diccionario completo en `app.js` (~120 strings), persistencia en localStorage y locale de fechas. Log, notificaciones y panel on-chain se re-traducen al cambiar de idioma.
+- **Archivos clave:** `demo/app.js`, `demo/styles.css`, `demo/index.html`, `demo/assets/`.
+- **Próximo paso:** deploy del `demo/` en Vercel/Netlify y ensayo del guion bilingüe.
+
+## 2026-10-03 · feat(demo): add Salua clickable prototype
+- **Qué hice:** prototipo navegable de Salua en `demo/` (HTML+CSS+JS puro, sin backend ni build, datos ficticios). Recorre el flujo completo: emisión firmada de estudio, disputa "no es mío", solicitud de acceso, firma de grant_access por 1h/24h/7d, visor con marca de agua y verificación de hash, denegación por defecto, vencimiento del permiso y línea de tiempo con links simulados a solscan devnet. Panel lateral "Qué queda en Solana" con PDAs, hashes, firmas y eventos. Verificado de punta a punta con Playwright en móvil y desktop.
+- **Archivos clave:** `demo/index.html`, `demo/app.js`, `demo/styles.css`, `demo/README.md`.
+- **Próximo paso:** deploy en Vercel/Netlify para presentarlo mañana en la entrega.
+
 ## 2026-10-03 · feat(landing): scaffold static Next.js landing page
 - **Qué hice:** estructura base de `hcd_landing`: Next.js con `output: 'export'`, Tailwind 4 con la paleta Salua, página inicial con hero/problema/cómo funciona/seguridad/equipo, `.gitignore`, `.env.example` y README. Build estático verificado (`out/`).
 - **Archivos clave:** `hcd_landing/app/`, `next.config.ts`, `package.json`.
