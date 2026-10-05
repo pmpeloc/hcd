@@ -2,6 +2,12 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · `hcd_app` se reparte entre Maxi y Mati · Franco (por confirmar con Mati y Maxi)
+- **Maxi** se queda con lo que ve el jurado: rutas `(paciente)` y `(medico)`, `components/` (visor, marca de agua, QR, listas), la marca Salua en lo visible y la publicación del demo.
+- **Mati** suma la plomería de la app: `app/(auth)/login`, `(clinica)/avalar-medicos`, `(admin)/verificar`, `lib/api.ts`, `lib/supabase.ts`, `lib/privy.ts`, `lib/schemas/` (copia de los esquemas Zod que él mismo escribe en la API), `lib/hcd-client/` (con Franco), guards de ruta, estados globales de carga/error y la PWA (manifest + Serwist + Web Push).
+- **Por qué:** la app era la carga más pesada del proyecto y estaba toda en una sola persona. Todo lo que se movió empalma con el backend que escribe Mati: cada uno hace el endpoint y la pantalla que lo consume, con menos coordinación y sin errores de traducción de contratos.
+- **Regla de territorio:** un archivo, una sola persona. Si Maxi necesita un cambio en la plomería se lo pide a Mati (y viceversa con las pantallas); nunca dos personas editan lo mismo en paralelo.
+
 ## 2026-10-04 · Programa: calendario, re-otorgar permisos y cuentas pagadas por el sponsor · Misael
 - **Las 6 instrucciones del ciclo** (`issue_record`, `dispute_record`, `void_record`, `grant_access`, `revoke_access`, `log_access`) entran el **lunes 5**, con el IDL v0 esa noche, como dice el plan de Franco (`Plan_Completo_Salua.pdf`). Deploy con tests negativos el martes 6.
 - **Re-otorgar un permiso revocado o vencido:** se reactiva el **mismo** AccessGrant (`["grant", record, doctor]`) con un vencimiento nuevo; `access_count` sigue sumando. Sin esto, un paciente no podía volver a darle acceso al mismo médico, porque la cuenta revocada no se cierra.
