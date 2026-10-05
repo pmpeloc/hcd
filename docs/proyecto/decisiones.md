@@ -2,6 +2,11 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-05 · `main` y `staging` protegidas: todo entra por PR con aprobación · Misael
+- En los 4 repos (`hcd`, `hcd_api`, `hcd_app`, `hcd_landing`) hay un ruleset de GitHub ("Require approval on main and staging") sobre `main` y `staging`: no se puede hacer push directo, force push ni borrar la rama.
+- Todo entra por PR con **1 aprobación de otro integrante**. Nadie está exento, tampoco el dueño de los repos.
+- Impacto: los commits de docs en `hcd` (bitácora y estado) también van en una rama y con su propio PR. Detalle en `AGENTS.md`, sección 6.
+
 ## 2026-10-05 · Auditoría on-chain solo de accesos de terceros · Franco y Misael
 - **`log_access` registra solo los accesos de médicos con permiso.** No se agrega `log_self_access`: la auditoría on-chain existe para mostrarle al paciente quién **más** accedió a sus datos.
 - Las lecturas del **propio paciente** no se registran on-chain: no aportan a la auditoría y costarían una transacción por lectura.

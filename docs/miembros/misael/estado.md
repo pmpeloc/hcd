@@ -3,11 +3,10 @@
 **Última actualización:** 2026-10-05
 
 ## En qué estoy
-Las 9 instrucciones del programa están implementadas en la rama `feat/program-config-provider-patient` (43 tests pasando en local) y el IDL v0 está publicado en `hcd_api/idl/hcd.json` (puerta G2).
+Programa completo (9 instrucciones, 43 tests) e IDL v0 mergeados a `staging`. `main` y `staging` quedaron protegidas en los 4 repos: todo entra por PR con 1 aprobación de otro integrante.
 
 ## Próximo paso
-- Avisar al grupo del IDL v0 para que regeneren clientes; las cuentas que pasa el backend están en `decisiones.md` (2026-10-05).
-- PR a `main` con revisión de Franco.
+- Avisar al equipo del flujo con PR obligatorio (también para los docs de `hcd`).
 - Redeploy en devnet y tests negativos contra devnet (puerta G3).
 
 ## Bloqueos
