@@ -1,13 +1,14 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-04
+**Última actualización:** 2026-10-05
 
 ## En qué estoy
-Día 2 completo en la rama `feat/program-config-provider-patient`: esquema de las 5 PDAs cerrado (semillas como constantes) e implementadas `initialize_config`, `register_provider`, `set_provider_verified` y `register_patient`, con 13 tests pasando en validador local (`anchor test`).
+Rama `feat/program-config-provider-patient`: además de config, provider y patient, ya están `issue_record` (doble firma médico + `key_service`, reemisión con `superseded_record`), `dispute_record` y `void_record`. 29 tests pasando en validador local (`anchor test`).
 
 ## Próximo paso
-- Lunes 5: las 6 instrucciones del ciclo (`issue_record` → `log_access`) con tests negativos y publicar el IDL v0 a la noche.
-- `issue_record` con doble firma (médico + `key_service`), decidido el 2026-10-04.
+- Hoy: `grant_access`, `revoke_access` y `log_access` con tests negativos.
+- Publicar el IDL v0 (`idl/hcd.json`) esta noche y avisar al grupo.
+- Aviso a Franco (`tx`): `issue_record` lleva las cuentas `payer`, `issuer`, `keyService` y opcional `supersededRecord`.
 
 ## Bloqueos
 Ninguno.
