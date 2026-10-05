@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · chore(scripts): use anchor program deploy for devnet
+- **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL; no lo volví a correr para no gastar SOL en un redeploy idéntico.
+- **Archivos clave:** `hcd_api/package.json`.
+- **Próximo paso:** `initialize_config` en devnet cuando Franco pase la pubkey de `key_service`.
+
 ## 2026-10-05 · docs(program): record devnet redeploy of the full program
 - **Qué hice:** redeploy en devnet del programa completo (9 instrucciones) desde `staging` (`4a58133`), mismo program id. El binario creció de 236 KB a 314 KB y se extendió solo; hizo falta cargar SOL de devnet por el faucet web porque el airdrop por CLI estaba limitado. Verifiqué que el binario on-chain es idéntico al compilado y que el IDL on-chain es igual a `idl/hcd.json`. En devnet todavía no hay cuentas: falta `initialize_config`. Documenté en el README el program id, la autoridad, el explorer y cuánto SOL pide un upgrade.
 - **Archivos clave:** `hcd_api/README.md`.
