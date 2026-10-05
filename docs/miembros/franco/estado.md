@@ -1,14 +1,14 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-03
+**Última actualización:** 2026-10-05
 
 ## En qué estoy
-Quedó listo el prototipo navegable de Salua en `demo/` con logo oficial, toggle ES/EN y tipografía más legible: flujo completo (emisión, disputa, permiso, visor con marca de agua, denegación, vencimiento y línea de tiempo) todo simulado en el navegador, verificado con Playwright en los dos idiomas. Antes: base de los tres repos de código (`hcd_api`, `hcd_app`, `hcd_landing` con builds verificados).
+Arranco el día 3 del plan (lunes): diseño del servicio de llaves y spec del módulo `tx`, esperando el IDL v0 de Misael esta noche. Preselección enviada el domingo 4/10 con el formulario completo. Entorno listo: los cuatro repos en `staging`, toolchain Anchor 1.2.0 verificado en WSL (13/13 tests), `.env` de api y app cargados y vivos, API levantando en :3001 y app en :3000. Instalé las 4 skills de Devin del equipo en `hcd/.devin/skills/` (commit-docs, review, anchor-check, salua-ui).
 
 ## Próximo paso
-- Deploy del `demo/` en Vercel/Netlify y ensayo del guion bilingüe (menos de 2 minutos).
-- Enviar los pasos 3 y 4 de la preselección antes del domingo 4/10 a las 13:00.
-- Kickoff técnico del domingo: congelar cuentas del programa y contratos de API.
+- Diseño del servicio de llaves (flujo `/keys/release`, envoltura DEK/KEK con HKDF, tabla `key_releases`).
+- Spec del módulo `tx` (armado → firma usuario → verificación byte a byte → co-firma) incluyendo la firma de `key_service` en `issue_record` (decisión del 4/10).
+- Prueba de 1 hora: Privy + Supabase Auth con wallet de Solana.
 
 ## Bloqueos
-- Los formularios de los pasos 3 y 4 hay que leerlos hoy para saber qué piden exactamente.
+- IDL v0 del programa (Misael, esta noche) para generar el cliente Codama.

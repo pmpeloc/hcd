@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · chore(skills): add Devin skills for review, docs, anchor checks and UI guide
+- **Qué hice:** instalé en `hcd/.devin/skills/` cuatro skills de Devin para el equipo: `commit-docs` (bitácora/estado antes del commit), `review` (diff con foco en seguridad cripto y permisos), `anchor-check` (build/test del programa en WSL, solo reporta) y `salua-ui` (guía de diseño de pantallas). Corregí la paleta de `salua-ui` a los colores oficiales (`#0D2950`/`#0B91F2`/`#0FB3AA`, tokens ya definidos en `globals.css`) y agregué a `anchor-check` el paso de rsync a `~/hcd_api` en WSL (compilar sobre `/mnt/d` falla sin el fix de automount).
+- **Archivos clave:** `.devin/skills/commit-docs/`, `.devin/skills/review/`, `.devin/skills/anchor-check/`, `.devin/skills/salua-ui/`.
+- **Próximo paso:** diseño del servicio de llaves y spec del módulo `tx` (día 3 del plan).
+
 ## 2026-10-04 · feat(demo): add real logo, ES/EN language switch and larger type
 - **Qué hice:** integré el logo oficial (`demo/assets/logo-salua.jpeg`) en sidebar, topbar móvil y favicon; subí toda la escala tipográfica (~+2-4px en textos chicos); agregué toggle ES/EN en la topbar con diccionario completo en `app.js` (~120 strings), persistencia en localStorage y locale de fechas. Log, notificaciones y panel on-chain se re-traducen al cambiar de idioma.
 - **Archivos clave:** `demo/app.js`, `demo/styles.css`, `demo/index.html`, `demo/assets/`.
