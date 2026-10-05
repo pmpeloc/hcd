@@ -3,13 +3,13 @@
 **Última actualización:** 2026-10-05
 
 ## En qué estoy
-Redistribuí `hcd_app` entre Maxi y Mati (decisión registrada en `decisiones.md`): Maxi queda con las rutas de paciente/médico y `components/`; Mati suma la plomería (login, Privy, `lib/api`, schemas, `hcd-client`, clínica/admin, PWA). Antes: demo navegable con logo, toggle ES/EN y tipografía legible; base de los tres repos de código; skills de Devin (`/review`, `/commit-docs`, `/anchor-check`, `/salua-ui`) publicadas en `.devin/skills/`.
+Día 1 del plan de implementación cerrado: specs de `src/keys/` (servicio-llaves.md), `src/tx/` (modulo-tx.md) y spike de Privy (prueba-privy.md — **plan A confirmado**, el JWKS de Supabase firma ES256). Todo escrito contra el IDL v0 que Misael publicó hoy (programa completo: 10 instrucciones, 43 tests, mergeado a staging). Revisé su PR y la mergeé. Antes: reasignación de `hcd_app` entre Maxi y Mati, skills de Devin publicadas, demo deployado en https://salua.vercel.app.
 
 ## Próximo paso
-- Día 1 del plan: diseño del servicio de llaves (`/keys/release`, DEK/KEK con HKDF, `key_releases`) + spec del módulo `tx` + prueba de 1 hora de Privy.
-- Mergear la PR de skills y esta de tareas; que el equipo confirme la reasignación.
-- Deploy del `demo/` en Vercel para el "enlace al producto en vivo" de la entrega.
+- Día 2: implementar `src/tx/` (build → firma usuario → verificación byte a byte → co-firma) + rate limit y presupuesto del fee payer.
+- Avisar a Mati: falta `app_user.wallet_pubkey` en el esquema; `GET /audit` queda en su indexer.
+- Preguntar a Misael si agrega `log_self_access` para registrar entregas a paciente/emisor (hoy `log_access` exige grant de médico).
 
 ## Bloqueos
-- La reasignación de tareas necesita el OK de Mati y Maxi antes de mergear.
-- `lib/hcd-client/` espera el IDL v0 de Misael (lunes 5 a la noche).
+- `lib/hcd-client/` (Codama) espera generarse sobre el IDL v0 — ya disponible.
+- Privy: falta pedir acceso a "Custom Auth" en el dashboard (Integrations > Plugins) — trámite manual de quien tenga la cuenta.

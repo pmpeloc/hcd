@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · docs(specs): add key service, tx module and Privy spike docs
+- **Qué hice:** specs de trabajo escritos con subagentes sobre el IDL v0 real. `servicio-llaves.md`: flujo de `/keys/release` con matriz de decisión, HKDF/AES-GCM exactos, propuesta de columnas para `key_releases`; `modulo-tx.md`: flujo `POST /tx/build` + `/tx/submit`, verificación byte a byte, límites del fee payer; `prueba-privy.md`: plan A confirmado (JWKS de Supabase devuelve ES256 — verifiqué el endpoint). Hallazgo: `log_access` exige grant de médico, así que entregas a paciente/emisor solo quedan en `key_releases`.
+- **Archivos clave:** `docs/proyecto/servicio-llaves.md`, `modulo-tx.md`, `prueba-privy.md`.
+- **Próximo paso:** decisión sobre `log_self_access` + `app_user.wallet_pubkey` (aviso a Mati/Misael); Día 2: implementar `src/tx/`.
+
 ## 2026-10-05 · docs(tasks): split hcd_app between Maxi and Mati
 - **Qué hice:** redistribuí `hcd_app` porque toda la app estaba en una sola persona. Maxi se queda con lo que ve el jurado (`(paciente)`, `(medico)`, `components/`, marca y demo); Mati suma la plomería que empalma con su backend (`(auth)/login`, `(clinica)`, `(admin)`, `lib/api|supabase|privy|schemas|hcd-client`, guards y PWA). Actualicé los planes de ambos, `franco.md`, `equipo.md` y la decisión en `decisiones.md`.
 - **Archivos clave:** `docs/tareas/maximiliano.md`, `docs/tareas/matias.md`, `docs/tareas/franco.md`, `docs/proyecto/decisiones.md`, `docs/equipo.md`.
