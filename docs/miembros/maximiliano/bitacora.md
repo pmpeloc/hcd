@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · feat(app): add patient QR screen with 2-minute one-time code
+- **Qué hice:** pantalla Mi QR (`/qr`) del paciente con el diseño «Salua · App C»: QR vectorial con un código corto de un solo uso (`SAL-XXXX`), cuenta regresiva grande de 2 minutos con barra, aviso cuando quedan 30 segundos, estado vencido con el QR desenfocado y "Generar uno nuevo", estados de carga y error, y el identificador de la cuenta abreviado con botón para copiar. La sesión del código es ficticia (`createQrSession`) hasta que estén Privy y la API de Mati; dejé `parseQrPayload` para el escáner del médico.
+- **Archivos clave:** `hcd_app/components/patient-qr/`, `app/(paciente)/qr/page.tsx`, `components/big-number.tsx`, `components/progress-track.tsx`.
+- **Próximo paso:** escáner del médico (`/escanear`) con `@yudiel/react-qr-scanner`, leyendo el QR con `parseQrPayload`.
+
 ## 2026-10-06 · feat(app): apply bento layout from Salua App C to home screens
 - **Qué hice:** pasé a `hcd_app` el diseño «Salua · App C» de Claude Design (exportado en `design/app-c/`): bloques bento (blanco, cielo, menta, navy), un número grande por pantalla para el tiempo restante y barras con el degradé de marca. Rehice el Inicio del paciente y el `/panel` del médico, sumé buscador y "Mostrar mi QR" arriba para el paciente, contador en Accesos y punto de notificaciones. Entre 1024 y 1180 px la lista pasa a ancho completo para que los bloques chicos no queden estirados.
 - **Archivos clave:** `hcd_app/app/globals.css`, `components/tile.tsx`, `components/big-number.tsx`, `components/app-shell/`, `app/(paciente)/inicio/page.tsx`, `app/(medico)/panel/page.tsx`.
