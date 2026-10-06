@@ -2,6 +2,16 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · feat(app): apply bento layout from Salua App C to home screens
+- **Qué hice:** pasé a `hcd_app` el diseño «Salua · App C» de Claude Design (exportado en `design/app-c/`): bloques bento (blanco, cielo, menta, navy), un número grande por pantalla para el tiempo restante y barras con el degradé de marca. Rehice el Inicio del paciente y el `/panel` del médico, sumé buscador y "Mostrar mi QR" arriba para el paciente, contador en Accesos y punto de notificaciones. Entre 1024 y 1180 px la lista pasa a ancho completo para que los bloques chicos no queden estirados.
+- **Archivos clave:** `hcd_app/app/globals.css`, `components/tile.tsx`, `components/big-number.tsx`, `components/app-shell/`, `app/(paciente)/inicio/page.tsx`, `app/(medico)/panel/page.tsx`.
+- **Próximo paso:** pantalla Mi QR con la cuenta regresiva de 2 minutos y el número grande, siguiendo `design/app-c/PacienteQR.html`.
+
+## 2026-10-05 · feat(app): add Salua design system and patient/doctor app shells
+- **Qué hice:** en `hcd_app` pasé a código el sistema y el esqueleto del prototipo «Salua · App» de Claude Design: tema shadcn/ui con la paleta oficial más tonos AA (`#0A6FC2`, `#0B7A74`, `#5F6B80`), Poppins + Inter con `next/font`, botones pill, chips de estado, selector 1 h / 24 h / 7 días, y shells de paciente (sidebar + barra inferior mobile) y médico (sidebar). Agregué `/panel` y `/mis-accesos` para el médico. Versiones fijadas y de más de 7 días, salvo `shadcn` 4.21.1 (la de `stack.md`).
+- **Archivos clave:** `hcd_app/app/globals.css`, `app/layout.tsx`, `components/app-shell/`, `components/ui/`, `components/status-chip.tsx`, `components/duration-selector.tsx`.
+- **Próximo paso:** pantalla Mi QR del paciente (wallet pública + código de 2 minutos) con la lógica del prototipo; que el equipo apruebe los tonos AA.
+
 ## 2026-10-05 · fix(skills): replace DNI search with patient QR in salua-ui
 - **Qué hice:** la skill `salua-ui` les pedía a los agentes un "buscador por DNI" para el médico, contra el principio del plan "el destino es una wallet, no un DNI". Ahora indica el escáner del QR del paciente (o su código corto de 2 minutos) y prohíbe la búsqueda por DNI.
 - **Archivos clave:** `.devin/skills/salua-ui/SKILL.md`.
