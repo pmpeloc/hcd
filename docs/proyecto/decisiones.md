@@ -2,6 +2,14 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-06 · Programa endurecido tras la revisión de seguridad (IDL v1) · Misael
+Una revisión independiente del programa no encontró nada crítico ni alto. Cambios:
+- **`storage_ref` es el `id` (UUID) de la fila de `records`.** El programa solo acepta un UUID en minúsculas, así que no se puede grabar on-chain una ruta legible, un nombre o un DNI. **Impacto (Franco/Mati):** el builder de `issue_record` tiene que mandar `records.id`, no `storage_path`; conviene que el esquema Zod pase de `z.string().max(64)` a `z.string().uuid()`.
+- **`update_config` (solo el admin)** reemplaza admin, `key_service` y duración máxima. Si se filtra `key_service` se rota en una transacción (`scripts/update-config.mts`), en vez de tener que actualizar el programa. `key_service` nunca puede ser el admin.
+- **`issue_record`** rechaza que el médico se emita a sí mismo y un `content_hash` en cero.
+- **IDL v1:** suma `update_config`, el evento `ConfigUpdated` y 3 errores nuevos. No cambia ninguna instrucción existente, cuenta ni código de error: los clientes actuales siguen andando sin regenerarse.
+- **Riesgos aceptados para el MVP** (detalle en `hcd_api/programs/hcd/README.md`): un estudio anulado puede reemplazarse más de una vez (la app muestra el más reciente); verificar de nuevo a un médico suspendido reactiva sus permisos vigentes (el admin los revisa antes); la relación paciente-médico es visible on-chain sin datos médicos.
+
 ## 2026-10-06 · Cada `log_access` lleva un Memo con el id de `key_releases` · Misael (aceptado por Franco)
 - Cuando se implemente `src/keys`, cada transacción de `log_access` incluye una instrucción **Memo con `key_releases.id`**.
 - Por qué: dos `log_access` seguidos del mismo permiso pueden ser transacciones idénticas; si comparten blockhash, la red descarta la segunda y `access_count` subcuenta aunque las dos llamadas devuelvan éxito (visto en devnet el 2026-10-05). El Memo hace única cada transacción y además enlaza el registro on-chain con la fila de la base.
