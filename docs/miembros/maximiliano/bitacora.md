@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · feat(app): add doctor QR scanner with in-person ID check
+- **Qué hice:** escáner del médico (`/escanear`) con `@yudiel/react-qr-scanner` y el diseño «Salua · App C». Lee el QR de Mi QR con `parseQrPayload` o acepta el código escrito a mano (normaliza "4f7k" a `SAL-4F7K`). Muestra el paciente en grande con la cuenta regresiva del código, y "Cargar estudio" y "Pedir acceso" se habilitan recién con el interruptor "Verifiqué el DNI en persona". Tiene estados para código vencido, no encontrado, QR que no es de Salua, código mal escrito y cámara sin permiso o no disponible. Corregí que la librería exigía cámaras de 640 px de alto o más (rechazaba webcams de 480p). La búsqueda del paciente es ficticia (`lookupPatient`) hasta que exista la API; `SAL-VVVV` y `SAL-NNNN` muestran los estados de error en la demo. Lo probé de punta a punta con una cámara falsa que muestra un QR real.
+- **Archivos clave:** `hcd_app/components/doctor-scanner/`, `app/(medico)/escanear/page.tsx`, `components/patient-qr/qr-session.ts`, `app/globals.css`.
+- **Próximo paso:** formulario de carga del estudio (`/cargar`), recibiendo el paciente desde el escáner.
+
 ## 2026-10-06 · feat(app): add patient QR screen with 2-minute one-time code
 - **Qué hice:** pantalla Mi QR (`/qr`) del paciente con el diseño «Salua · App C»: QR vectorial con un código corto de un solo uso (`SAL-XXXX`), cuenta regresiva grande de 2 minutos con barra, aviso cuando quedan 30 segundos, estado vencido con el QR desenfocado y "Generar uno nuevo", estados de carga y error, y el identificador de la cuenta abreviado con botón para copiar. La sesión del código es ficticia (`createQrSession`) hasta que estén Privy y la API de Mati; dejé `parseQrPayload` para el escáner del médico.
 - **Archivos clave:** `hcd_app/components/patient-qr/`, `app/(paciente)/qr/page.tsx`, `components/big-number.tsx`, `components/progress-track.tsx`.
