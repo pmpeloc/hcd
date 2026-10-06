@@ -22,7 +22,7 @@ Salua es una app de salud: tiene que transmitir **confianza, calma y claridad**.
 
 ## Patrones clave
 - Paciente: pantalla de inicio con "Mis historiales" y una bandeja visible de **solicitudes de acceso** con botones grandes Aprobar / Rechazar.
-- Médico: buscador por DNI, estado de la solicitud (pendiente / aprobada / rechazada) y vista de lectura limpia.
+- Médico: escáner del QR del paciente (o su código corto que vence en 2 minutos), estado de la solicitud (pendiente / aprobada / rechazada) y vista de lectura limpia. **Nunca un buscador por DNI**: el destino es la wallet del paciente; el DNI solo se verifica en persona y no se guarda (ver `docs/proyecto/plan.md` §4 y §5).
 - Mostrar siempre quién emitió cada estudio y su verificación (badge "Médico verificado").
 - Acciones de la wallet/firma: explicar en lenguaje simple qué se va a firmar antes de abrir Privy.
 - Estados vacíos, cargando y error en TODAS las pantallas, con mensajes humanos.
