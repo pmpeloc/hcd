@@ -1,14 +1,15 @@
 # Estado · Matías
 
-**Última actualización:** 2026-10-05
+**Última actualización:** 2026-10-06
 
 ## En qué estoy
-Primera tarea: migración de wallet y auditoría preparada en feat/wallet-audit-schema.
-Agrega wallet_pubkey y datos de key_releases; conserva filas históricas sin inventar evidencia.
-Prueba SQL aprobada en PostgreSQL 18 local descartable, con datos sintéticos. No aplicada a Supabase.
+Migración de wallet/auditoría en feat/wallet-audit-schema y guard de autenticación en feat/supabase-auth-guard, actualizados desde staging. Ambas tareas preparadas para revisión; documentación unificada en docs/matias-wallet-audit-schema.
 
 ## Próximo paso
-Revisión de la migración con Franco, integración y aplicación controlada; después guard de autenticación y login Supabase/Privy.
+Revisión de los dos PR de API y documentación. Coordinar con Franco la aplicación explícita del guard en tx/keys y vinculación de la wallet; continuar login Supabase/Privy.
+
+## Validación y límites
+Migración probada en PostgreSQL local con datos sintéticos; no aplicada a Supabase. Guard con 13 pruebas unitarias. El guard exportado no protege automáticamente las nuevas rutas de tx. Falta la prueba real de Supabase y autorización por recurso.
 
 ## Bloqueos
-Sin bloqueo para revisar. Falta validar integración en Supabase y resolver el backfill si existen entregas históricas. Memo y servicio de llaves corresponden a Franco.
+Permiso de escritura verificado el 6/10. Pendientes revisión del equipo e integración.
