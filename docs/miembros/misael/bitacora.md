@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · feat(scripts): add admin script to verify or suspend providers
+- **Qué hice:** `scripts/set-provider-verified.mts <authority> <true|false>` verifica o suspende un prestador con la wallet de autoridad: muestra tipo, organización y estado; falla si el prestador no está registrado y no manda transacción si ya está en ese estado. Saqué la conexión compartida a `scripts/program.mts` (RPC de `SOLANA_RPC_URL`, wallet, programa) y `initialize-config.mts` la reutiliza. Probado en devnet con una clínica sintética: verificar, repetir (no hace nada) y suspender; también los errores de uso y de prestador inexistente.
+- **Archivos clave:** `hcd_api/scripts/set-provider-verified.mts`, `hcd_api/scripts/program.mts`, `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`.
+- **Próximo paso:** soporte de integración a Matías (indexer) y Franco (`log_access`, fee payer); revisión cruzada del programa con Franco.
+
 ## 2026-10-05 · test(program): run the suite against devnet
 - **Qué hice:** `npm run anchor:test:devnet` corre la misma suite contra el programa desplegado, sin redeploy. En devnet saltea los tests que crean la Config (ya existe), firma con la `key_service` real (`KEY_SERVICE_SECRET` del `.env`), usa el RPC de `SOLANA_RPC_URL` (con chequeo de que sea devnet) y fondea con transferencias en vez de airdrop. Sumé el caso "médico verificado sin permiso". En el camino aparecieron dos problemas de devnet: dos `log_access` idénticos se deduplican en la red (lo resolví en los tests y lo dejé como propuesta para Franco en `ideas.md`) y el test del permiso vencido tenía un margen de 2 s más chico que el desfase del reloj. Resultado: 44/44 en local y 3 corridas seguidas en devnet con 42 OK, 0 fallas y 3 salteados (~0,07 SOL por corrida).
 - **Archivos clave:** `hcd_api/tests/hcd.test.mts`, `hcd_api/package.json`, `hcd_api/README.md`, `docs/miembros/misael/ideas.md`.
