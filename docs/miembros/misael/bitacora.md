@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · docs(program): add program README with design and security decisions
+- **Qué hice:** `programs/hcd/README.md` documenta el programa: cómo compilar, testear y desplegar, las 5 cuentas con sus semillas, las 9 instrucciones con firmantes y reglas, eventos, errores y las decisiones de seguridad (doble firma en `issue_record`, suspensión inmediata, `Clock`, auditoría con Memo, rent del sponsor, nada médico on-chain, Config inmutable). Lo enlacé desde el README de `hcd_api`. Le pedí a Franco la revisión cruzada del programa.
+- **Archivos clave:** `hcd_api/programs/hcd/README.md`, `hcd_api/README.md`.
+- **Próximo paso:** test de integración del recorrido completo en devnet (puerta G4).
+
 ## 2026-10-05 · feat(scripts): add admin script to verify or suspend providers
 - **Qué hice:** `scripts/set-provider-verified.mts <authority> <true|false>` verifica o suspende un prestador con la wallet de autoridad: muestra tipo, organización y estado; falla si el prestador no está registrado y no manda transacción si ya está en ese estado. Saqué la conexión compartida a `scripts/program.mts` (RPC de `SOLANA_RPC_URL`, wallet, programa) y `initialize-config.mts` la reutiliza. Probado en devnet con una clínica sintética: verificar, repetir (no hace nada) y suspender; también los errores de uso y de prestador inexistente.
 - **Archivos clave:** `hcd_api/scripts/set-provider-verified.mts`, `hcd_api/scripts/program.mts`, `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`.
