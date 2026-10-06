@@ -6,6 +6,7 @@ La más nueva arriba.
 En los tests contra devnet, dos `log_access` seguidos del mismo permiso dejaron **una sola** transacción en la cadena y `access_count` sumó 1 en vez de 2, aunque las dos llamadas devolvieron éxito. Las dos transacciones son idénticas (mismo firmante, cuentas y datos); si toman el mismo blockhash, tienen la misma firma y la red descarta la segunda. Si el servicio de llaves entrega la misma DEK dos veces seguidas, la auditoría subcuenta.
 - **Propuesta para Franco (`src/keys`, `src/tx`):** agregar a cada `log_access` una instrucción Memo con el id de la fila de `key_releases`. Hace única cada transacción y además enlaza el registro on-chain con la base de datos. Alternativa mínima: una instrucción de compute budget distinta en cada llamada (es lo que hacen los tests).
 - No cambia el programa ni el IDL.
+- **Aceptada por Franco el 2026-10-06:** cada `log_access` llevará `Memo(<key_releases.id>)` cuando se implemente `src/keys`. Registrado en [decisiones.md](../../proyecto/decisiones.md).
 
 ## 2026-10-03 · Caso Pepito: médico cómplice que carga un estudio falso
 Pepito es adicto y un amigo médico sube una radiografía falsa de una pierna rota para que le receten analgésicos. HCD no puede impedirlo (tampoco el papel), pero puede dejar al médico identificado y alertar a quien lee. El "no es mío" no sirve porque Pepito es cómplice.
