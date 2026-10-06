@@ -1,13 +1,13 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-05
+**Última actualización:** 2026-10-06
 
 ## En qué estoy
-Puerta G3 cumplida: programa completo desplegado y configurado en devnet (`8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd`), y la suite completa pasa contra devnet (`npm run anchor:test:devnet`: 42 OK, 3 salteados, estable en 3 corridas seguidas).
+Programa completo desplegado, configurado y testeado en devnet (G3), con script de admin y README del programa (`programs/hcd/README.md`). Pedí a Franco la revisión cruzada del programa.
 
 ## Próximo paso
-- Script de admin para verificar prestadores (`set_provider_verified`).
-- Avisar a Franco que cada `log_access` tiene que ser una transacción única (ver `ideas.md`).
+- Test de integración del recorrido completo en devnet: emitir → disputar/anular → otorgar → registrar acceso → revocar (puerta G4).
+- Corregir lo que salga de la revisión de Franco.
 
 ## Bloqueos
 Ninguno.

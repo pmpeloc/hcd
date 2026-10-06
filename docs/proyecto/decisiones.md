@@ -2,6 +2,11 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-06 · Cada `log_access` lleva un Memo con el id de `key_releases` · Misael (aceptado por Franco)
+- Cuando se implemente `src/keys`, cada transacción de `log_access` incluye una instrucción **Memo con `key_releases.id`**.
+- Por qué: dos `log_access` seguidos del mismo permiso pueden ser transacciones idénticas; si comparten blockhash, la red descarta la segunda y `access_count` subcuenta aunque las dos llamadas devuelvan éxito (visto en devnet el 2026-10-05). El Memo hace única cada transacción y además enlaza el registro on-chain con la fila de la base.
+- No cambia el programa ni el IDL. Detalle en [ideas de Misael](../miembros/misael/ideas.md).
+
 ## 2026-10-05 · Config del programa en devnet · Franco y Misael
 - **`key_service`:** `DmiHb7zTyWhaLtRCXhCTNkM8Ga1G2S36XzCUx1GUH4yG`, la del `.env` definitivo del backend. Es distinta del fee payer.
 - **Duración máxima de un permiso:** 7 días (604800 s).
