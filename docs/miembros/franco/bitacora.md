@@ -2,6 +2,12 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-05 · feat(tx): add transaction build/submit flow with byte-by-byte verification
+- **Qué hice:** implementé `src/tx/` completo según `modulo-tx.md`: `POST /tx/build` arma la transacción con el cliente Anchor contra `idl/hcd.json` (7 instrucciones de usuario, resuelve PDAs y `next_record_id` on-chain), guarda los bytes del `message` en un store con TTL ~2 min; `POST /tx/submit` compara byte a byte (un bit distinto = 403 + log de seguridad), verifica la firma del usuario, co-firma como fee payer (+`key_service` en `issue_record`) y envía a devnet con fallback de RPC. Fee payer protegido con throttler por wallet (10/min), cupo diario por usuario (50), presupuesto diario en lamports (corrige con el balance delta real post-confirmación) y alerta de saldo bajo. Errores del programa 6000+ mapeados a 422 desde el IDL. 12 tests Jest verdes incluyendo tamper, firma forjada, tx_id de un solo uso y budget 429.
+- **Decisiones:** cliente `@anchor-lang/core` en vez de Codama por ahora (la interfaz `ProgramClient` aísla el swap futuro); `pending_tx` y `fee_payer_spend` en memoria — se migran a Postgres cuando llegue el esquema de Mati (misma interfaz). `npm test` ahora corre con `--experimental-vm-modules` porque `@solana/web3.js` trae `uuid` ESM-only.
+- **Archivos clave:** `src/tx/` (9 archivos + spec), `.env.example` (`TX_DAILY_BUDGET_LAMPORTS`), `package.json`.
+- **Próximo paso:** PR a `staging` con 1 aprobación; día 5 `hcd_app/lib/crypto/`; luego `src/keys/` donde entra el Memo con `key_releases.id` en `log_access`.
+
 ## 2026-10-05 · docs(specs): add key service, tx module and Privy spike docs
 - **Qué hice:** specs de trabajo escritos con subagentes sobre el IDL v0 real. `servicio-llaves.md`: flujo de `/keys/release` con matriz de decisión, HKDF/AES-GCM exactos, propuesta de columnas para `key_releases`; `modulo-tx.md`: flujo `POST /tx/build` + `/tx/submit`, verificación byte a byte, límites del fee payer; `prueba-privy.md`: plan A confirmado (JWKS de Supabase devuelve ES256 — verifiqué el endpoint). Hallazgo: `log_access` exige grant de médico, así que entregas a paciente/emisor solo quedan en `key_releases`.
 - **Archivos clave:** `docs/proyecto/servicio-llaves.md`, `modulo-tx.md`, `prueba-privy.md`.

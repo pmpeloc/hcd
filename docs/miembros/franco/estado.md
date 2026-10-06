@@ -3,13 +3,13 @@
 **Última actualización:** 2026-10-05
 
 ## En qué estoy
-Día 1 del plan de implementación cerrado: specs de `src/keys/` (servicio-llaves.md), `src/tx/` (modulo-tx.md) y spike de Privy (prueba-privy.md — **plan A confirmado**, el JWKS de Supabase firma ES256). Todo escrito contra el IDL v0 que Misael publicó hoy (programa completo: 10 instrucciones, 43 tests, mergeado a staging). Revisé su PR y la mergeé. Antes: reasignación de `hcd_app` entre Maxi y Mati, skills de Devin publicadas, demo deployado en https://salua.vercel.app.
+Día 2 avanzado: `src/tx/` implementado y verde (build/submit byte a byte, co-firma fee payer + key_service, throttler por wallet, presupuesto diario, 12 tests). Mergeé las 4 PRs de Misael del programa en devnet y la investigación de producto quedó archivada en `D:\hackathon\Documentacion` (8 docs + 2 PDFs). En revisión: PR `feat/tx-module` a staging.
 
 ## Próximo paso
-- Día 2: implementar `src/tx/` (build → firma usuario → verificación byte a byte → co-firma) + rate limit y presupuesto del fee payer.
-- Avisar a Mati: falta `app_user.wallet_pubkey` en el esquema; `GET /audit` queda en su indexer.
-- Preguntar a Misael si agrega `log_self_access` para registrar entregas a paciente/emisor (hoy `log_access` exige grant de médico).
+- Mergear `src/tx/` tras aprobación; día 5: `hcd_app/lib/crypto/` (AES-GCM + SHA-256) y luego `src/keys/` con Memo `key_releases.id` en `log_access`.
+- Mati: cuando tenga write access a `hcd_api` revisar `feat/wallet-audit-schema` y coordinar `key_releases` + `pending_tx`/`fee_payer_spend` (hoy en memoria en `src/tx/`).
+- Misael: evaluar `log_self_access` + rotación de `key_service`/Config (hoy inmutable on-chain) antes de producción.
 
 ## Bloqueos
-- `lib/hcd-client/` (Codama) espera generarse sobre el IDL v0 — ya disponible.
-- Privy: falta pedir acceso a "Custom Auth" en el dashboard (Integrations > Plugins) — trámite manual de quien tenga la cuenta.
+- Mati/Maxi/Rodrigo sin write access en los 3 repos de código — Misael tiene que invitarlos (Settings > Collaborators).
+- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Queda para cuando entre auth + `src/keys/` (el spec lo exige como cierre del hueco de carga).
