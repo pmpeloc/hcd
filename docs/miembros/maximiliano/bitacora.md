@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · feat(app): add doctor study upload with in-browser encryption
+- **Qué hice:** pantalla Cargar estudio (`/cargar`) con el diseño «Salua · App C». Llega con el paciente desde el escáner (`?paciente=SAL-XXXX`); sin paciente pide escanear primero. Tiene pasos, tipo de estudio con sugerencias, fecha, origen ("Emitido por" o "Copia digitalizada por"), zona para arrastrar el archivo con validación de formato y tamaño (50 MB), resumen antes de confirmar y progreso grande por fases. El cifrado ya es real: usa `lib/crypto` de Franco (AES-256-GCM en el navegador y SHA-256 del archivo cifrado). La subida, el depósito de la llave y la firma de `issue_record` son ficticios hasta que exista la API; un archivo con "error" en el nombre muestra el estado de error.
+- **Archivos clave:** `hcd_app/components/doctor-upload/`, `app/(medico)/cargar/page.tsx`.
+- **Próximo paso:** conectar la subida a la API cuando Mati la tenga; seguir con Pedir acceso y las solicitudes del paciente.
+
 ## 2026-10-06 · feat(app): add doctor QR scanner with in-person ID check
 - **Qué hice:** escáner del médico (`/escanear`) con `@yudiel/react-qr-scanner` y el diseño «Salua · App C». Lee el QR de Mi QR con `parseQrPayload` o acepta el código escrito a mano (normaliza "4f7k" a `SAL-4F7K`). Muestra el paciente en grande con la cuenta regresiva del código, y "Cargar estudio" y "Pedir acceso" se habilitan recién con el interruptor "Verifiqué el DNI en persona". Tiene estados para código vencido, no encontrado, QR que no es de Salua, código mal escrito y cámara sin permiso o no disponible. Corregí que la librería exigía cámaras de 640 px de alto o más (rechazaba webcams de 480p). La búsqueda del paciente es ficticia (`lookupPatient`) hasta que exista la API; `SAL-VVVV` y `SAL-NNNN` muestran los estados de error en la demo. Lo probé de punta a punta con una cámara falsa que muestra un QR real.
 - **Archivos clave:** `hcd_app/components/doctor-scanner/`, `app/(medico)/escanear/page.tsx`, `components/patient-qr/qr-session.ts`, `app/globals.css`.
