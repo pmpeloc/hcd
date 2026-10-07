@@ -106,3 +106,8 @@ Cada integrante tiene su carpeta en `docs/miembros/` y la actualiza en el mismo 
 
 ## 2026-10-03 · Nada médico en la cadena · propuesta de la investigación
 En Solana solo van identidad, permisos, hashes, firmas y registro de accesos. Los documentos van cifrados en almacenamiento que se pueda borrar. Ver [arquitectura.md](arquitectura.md).
+
+## 2026-10-06 · Dependencias de la integración Privy en la app · implementación de Matías para revisión
+- La integración usa Supabase PKCE y el hook useSyncJwtBasedAuthState de Privy para eventos de sesión y renovación de tokens. El cliente no acredita por sí mismo la propiedad de la wallet ante la API.
+- Para compilar el SDK Solana de Privy se agregan sus peer dependencies: @solana/kit 8.4.0 (ya parte del stack), @solana-program/memo 0.15.0, @solana-program/system 0.15.0 y @solana-program/token 0.17.0. Versiones fijadas con npm y lockfile. No se introduce otro proveedor de wallets.
+- El recorrido de esta entrega termina en sesión y wallet. El alta de app_user y vinculación verificable quedan en backend de Matías; protección de tx/keys y asociación al signer requieren integración con Franco.
