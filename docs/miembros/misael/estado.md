@@ -3,11 +3,12 @@
 **Última actualización:** 2026-10-06
 
 ## En qué estoy
-Programa completo desplegado, configurado y testeado en devnet (G3), con script de admin y README del programa (`programs/hcd/README.md`). Pedí a Franco la revisión cruzada del programa.
+Programa endurecido tras una revisión de seguridad independiente (nada crítico ni alto): `update_config`, emisor ≠ paciente, hash no nulo y `storage_ref` = UUID de `records`. IDL v1 publicado (solo agrega cosas) y redeploy en devnet.
 
 ## Próximo paso
-- Test de integración del recorrido completo en devnet: emitir → disputar/anular → otorgar → registrar acceso → revocar (puerta G4).
-- Corregir lo que salga de la revisión de Franco.
+- Avisar al grupo del IDL v1 y que el builder de `issue_record` mande `records.id` como `storage_ref` (Franco/Mati).
+- Revisión cruzada de Franco sobre el programa endurecido.
+- Test de integración del recorrido completo en devnet (puerta G4).
 
 ## Bloqueos
 Ninguno.

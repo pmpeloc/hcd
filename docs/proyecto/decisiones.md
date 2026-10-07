@@ -2,6 +2,14 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-06 · Programa endurecido tras la revisión de seguridad (IDL v1) · Misael
+Una revisión independiente del programa no encontró nada crítico ni alto. Cambios:
+- **`storage_ref` es el `id` (UUID) de la fila de `records`.** El programa solo acepta un UUID en minúsculas, así que no se puede grabar on-chain una ruta legible, un nombre o un DNI. **Impacto (Franco/Mati):** el builder de `issue_record` tiene que mandar `records.id`, no `storage_path`; conviene que el esquema Zod pase de `z.string().max(64)` a `z.string().uuid()`.
+- **`update_config` (solo el admin)** reemplaza admin, `key_service` y duración máxima. Si se filtra `key_service` se rota en una transacción (`scripts/update-config.mts`), en vez de tener que actualizar el programa. `key_service` nunca puede ser el admin.
+- **`issue_record`** rechaza que el médico se emita a sí mismo y un `content_hash` en cero.
+- **IDL v1:** suma `update_config`, el evento `ConfigUpdated` y 3 errores nuevos. No cambia ninguna instrucción existente, cuenta ni código de error: los clientes actuales siguen andando sin regenerarse.
+- **Riesgos aceptados para el MVP** (detalle en `hcd_api/programs/hcd/README.md`): un estudio anulado puede reemplazarse más de una vez (la app muestra el más reciente); verificar de nuevo a un médico suspendido reactiva sus permisos vigentes (el admin los revisa antes); la relación paciente-médico es visible on-chain sin datos médicos.
+
 ## 2026-10-06 · Cada `log_access` lleva un Memo con el id de `key_releases` · Misael (aceptado por Franco)
 - Cuando se implemente `src/keys`, cada transacción de `log_access` incluye una instrucción **Memo con `key_releases.id`**.
 - Por qué: dos `log_access` seguidos del mismo permiso pueden ser transacciones idénticas; si comparten blockhash, la red descarta la segunda y `access_count` subcuenta aunque las dos llamadas devuelvan éxito (visto en devnet el 2026-10-05). El Memo hace única cada transacción y además enlaza el registro on-chain con la fila de la base.
@@ -98,3 +106,8 @@ Cada integrante tiene su carpeta en `docs/miembros/` y la actualiza en el mismo 
 
 ## 2026-10-03 · Nada médico en la cadena · propuesta de la investigación
 En Solana solo van identidad, permisos, hashes, firmas y registro de accesos. Los documentos van cifrados en almacenamiento que se pueda borrar. Ver [arquitectura.md](arquitectura.md).
+
+## 2026-10-06 · Dependencias de la integración Privy en la app · implementación de Matías para revisión
+- La integración usa Supabase PKCE y el hook useSyncJwtBasedAuthState de Privy para eventos de sesión y renovación de tokens. El cliente no acredita por sí mismo la propiedad de la wallet ante la API.
+- Para compilar el SDK Solana de Privy se agregan sus peer dependencies: @solana/kit 8.4.0 (ya parte del stack), @solana-program/memo 0.15.0, @solana-program/system 0.15.0 y @solana-program/token 0.17.0. Versiones fijadas con npm y lockfile. No se introduce otro proveedor de wallets.
+- El recorrido de esta entrega termina en sesión y wallet. El alta de app_user y vinculación verificable quedan en backend de Matías; protección de tx/keys y asociación al signer requieren integración con Franco.
