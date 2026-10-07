@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-06 · feat(program): harden program after security review (IDL v1)
+- **Qué hice:** como Franco se quedó sin tokens para la revisión cruzada, corrí una revisión independiente del programa con un agente sin contexto: nada crítico ni alto. Con eso agregué `update_config` (rotar `key_service`/admin/duración; `key_service` ≠ admin, también en `initialize_config`), `issue_record` rechaza emisor = paciente y hash en cero, y `storage_ref` pasa a ser un UUID en minúsculas (`records.id`). 18 tests nuevos (62 en local) cubren los huecos que marcó la revisión, más un test unitario de Rust del validador de UUID. Script `scripts/update-config.mts`. IDL v1 publicado (solo agrega cosas). Redeploy en devnet; los riesgos aceptados quedaron en el README del programa y en `decisiones.md`.
+- **Archivos clave:** `programs/hcd/src/instructions/{update_config,issue_record,initialize_config}.rs`, `programs/hcd/src/{lib,errors,events}.rs`, `tests/hcd.test.mts`, `scripts/update-config.mts`, `idl/hcd.json`, `programs/hcd/README.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** que Franco revise igual el programa (puede partir de los hallazgos) y ajuste el builder para mandar `records.id`; test de integración del recorrido completo (G4).
+
 ## 2026-10-06 · docs(program): add program README with design and security decisions
 - **Qué hice:** `programs/hcd/README.md` documenta el programa: cómo compilar, testear y desplegar, las 5 cuentas con sus semillas, las 9 instrucciones con firmantes y reglas, eventos, errores y las decisiones de seguridad (doble firma en `issue_record`, suspensión inmediata, `Clock`, auditoría con Memo, rent del sponsor, nada médico on-chain, Config inmutable). Lo enlacé desde el README de `hcd_api`. Le pedí a Franco la revisión cruzada del programa.
 - **Archivos clave:** `hcd_api/programs/hcd/README.md`, `hcd_api/README.md`.
