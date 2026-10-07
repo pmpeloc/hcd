@@ -1,14 +1,17 @@
 # Estado · Maximiliano
 
-**Última actualización:** 2026-10-05
+**Última actualización:** 2026-10-06
 
 ## En qué estoy
-Base visual de `hcd_app` en la rama `feat/design-system`: shadcn/ui inicializado (Radix, preset Nova, versiones fijadas). Falta aplicar el tema Salua y armar los layouts de paciente y médico según el mockup elegido en Claude Design (Landing K). Corregí la skill `salua-ui` para que no proponga buscar pacientes por DNI.
+Quedó en PR la base visual de `hcd_app` (`feat/design-system`): tema Salua sobre shadcn/ui, tipografías, componentes (botones, chips de estado, tarjetas, campos, selector de duración) y los shells de paciente y médico, copiados del prototipo «Salua · App» de Claude Design. Encima apliqué el diseño «Salua · App C» (bloques bento y número grande) al Inicio del paciente y al panel del médico. En la rama `feat/patient-qr` (sale de `feat/design-system`) hice la pantalla Mi QR con datos ficticios, y en `feat/doctor-scanner` (sale de esa) el escáner del médico con la verificación del DNI, y en `feat/doctor-upload` la carga del estudio con cifrado real en el navegador. Todo va en un solo PR al final del día. Las demás páginas tienen el shell y su título; el contenido de cada pantalla sigue el plan día por día. La landing K queda en pausa (es de Rodrigo).
 
 ## Próximo paso
-- Tema Salua (colores, tipografía, radios) sobre los tokens de shadcn, a partir del Landing K.
-- Layouts de `(paciente)` (barra inferior, mobile-first) y `(medico)` (sidebar).
-- Perfil del paciente y pantalla Mi QR (día 3, atrasado).
+- Conectar Mi QR a la wallet real (Privy) y a la API cuando Mati las suba.
+- Conectar la carga a la API (subida, llave e `issue_record`) cuando Mati la suba.
+- Pedir acceso (médico) y solicitudes del paciente (día 6).
+- Conectar el escáner a la API de Mati para validar el código.
+- Reemplazar el usuario fijo del shell por la sesión real cuando Mati tenga la plomería.
 
 ## Bloqueos
-- Necesito el Landing K exportado (HTML o capturas) en una carpeta local: claude.ai no se puede abrir desde el agente.
+- El equipo tiene que aprobar los tonos AA sumados a la paleta (`#0A6FC2`, `#0B7A74`, `#5F6B80`).
+- `npm run lint` en `hcd_app` falla al cargar `eslint.config.mjs` ("circular structure"); viene del scaffold.
