@@ -2,6 +2,16 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-07 · feat(app): add patient studies list with "not mine" dispute
+- **Qué hice:** pantalla Mis estudios (`/estudios`) con el diseño «Salua · App C»: lista con estado (Activo, En disputa, Anulado) y origen de cada estudio ("Emitido por" o "Copia digitalizada por"), filtros por estado con contador, número grande de estudios activos, y el botón "No es mío" con confirmación que deja el estudio en disputa. Tiene estados de carga, error, vacío y filtro sin resultados. Los datos y la disputa son ficticios (`getMyStudies`, `disputeStudy`) hasta que exista `GET /patients/me/records` y se firme `dispute_record` con `/tx`.
+- **Archivos clave:** `hcd_app/components/patient-studies/`, `app/(paciente)/estudios/page.tsx`.
+- **Próximo paso:** Pedir acceso y solicitudes del paciente (día 6).
+
+## 2026-10-07 · feat(app): connect patient and doctor shells to the real session
+- **Qué hice:** los layouts de paciente y médico ahora usan la sesión de Supabase y la wallet de Privy que integró Mati (PR #4). El shell muestra el nombre real y lleva a `/login` desde la cuenta; sin sesión pide iniciar sesión. Mi QR usa la wallet real del paciente, con estados para "preparando tu cuenta" y error. Si Supabase no está configurado queda un modo demo con datos de ejemplo y un aviso (sin Supabase, el puente de Privy rompía la página). Los saludos de Inicio y del panel salen de la sesión. Arreglé el único error de lint del escáner.
+- **Archivos clave:** `hcd_app/components/app-shell/session-shell.tsx`, `app/(paciente)/layout.tsx`, `app/(medico)/layout.tsx`, `components/patient-qr/`.
+- **Próximo paso:** lista de estudios del paciente.
+
 ## 2026-10-06 · feat(app): add doctor study upload with in-browser encryption
 - **Qué hice:** pantalla Cargar estudio (`/cargar`) con el diseño «Salua · App C». Llega con el paciente desde el escáner (`?paciente=SAL-XXXX`); sin paciente pide escanear primero. Tiene pasos, tipo de estudio con sugerencias, fecha, origen ("Emitido por" o "Copia digitalizada por"), zona para arrastrar el archivo con validación de formato y tamaño (50 MB), resumen antes de confirmar y progreso grande por fases. El cifrado ya es real: usa `lib/crypto` de Franco (AES-256-GCM en el navegador y SHA-256 del archivo cifrado). La subida, el depósito de la llave y la firma de `issue_record` son ficticios hasta que exista la API; un archivo con "error" en el nombre muestra el estado de error.
 - **Archivos clave:** `hcd_app/components/doctor-upload/`, `app/(medico)/cargar/page.tsx`.
