@@ -4,7 +4,7 @@ Una entrada por commit, la más nueva arriba.
 
 ## 2026-10-07 · fix(tx): require lowercase UUID storage_ref (IDL v1)
 - **Qué hice:** revisión cruzada del programa de Misael (PR hcd_api#10): leí las 11 instrucciones + 5 cuentas + errors/events completos y corrí `anchor test` en WSL (62/62 verdes, 1 skipped). Checklist de firmantes, seeds, Clock, log_access y datos on-chain: todo OK; dos menores reportados en la review (typo "ponytail:" en register_provider.rs y la independencia admin/key_service en update_config). Aprobé y mergeé #10 + docs #15. Adapté `src/tx/` al contrato nuevo: `storage_ref` ahora exige UUID canónico en minúscula (regex espejo del validador on-chain) + test negativo nuevo (13 tests en total).
-- **Archivos clave:** `src/tx/tx-schemas.ts`, `src/tx/tx.service.spec.ts`.
+- **Archivos clave:** `src/tx/tx-schemas.ts`, `src/tx/tx.service.spec.ts`. También aprobé y mergeé las PRs de Mati: #11 (schema wallet+key_releases) y #12 (SupabaseAuthGuard, resolviendo el conflicto de README que le quedó con #11; 25 tests verdes post-merge).
 - **Próximo paso:** revisar PRs de Mati (#11 schema key_releases, #12 auth guard) para destrabar `src/keys/`; el storage_ref real lo pasa el endpoint `/records` de Mati (records.id).
 
 ## 2026-10-05 · feat(tx): add transaction build/submit flow with byte-by-byte verification
