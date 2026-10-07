@@ -3,7 +3,7 @@
 **Última actualización:** 2026-10-07
 
 ## En qué estoy
-Ya están en `staging` (hcd_app#6) el sistema de diseño, los inicios en bento, Mi QR, el escáner y Cargar estudio. Hoy (día 5) en `feat/patient-studies-session`: los shells de paciente y médico usan la sesión real de Supabase + Privy (Mi QR muestra la wallet real) y la pantalla Mis estudios con estados y "No es mío". Lo que depende del backend sigue detrás de funciones ficticias: `lookupPatient` (escáner), `uploadRecord` (subida, llave e `issue_record`; el cifrado ya es real), `getMyStudies` y `disputeStudy`.
+Ya están en `staging` (hcd_app#6) el sistema de diseño, los inicios en bento, Mi QR, el escáner y Cargar estudio. Hoy (día 5) en `feat/patient-studies-session`: los shells de paciente y médico usan la sesión real de Supabase + Privy (Mi QR muestra la wallet real) y la pantalla Mis estudios con estados y "No es mío", todo cubierto con tests de Playwright (`npm run test:e2e`). Lo que depende del backend sigue detrás de funciones ficticias: `lookupPatient` (escáner), `uploadRecord` (subida, llave e `issue_record`; el cifrado ya es real), `getMyStudies` y `disputeStudy`.
 
 ## Próximo paso
 - Pedir acceso (médico) y solicitudes del paciente: aprobar 1 h / 24 h / 7 días, rechazar, revocar (día 6).

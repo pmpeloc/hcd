@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-07 · test(app): cover patient and doctor screens with Playwright
+- **Qué hice:** 35 tests nuevos con Playwright (el runner que ya usa la app; Vitest no está en el stack del frontend). Lógica: código del QR (formato, ida y vuelta del payload, códigos escritos, cuenta regresiva), búsqueda del escáner, validación de archivos y que el cifrado sea real (la huella es del archivo cifrado y cambia con cada llave). Pantallas: pedir sesión sin login, nombre de la sesión en el shell, Mi QR sin wallet, Mis estudios con filtros y "No es mío", escáner con DNI y errores, y la carga completa con error y reintento. La sesión se simula igual que en los tests de login de Mati. Pasan los 41 tests, también repetidos.
+- **Archivos clave:** `hcd_app/e2e/app-logic.spec.ts`, `e2e/app-shell.spec.ts`, `e2e/patient-studies.spec.ts`, `e2e/doctor-flow.spec.ts`, `e2e/support/session.ts`.
+- **Próximo paso:** Pedir acceso y solicitudes del paciente (día 6), con sus tests.
+
 ## 2026-10-07 · feat(app): add patient studies list with "not mine" dispute
 - **Qué hice:** pantalla Mis estudios (`/estudios`) con el diseño «Salua · App C»: lista con estado (Activo, En disputa, Anulado) y origen de cada estudio ("Emitido por" o "Copia digitalizada por"), filtros por estado con contador, número grande de estudios activos, y el botón "No es mío" con confirmación que deja el estudio en disputa. Tiene estados de carga, error, vacío y filtro sin resultados. Los datos y la disputa son ficticios (`getMyStudies`, `disputeStudy`) hasta que exista `GET /patients/me/records` y se firme `dispute_record` con `/tx`.
 - **Archivos clave:** `hcd_app/components/patient-studies/`, `app/(paciente)/estudios/page.tsx`.
