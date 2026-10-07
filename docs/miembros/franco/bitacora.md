@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-07 · feat(keys): add key release service with on-chain audit
+- **Qué hice:** implementé `src/keys/` según `servicio-llaves.md`: `POST /keys/release` con SupabaseAuthGuard, matriz paciente/emisor/médico decidida on-chain (Record activo, grant vigente contra Clock, provider verificado), DEK desenvuelta con KEK por organización (HKDF de MASTER_KEY, AES-256-GCM, blob `iv||ct||tag` de 60 B) y URL firmada de 60 s. En releases de médico la fila `key_releases` se inserta primero y su `id` va en un **Memo** dentro de la `log_access` (firman key_service + fee_payer): queda única y enlazada a la base. Rechazo del programa → 403 sin entrega y fila `failed`; RPC caído → se entrega igual y queda `pending` para reintento (índice ya mergeado en #11). Registro Zod de la fila `records` y guardarraíl al boot: KEY_SERVICE_SECRET debe ser el `Config.key_service` on-chain. 14 tests: matriz completa, RPC caído, blob corrupto, fingerprint y boot inválido.
+- **Archivos clave:** `src/keys/{keys.service,key-crypto.service,keys.controller,keys-schemas,supabase-admin.factory,keys.module}.ts`, `src/keys/keys.service.spec.ts`, `.env.example` (`STORAGE_BUCKET`).
+- **Próximo paso:** worker de reintento para `key_releases` pending; conectar `wallet_pubkey` al enrolamiento; smoke E2E build→submit→release contra devnet.
+
 ## 2026-10-07 · fix(tx): require lowercase UUID storage_ref (IDL v1)
 - **Qué hice:** revisión cruzada del programa de Misael (PR hcd_api#10): leí las 11 instrucciones + 5 cuentas + errors/events completos y corrí `anchor test` en WSL (62/62 verdes, 1 skipped). Checklist de firmantes, seeds, Clock, log_access y datos on-chain: todo OK; dos menores reportados en la review (typo "ponytail:" en register_provider.rs y la independencia admin/key_service en update_config). Aprobé y mergeé #10 + docs #15. Adapté `src/tx/` al contrato nuevo: `storage_ref` ahora exige UUID canónico en minúscula (regex espejo del validador on-chain) + test negativo nuevo (13 tests en total).
 - **Archivos clave:** `src/tx/tx-schemas.ts`, `src/tx/tx.service.spec.ts`. También aprobé y mergeé las PRs de Mati: #11 (schema wallet+key_releases) y #12 (SupabaseAuthGuard, resolviendo el conflicto de README que le quedó con #11; 25 tests verdes post-merge).
