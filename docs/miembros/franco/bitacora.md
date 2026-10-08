@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · feat(tx): prove wallet ownership before first-use binding
+- **Qué hice:** hallazgo de Mati en review de #19 — el binding anterior registraba `wallet_pubkey` sin probar posesión (cualquiera podía ligar la clave de otro). Ahora el primer `build` exige `wallet_proof` (firma ed25519 de `salua:bind-wallet:<user.id>:<signer>:<ts>`, frescura ≤5 min) + `wallet_proof_ts`; verificación nativa con `crypto.verify` + JWK — cero dependencias nuevas. Sin proof → 400, firma inválida o stale → 403. 3 tests nuevos (19/19 en tx), lint/build limpios.
+- **Archivos clave:** `src/tx/{tx.service,tx-schemas,tx.service.spec}.ts`.
+- **Próximo paso:** la app firma ese mensaje con Privy `signMessage` en el primer build (aviso a Maxi/Mati); luego smoke E2E.
+
 ## 2026-10-08 · feat(tx): move pending_tx and fee payer spend to Postgres
 - **Qué hice:** migré los dos stores en memoria a Postgres (migración `20261008000000_tx_stores.sql`, tablas backend-only con RLS sin policies — solo service role). `pending_tx` guarda los envelopes build→submit con TTL (ya no se pierden con un restart ni dependen de una sola instancia); `fee_payer_spend` (día → lamports) + `fee_payer_user_txs` (día+signer → count) con el incremento atómico en la función `fee_payer_record` (solo service_role puede ejecutarla). Misma interfaz que antes, ahora async. Un bug del mock encontrado por los tests: el `default false` de la columna `used` no existe en un mock — explícito en el insert.
 - **Archivos clave:** `src/tx/{pending-tx.store,fee-budget.service,tx.service,tx.service.spec}.ts`, `supabase/migrations/20261008000000_tx_stores.sql`.
