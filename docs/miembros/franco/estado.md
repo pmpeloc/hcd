@@ -1,15 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-07
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-`src/tx/` mergeado en staging (#8) y adaptado al IDL v1 (`storage_ref` = UUID minúscula, 13 tests). Revisión cruzada del programa hecha y aprobada: PR hcd_api#10 mergeada (IDL v1 con `update_config`, ya en devnet). Ojo: el informe de Colosseum pone el cierre el **domingo 11/10 23:59** con pitch ≤2:00 y demo ≤3:00 en inglés.
+Instalé la skill Archify en `.devin/skills/` (disponible para todo el equipo) y generé el diagrama de arquitectura de Salua con evidencia pinneada al repo — SVG + HTML interactivo en `docs/proyecto/assets/`, ya embebido en el README (que seguía diciendo "Code is coming"). Privy quedó configurado (Custom Auth + JWKS) — la wallet ya debería crearse al loguear.
 
 ## Próximo paso
-- Revisar PRs de Mati (#11 `key_releases`/`wallet_pubkey`, #12 auth guard) — destraban `src/keys/` (día 6) y la conexión auth↔tx.
-- `src/keys/`: envoltura DEK + `/keys/release` + `log_access` con Memo `key_releases.id`.
-- Integración `lib/crypto` ↔ subida de Maxi (día 5, depende de su merge).
+- Smoke E2E contra devnet: build → firma → submit → release.
+- Verificar en la app que la wallet Privy se crea tras el fix de Misael.
+- Coordinar con Mati: correr la migración `tx_stores` en Supabase antes de desplegar.
 
 ## Bloqueos
-- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Se cierra con auth (PR #12) + `src/keys/`.
-- `pending_tx`/`fee_payer_spend` siguen en memoria hasta que entre el schema de Mati (#11).
+- PRs propias esperando aprobación: `hcd_api#17` (fail-closed), `#18` (tsconfig), `#19` (auth en /tx), `#20` (Postgres) y `hcd#23` (docs de esas) + esta PR de README/Archify. #19 y #20 van apiladas — mergear en orden.
+- Nota: con auth en `/tx`, los flujos de la app y scripts tienen que mandar el Bearer token — el primer build de cada usuario bindea su wallet.

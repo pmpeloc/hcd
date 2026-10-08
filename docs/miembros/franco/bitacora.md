@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · docs(readme): add Archify skill and architecture diagram
+- **Qué hice:** instalé la skill `tt-a1i/archify` en `.devin/skills/archify/` (queda disponible para todo el equipo; registrada en `skills-lock.json`, carpeta de trabajo `/.archify/` gitignored). Generé el mapa de arquitectura de Salua con evidencia real del repo (sources pinneadas a `hcd_api@65fa691`, gates validate/deliver/check/browser-check todos verdes) y exporté SVG canónico + HTML interactivo a `docs/proyecto/assets/`. README ahora muestra el diagrama con 3 bullets clave (cifrado en cliente, Solana solo hashes/grants/logs, backend que solo libera clave tras verificar grant on-chain) — el "Code is coming" quedó corregido porque ya hay código en los repos hermanos.
+- **Archivos clave:** `.devin/skills/archify/`, `skills-lock.json`, `.gitignore`, `README.md`, `docs/proyecto/assets/salua-architecture.{svg,html}`.
+- **Próximo paso:** smoke E2E contra devnet; la migración `tx_stores` sigue pendiente de correr en Supabase.
+
 ## 2026-10-07 · fix(tx): require lowercase UUID storage_ref (IDL v1)
 - **Qué hice:** revisión cruzada del programa de Misael (PR hcd_api#10): leí las 11 instrucciones + 5 cuentas + errors/events completos y corrí `anchor test` en WSL (62/62 verdes, 1 skipped). Checklist de firmantes, seeds, Clock, log_access y datos on-chain: todo OK; dos menores reportados en la review (typo "ponytail:" en register_provider.rs y la independencia admin/key_service en update_config). Aprobé y mergeé #10 + docs #15. Adapté `src/tx/` al contrato nuevo: `storage_ref` ahora exige UUID canónico en minúscula (regex espejo del validador on-chain) + test negativo nuevo (13 tests en total).
 - **Archivos clave:** `src/tx/tx-schemas.ts`, `src/tx/tx.service.spec.ts`. También aprobé y mergeé las PRs de Mati: #11 (schema wallet+key_releases) y #12 (SupabaseAuthGuard, resolviendo el conflicto de README que le quedó con #11; 25 tests verdes post-merge).
