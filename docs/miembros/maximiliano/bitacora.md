@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · test(app): cover access screens and the tx flow
+- **Qué hice:** 20 tests nuevos. Lógica: `runTx` con una API falsa (orden de fases, rearma una vez ante 409, se rinde al segundo, firma cancelada no envía nada, mensajes para 403/429/503) y los helpers de permisos (tiempo restante, "se cierra hoy/mañana/el dd/mm", vencimiento, progreso, estado vencido). Pantallas: solicitud con 24 h por defecto, cambio de duración, aprobar, rechazar, revocar con cancelar y confirmar, historial; y Pedir acceso sin paciente, envío con motivo y error con reintento. Pasan los 61 tests y el build.
+- **Archivos clave:** `hcd_app/e2e/access.spec.ts`, `e2e/app-logic.spec.ts`.
+- **Próximo paso:** visor (día 7) contra `/keys/release`; conectar `runTx` cuando Mati sume la firma a `useSaluaWallet`.
+
 ## 2026-10-08 · feat(app): add access requests, approvals and revocation
 - **Qué hice:** día 6. Paciente (`/accesos`): solicitud pendiente con quién pide (matrícula, centro, motivo), selector 1 h / 24 h / 7 días con número grande y hora de cierre, aprobar o rechazar; permisos activos con tiempo restante, barra y "Revocar" con confirmación; historial de permisos vencidos y revocados. Médico (`/solicitar`): paciente, qué pide (toda la historia, sin descarga, duración que elige el paciente), motivo opcional, enviado y error con reintento. Sumé `runTx` (`components/onchain/tx-flow.ts`): pide la tx a `/tx/build`, la firma con la wallet y la manda a `/tx/submit`, rearma una vez si venció el blockhash y traduce los errores (403, 409, 429, 503, firma cancelada). Los datos siguen siendo ficticios hasta que existan los endpoints de `access` y `records` y la firma en `useSaluaWallet`. También extraje el diálogo de confirmación y el bloque "Primero identificá al paciente".
 - **Archivos clave:** `hcd_app/components/access/`, `components/onchain/tx-flow.ts`, `components/confirm-dialog.tsx`, `components/needs-patient.tsx`, `app/(paciente)/accesos/page.tsx`, `app/(medico)/solicitar/page.tsx`.
