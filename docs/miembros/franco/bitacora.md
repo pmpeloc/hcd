@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · feat(tx): require auth and bind the signer wallet
+- **Qué hice:** enchufé `SupabaseAuthGuard` a todo `/tx` (antes del throttler). En `build`, el `signer` declarado tiene que ser una wallet del usuario autenticado (`app_user.wallet_pubkey` o `doctors.wallet_pubkey`, leídas con service-role). Si el usuario aún no tiene wallet registrada, el primer signer se **bindea** a su `app_user` (`wallet_pubkey` null → set, nunca sobrescribe) y queda exigido de ahí en más; una wallet ya ligada a otra cuenta → 403. Así se cierra el hueco "backend co-firma cualquier signer" sin bloquear el flujo hasta que exista el enrolamiento formal. `SupabaseAdminFactory` se mudó a `src/auth/` (era de `src/keys/`) y ahora lo exporta `AuthModule` para compartirlo sin acoplar tx→keys. 3 tests nuevos (signer ajeno → 403, binding inicial, wallet ya ligada a otra cuenta → 403); 43/43 en total, lint/tsc/build limpios.
+- **Archivos clave:** `src/tx/{tx.controller,tx.service,tx.module,tx.service.spec}.ts`, `src/auth/{auth.module,supabase-admin.factory}.ts`, `src/keys/*` (imports).
+- **Próximo paso:** migrar `pending_tx`/`fee_payer_spend` a Postgres; smoke E2E contra devnet.
+
 ## 2026-10-08 · chore(build): exclude anchor tests from root tsconfig
 - **Qué hice:** `tsc --noEmit` de staging fallaba en `tests/hcd.test.mts` (vino del merge #16: usa `web3.` sin import y `program.account.record` sin tipar — se ejecuta con el runner de Anchor que transpila sin typecheck, no con `tsc`). Saqué `tests/**/*` del `include` del `tsconfig.json` raíz; `tsconfig.build.json` ya lo excluía, así que el comportamiento queda consistente. No toqué el archivo del test (es de Misael). `tsc --noEmit` y `nest build` limpios.
 - **Archivos clave:** `hcd_api/tsconfig.json`.
