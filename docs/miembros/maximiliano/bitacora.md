@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · feat(app): send the session token to the API and explain program errors
+- **Qué hice:** `createApiClient` (`components/onchain/api-client.ts`): toda llamada a la API pasa por ahí y lleva `Authorization: Bearer <token>` de Supabase, leído en cada llamada (Supabase lo renueva solo); así nada da 401 cuando entre hcd_api#19. `runTx` ahora traduce los 20 errores del programa (el backend los devuelve como 422 con el nombre del IDL), incluidos los 3 nuevos (`KeyServiceIsAdmin`, `IssuerIsPatient`, `InvalidContentHash`), y el 401 a "Tu sesión venció"; los errores del programa no se reintentan. 9 tests nuevos. El lint (`npm run lint`) pasa limpio: el "circular structure" que vio el equipo sale de no correr `npm ci` después de traer `staging`.
+- **Archivos clave:** `hcd_app/components/onchain/api-client.ts`, `components/onchain/tx-flow.ts`, `e2e/app-logic.spec.ts`.
+- **Próximo paso:** visor `visor/[recordId]` contra `/keys/release`.
+
 ## 2026-10-08 · test(app): cover access screens and the tx flow
 - **Qué hice:** 20 tests nuevos. Lógica: `runTx` con una API falsa (orden de fases, rearma una vez ante 409, se rinde al segundo, firma cancelada no envía nada, mensajes para 403/429/503) y los helpers de permisos (tiempo restante, "se cierra hoy/mañana/el dd/mm", vencimiento, progreso, estado vencido). Pantallas: solicitud con 24 h por defecto, cambio de duración, aprobar, rechazar, revocar con cancelar y confirmar, historial; y Pedir acceso sin paciente, envío con motivo y error con reintento. Pasan los 61 tests y el build.
 - **Archivos clave:** `hcd_app/e2e/access.spec.ts`, `e2e/app-logic.spec.ts`.
