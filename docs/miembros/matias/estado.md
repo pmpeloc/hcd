@@ -1,15 +1,15 @@
 # Estado · Matías
 
-**Última actualización:** 2026-10-06
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-Tres tareas preparadas para revisión: migración wallet/auditoría (API #11), guard Supabase (API #12) y login Supabase/Privy en feat/supabase-privy-login (app). Documentación consolidada en la rama del PR #16.
+Backend de enrolamiento en feat/wallet-enrollment: perfil paciente seguro, desafío temporal y verificación Ed25519 con persistencia atómica. Contrato en app feat/wallet-enrollment-contract. Records sigue en API #21 y app #9 para revisión; no se mezcla su implementación con esta rama.
 
 ## Validación
-Login: seis pruebas simuladas en Edge, build y lint aprobados. API: 25 pruebas de auth/tx y compilación aprobadas. Migración: probada en PostgreSQL local; no aplicada a Supabase.
+Enrolamiento: 73 tests API (33 nuevos), build y lint aprobados; SQL en PostgreSQL local y prueba real de dos conexiones reclamando la misma wallet con un único éxito. No se aplicó la migración a Supabase. Los 70 tests de records corresponden a su rama separada, no se suman como una suite integrada.
 
 ## Próximo paso
-Prueba real de email/Google y creación/reutilización de wallet con cuenta de prueba. Implementar alta de app_user y vinculación verificada de wallet en backend. Coordinar con Franco la protección de tx/keys y la asociación de signer/tx_id a la identidad autenticada.
+Revisar contrato de enrolamiento con Franco, eliminar su binding inicial sin prueba y exigir wallet_verified_at al autorizar wallets. Luego integrar la firma de mensajes en Privy mediante acción explícita del usuario; firma de transacciones después. Records → tx e indexer siguen pendientes de integración.
 
 ## Bloqueos y límites
-Dashboards reales pendientes de verificar (redirect URLs, Google, JWT auth Privy y orígenes). Login no implica registro on-chain ni acceso a estudios. Las rutas ajenas a /login todavía no tienen protección de sesión en esta entrega. PR pendientes de revisión; no hubo despliegues ni migraciones remotas.
+La nueva API requiere migración wallet_enrollment y WALLET_ENROLLMENT_ORIGIN. Duplicados históricos de wallet bloquean la migración: no corregir automáticamente. Guard de dominio y módulos de Franco permanecen sin cambios, por lo que el enrolamiento por sí solo no corrige #19. Pendientes firma Privy real y smoke E2E. tx_stores ya aplicada; IV/pending_chain y enrolamiento todavía solo probados localmente.
