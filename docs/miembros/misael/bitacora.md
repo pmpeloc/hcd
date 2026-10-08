@@ -2,6 +2,17 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · test(program): add full journey integration test
+- **Qué hice:** puerta G4. Escenario `full journey` en la suite de Anchor: un mismo paciente y médico recorren alta → `issue_record` → `grant_access` → 2× `log_access` → `revoke_access` (el log siguiente se rechaza) → `dispute_record` → `void_record` → reemisión con `supersedes` → grant y log sobre el estudio nuevo (el anulado ya no acepta grants). En devnet imprime los links del explorer de cada transacción, para el formulario final. Verde en devnet (7/7, y la suite completa 58 ok / 0 fallas) y en local (68 ok / 0 fallas).
+- **Archivos clave:** `tests/hcd.test.mts`.
+- **Ejemplos en devnet:** [issue_record](https://explorer.solana.com/tx/4B8jY14aJ8jnWB8KpocTudPMfZtGog11SEP9C8kH1sSQnj4NCpBYrSMTjMYBo5C8wPZEGC3XCDRx3sfpTDcKDkvQ?cluster=devnet), [grant_access](https://explorer.solana.com/tx/qtAYVrj6ZVJaAVkid2BPWRZXd5Zon5CLDSwSn9AQwYqfr89eZzxaNq71b2vAHbmZGqPZ2EVEcvuW8yBvEXEAtAY?cluster=devnet), [log_access](https://explorer.solana.com/tx/3ua4HzzvhRzD1mqNywkfGqU6sj9TQMuEDEbYrZiPKEFadwgc4R6fWHswk3g64ueHbJH1ECE1qPBqWuGXc56ZCK1o?cluster=devnet).
+- **Próximo paso:** avisar al grupo del IDL v1; sábado: casos negativos extra y comentarios en las restricciones de Anchor.
+
+## 2026-10-08 · fix(program): address cross-review minor findings
+- **Qué hice:** cerré los dos menores de la revisión cruzada de Franco (hcd_api#10). Saqué el "ponytail:" que había quedado en un comentario de `register_provider.rs` (solo comentario: el bytecode no cambia y no hace falta redeploy). `update_config` valida solo el par nuevo, así que al traspasar el admin se podía dejar al admin saliente como `key_service`; ahora lo bloquea `scripts/update-config.mts` antes de firmar, sin tocar el programa.
+- **Archivos clave:** `programs/hcd/src/instructions/register_provider.rs`, `scripts/update-config.mts`.
+- **Próximo paso:** test de integración del recorrido completo en devnet (puerta G4) y avisar al grupo del IDL v1.
+
 ## 2026-10-06 · feat(program): harden program after security review (IDL v1)
 - **Qué hice:** como Franco se quedó sin tokens para la revisión cruzada, corrí una revisión independiente del programa con un agente sin contexto: nada crítico ni alto. Con eso agregué `update_config` (rotar `key_service`/admin/duración; `key_service` ≠ admin, también en `initialize_config`), `issue_record` rechaza emisor = paciente y hash en cero, y `storage_ref` pasa a ser un UUID en minúsculas (`records.id`). 18 tests nuevos (62 en local) cubren los huecos que marcó la revisión, más un test unitario de Rust del validador de UUID. Script `scripts/update-config.mts`. IDL v1 publicado (solo agrega cosas). Redeploy en devnet; los riesgos aceptados quedaron en el README del programa y en `decisiones.md`.
 - **Archivos clave:** `programs/hcd/src/instructions/{update_config,issue_record,initialize_config}.rs`, `programs/hcd/src/{lib,errors,events}.rs`, `tests/hcd.test.mts`, `scripts/update-config.mts`, `idl/hcd.json`, `programs/hcd/README.md`, `docs/proyecto/decisiones.md`.

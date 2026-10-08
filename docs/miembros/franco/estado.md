@@ -1,15 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-05
+**Última actualización:** 2026-10-07
 
 ## En qué estoy
-Día 2 avanzado: `src/tx/` implementado y verde (build/submit byte a byte, co-firma fee payer + key_service, throttler por wallet, presupuesto diario, 12 tests). Mergeé las 4 PRs de Misael del programa en devnet y la investigación de producto quedó archivada en `D:\hackathon\Documentacion` (8 docs + 2 PDFs). En revisión: PR `feat/tx-module` a staging.
+`src/tx/` mergeado en staging (#8) y adaptado al IDL v1 (`storage_ref` = UUID minúscula, 13 tests). Revisión cruzada del programa hecha y aprobada: PR hcd_api#10 mergeada (IDL v1 con `update_config`, ya en devnet). Ojo: el informe de Colosseum pone el cierre el **domingo 11/10 23:59** con pitch ≤2:00 y demo ≤3:00 en inglés.
 
 ## Próximo paso
-- Mergear `src/tx/` tras aprobación; día 5: `hcd_app/lib/crypto/` (AES-GCM + SHA-256) y luego `src/keys/` con Memo `key_releases.id` en `log_access`.
-- Mati: cuando tenga write access a `hcd_api` revisar `feat/wallet-audit-schema` y coordinar `key_releases` + `pending_tx`/`fee_payer_spend` (hoy en memoria en `src/tx/`).
-- Misael: evaluar `log_self_access` + rotación de `key_service`/Config (hoy inmutable on-chain) antes de producción.
+- Revisar PRs de Mati (#11 `key_releases`/`wallet_pubkey`, #12 auth guard) — destraban `src/keys/` (día 6) y la conexión auth↔tx.
+- `src/keys/`: envoltura DEK + `/keys/release` + `log_access` con Memo `key_releases.id`.
+- Integración `lib/crypto` ↔ subida de Maxi (día 5, depende de su merge).
 
 ## Bloqueos
-- Mati/Maxi/Rodrigo sin write access en los 3 repos de código — Misael tiene que invitarlos (Settings > Collaborators).
-- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Queda para cuando entre auth + `src/keys/` (el spec lo exige como cierre del hueco de carga).
+- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Se cierra con auth (PR #12) + `src/keys/`.
+- `pending_tx`/`fee_payer_spend` siguen en memoria hasta que entre el schema de Mati (#11).
