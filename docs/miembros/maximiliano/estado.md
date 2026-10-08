@@ -1,17 +1,19 @@
 # Estado · Maximiliano
 
-**Última actualización:** 2026-10-06
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-Quedó en PR la base visual de `hcd_app` (`feat/design-system`): tema Salua sobre shadcn/ui, tipografías, componentes (botones, chips de estado, tarjetas, campos, selector de duración) y los shells de paciente y médico, copiados del prototipo «Salua · App» de Claude Design. Encima apliqué el diseño «Salua · App C» (bloques bento y número grande) al Inicio del paciente y al panel del médico. En la rama `feat/patient-qr` (sale de `feat/design-system`) hice la pantalla Mi QR con datos ficticios, y en `feat/doctor-scanner` (sale de esa) el escáner del médico con la verificación del DNI, y en `feat/doctor-upload` la carga del estudio con cifrado real en el navegador. Todo va en un solo PR al final del día. Las demás páginas tienen el shell y su título; el contenido de cada pantalla sigue el plan día por día. La landing K queda en pausa (es de Rodrigo).
+Ya están en `staging` (hcd_app#6) el sistema de diseño, los inicios en bento, Mi QR, el escáner y Cargar estudio. Sin subir todavía, en ramas apiladas: `feat/patient-studies-session` (día 5: sesión real de Supabase + Privy en los shells y Mis estudios con "No es mío") y encima `feat/access-requests` (día 6: Accesos del paciente con aprobar 1 h / 24 h / 7 días, rechazar y revocar; Pedir acceso del médico; y `runTx`, el paso común build → firma → submit de `/tx`). 61 tests de Playwright en verde (`npm run test:e2e`). Lo que depende del backend sigue detrás de funciones ficticias: `lookupPatient`, `uploadRecord` (el cifrado ya es real), `getMyStudies`, `disputeStudy`, `getMyAccess`, `approveRequest`, `rejectRequest`, `revokeGrant` y `requestAccess`.
 
 ## Próximo paso
-- Conectar Mi QR a la wallet real (Privy) y a la API cuando Mati las suba.
-- Conectar la carga a la API (subida, llave e `issue_record`) cuando Mati la suba.
-- Pedir acceso (médico) y solicitudes del paciente (día 6).
-- Conectar el escáner a la API de Mati para validar el código.
-- Reemplazar el usuario fijo del shell por la sesión real cuando Mati tenga la plomería.
+- Visor `visor/[recordId]` (día 7) contra `/keys/release`: hash antes de descifrar, "Estudio alterado", marca de agua, sin descarga.
+- Conectar `runTx` a "No es mío", aprobar y revocar cuando haya firma en `useSaluaWallet` y record PDAs reales.
+- Conectar la carga y las listas cuando existan `/records` y `/access-requests`.
 
 ## Bloqueos
+- `hcd_api`: los módulos `records` y `access` siguen vacíos (sin upload-url, registrar estudio, listar mis estudios ni solicitudes). Lo tiene Mati.
+- `useSaluaWallet` (Mati) solo da la dirección: falta una función para firmar transacciones con Privy.
+- `records` no guarda tipo de estudio, fecha ni origen: sin eso la lista real no puede mostrar nombres.
+- `/tx` va a pedir sesión cuando se mergee hcd_api#19.
 - El equipo tiene que aprobar los tonos AA sumados a la paleta (`#0A6FC2`, `#0B7A74`, `#5F6B80`).
-- `npm run lint` en `hcd_app` falla al cargar `eslint.config.mjs` ("circular structure"); viene del scaffold.
+- El login (`/login`, de Mati) está en inglés; el resto de la app está en castellano.
