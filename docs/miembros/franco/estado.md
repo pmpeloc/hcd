@@ -3,7 +3,7 @@
 **Última actualización:** 2026-10-08
 
 ## En qué estoy
-`/keys/release` ahora es **fail-closed**: si `log_access` no confirma en Solana no se entrega la DEK (503 + fila `failed`). `KeyCryptoService` exportado para que `/records` (Mati) envuelva la DEK al registrar el estudio. Todo lo de anoche quedó mergeado: mi `src/keys/` (#14), el fix UUID de `src/tx/` (#13) y las 4 PRs de Misael que revisé hoy a la mañana (#15, #16, #21, #22 — incluye el test G4 de recorrido completo y el fix de mis 2 hallazgos menores). Cero PRs abiertas. Privy quedó configurado (Custom Auth + JWKS) — la wallet ya debería crearse al loguear.
+Atendí el hallazgo de Mati en la review de #19: el binding de wallet en el primer `build` ahora exige **proof de posesión** (`wallet_proof` = firma ed25519 del challenge `salua:bind-wallet:<user.id>:<signer>:<ts>`, ≤5 min, verificación nativa Node sin dependencias). Antes cualquiera podía ligar la pubkey de otro. La app firma ese mensaje con Privy `signMessage` en el primer build. Mati ya aplicó `tx_stores` en Supabase y dejó el cliente con Bearer automático (app #7).
 
 ## Próximo paso
 - Smoke E2E contra devnet: build → firma → submit → release.
