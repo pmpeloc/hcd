@@ -1,15 +1,15 @@
 # Estado · Matías
 
-**Última actualización:** 2026-10-06
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-Tres tareas preparadas para revisión: migración wallet/auditoría (API #11), guard Supabase (API #12) y login Supabase/Privy en feat/supabase-privy-login (app). Documentación consolidada en la rama del PR #16.
-
-## Validación
-Login: seis pruebas simuladas en Edge, build y lint aprobados. API: 25 pruebas de auth/tx y compilación aprobadas. Migración: probada en PostgreSQL local; no aplicada a Supabase.
+Cliente autenticado de API en feat/api-session-client, con 14 pruebas aprobadas. Migración tx_stores de Franco aplicada en Supabase y restricciones verificadas. PRs anteriores de wallet, guard y login ya integrados.
 
 ## Próximo paso
-Prueba real de email/Google y creación/reutilización de wallet con cuenta de prueba. Implementar alta de app_user y vinculación verificada de wallet en backend. Coordinar con Franco la protección de tx/keys y la asociación de signer/tx_id a la identidad autenticada.
+Alta segura de app_user y wallet, /records y URLs de carga, validación QR; después conexión a pantallas de Maxi. En /records usar records.id (UUID minúsculo) como storage_ref. Coordinar binding de identidad con Franco antes del smoke completo.
 
-## Bloqueos y límites
-Dashboards reales pendientes de verificar (redirect URLs, Google, JWT auth Privy y orígenes). Login no implica registro on-chain ni acceso a estudios. Las rutas ajenas a /login todavía no tienen protección de sesión en esta entrega. PR pendientes de revisión; no hubo despliegues ni migraciones remotas.
+## Pendientes de integración
+PRs API #17, #18, #19 y #20 siguen pendientes de merge; mantener orden. La migración #20 ya fue aplicada manualmente: reconciliar historial antes de usar db push. Privy real y smoke app/API/Supabase/devnet aún no verificados.
+
+## Observaciones para Franco y Rodrigo
+El binding inicial de #19 escribe wallet_pubkey antes de demostrar propiedad mediante firma; requiere corrección aunque se agregue enrolamiento formal. Los links de demo/app.js apuntan a firmas aleatorias simuladas y no prueban operaciones on-chain. El test del programa en devnet no cubre los endpoints faltantes ni la app completa.
