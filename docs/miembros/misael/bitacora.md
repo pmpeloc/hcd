@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · fix(program): address cross-review minor findings
+- **Qué hice:** cerré los dos menores de la revisión cruzada de Franco (hcd_api#10). Saqué el "ponytail:" que había quedado en un comentario de `register_provider.rs` (solo comentario: el bytecode no cambia y no hace falta redeploy). `update_config` valida solo el par nuevo, así que al traspasar el admin se podía dejar al admin saliente como `key_service`; ahora lo bloquea `scripts/update-config.mts` antes de firmar, sin tocar el programa.
+- **Archivos clave:** `programs/hcd/src/instructions/register_provider.rs`, `scripts/update-config.mts`.
+- **Próximo paso:** test de integración del recorrido completo en devnet (puerta G4) y avisar al grupo del IDL v1.
+
 ## 2026-10-06 · feat(program): harden program after security review (IDL v1)
 - **Qué hice:** como Franco se quedó sin tokens para la revisión cruzada, corrí una revisión independiente del programa con un agente sin contexto: nada crítico ni alto. Con eso agregué `update_config` (rotar `key_service`/admin/duración; `key_service` ≠ admin, también en `initialize_config`), `issue_record` rechaza emisor = paciente y hash en cero, y `storage_ref` pasa a ser un UUID en minúsculas (`records.id`). 18 tests nuevos (62 en local) cubren los huecos que marcó la revisión, más un test unitario de Rust del validador de UUID. Script `scripts/update-config.mts`. IDL v1 publicado (solo agrega cosas). Redeploy en devnet; los riesgos aceptados quedaron en el README del programa y en `decisiones.md`.
 - **Archivos clave:** `programs/hcd/src/instructions/{update_config,issue_record,initialize_config}.rs`, `programs/hcd/src/{lib,errors,events}.rs`, `tests/hcd.test.mts`, `scripts/update-config.mts`, `idl/hcd.json`, `programs/hcd/README.md`, `docs/proyecto/decisiones.md`.
