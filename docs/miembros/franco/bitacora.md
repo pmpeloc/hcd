@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · feat(tx): move pending_tx and fee payer spend to Postgres
+- **Qué hice:** migré los dos stores en memoria a Postgres (migración `20261008000000_tx_stores.sql`, tablas backend-only con RLS sin policies — solo service role). `pending_tx` guarda los envelopes build→submit con TTL (ya no se pierden con un restart ni dependen de una sola instancia); `fee_payer_spend` (día → lamports) + `fee_payer_user_txs` (día+signer → count) con el incremento atómico en la función `fee_payer_record` (solo service_role puede ejecutarla). Misma interfaz que antes, ahora async. Un bug del mock encontrado por los tests: el `default false` de la columna `used` no existe en un mock — explícito en el insert.
+- **Archivos clave:** `src/tx/{pending-tx.store,fee-budget.service,tx.service,tx.service.spec}.ts`, `supabase/migrations/20261008000000_tx_stores.sql`.
+- **Próximo paso:** smoke E2E contra devnet; la migración hay que correrla en Supabase antes de desplegar.
+
 ## 2026-10-08 · feat(tx): require auth and bind the signer wallet
 - **Qué hice:** enchufé `SupabaseAuthGuard` a todo `/tx` (antes del throttler). En `build`, el `signer` declarado tiene que ser una wallet del usuario autenticado (`app_user.wallet_pubkey` o `doctors.wallet_pubkey`, leídas con service-role). Si el usuario aún no tiene wallet registrada, el primer signer se **bindea** a su `app_user` (`wallet_pubkey` null → set, nunca sobrescribe) y queda exigido de ahí en más; una wallet ya ligada a otra cuenta → 403. Así se cierra el hueco "backend co-firma cualquier signer" sin bloquear el flujo hasta que exista el enrolamiento formal. `SupabaseAdminFactory` se mudó a `src/auth/` (era de `src/keys/`) y ahora lo exporta `AuthModule` para compartirlo sin acoplar tx→keys. 3 tests nuevos (signer ajeno → 403, binding inicial, wallet ya ligada a otra cuenta → 403); 43/43 en total, lint/tsc/build limpios.
 - **Archivos clave:** `src/tx/{tx.controller,tx.service,tx.module,tx.service.spec}.ts`, `src/auth/{auth.module,supabase-admin.factory}.ts`, `src/keys/*` (imports).
