@@ -1,15 +1,16 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-07
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-`src/tx/` mergeado en staging (#8) y adaptado al IDL v1 (`storage_ref` = UUID minúscula, 13 tests). Revisión cruzada del programa hecha y aprobada: PR hcd_api#10 mergeada (IDL v1 con `update_config`, ya en devnet). Ojo: el informe de Colosseum pone el cierre el **domingo 11/10 23:59** con pitch ≤2:00 y demo ≤3:00 en inglés.
+`/keys/release` ahora es **fail-closed**: si `log_access` no confirma en Solana no se entrega la DEK (503 + fila `failed`). `KeyCryptoService` exportado para que `/records` (Mati) envuelva la DEK al registrar el estudio. Todo lo de anoche quedó mergeado: mi `src/keys/` (#14), el fix UUID de `src/tx/` (#13) y las 4 PRs de Misael que revisé hoy a la mañana (#15, #16, #21, #22 — incluye el test G4 de recorrido completo y el fix de mis 2 hallazgos menores). Cero PRs abiertas. Privy quedó configurado (Custom Auth + JWKS) — la wallet ya debería crearse al loguear.
 
 ## Próximo paso
-- Revisar PRs de Mati (#11 `key_releases`/`wallet_pubkey`, #12 auth guard) — destraban `src/keys/` (día 6) y la conexión auth↔tx.
-- `src/keys/`: envoltura DEK + `/keys/release` + `log_access` con Memo `key_releases.id`.
-- Integración `lib/crypto` ↔ subida de Maxi (día 5, depende de su merge).
+- Enchufar `SupabaseAuthGuard` a `/tx` y validar `signer` = `wallet_pubkey` del usuario autenticado.
+- Migrar `pending_tx`/`fee_payer_spend` a Postgres (el schema de Mati ya está en staging).
+- Smoke E2E contra devnet: build → firma → submit → release.
+- Verificar en la app que la wallet Privy se crea tras el fix de Misael.
 
 ## Bloqueos
-- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Se cierra con auth (PR #12) + `src/keys/`.
-- `pending_tx`/`fee_payer_spend` siguen en memoria hasta que entre el schema de Mati (#11).
+- `tsc --noEmit` de staging falla en `tests/hcd.test.mts` (vino del merge #16 — fuera del scope de `nest build`, pero ensucia la verificación; se lo paso a Misael).
+- PRs propias esperando aprobación: `hcd_api` (fail-closed, abro ahora) + docs acompañantes.
