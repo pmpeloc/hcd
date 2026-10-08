@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · feat(app): add access requests, approvals and revocation
+- **Qué hice:** día 6. Paciente (`/accesos`): solicitud pendiente con quién pide (matrícula, centro, motivo), selector 1 h / 24 h / 7 días con número grande y hora de cierre, aprobar o rechazar; permisos activos con tiempo restante, barra y "Revocar" con confirmación; historial de permisos vencidos y revocados. Médico (`/solicitar`): paciente, qué pide (toda la historia, sin descarga, duración que elige el paciente), motivo opcional, enviado y error con reintento. Sumé `runTx` (`components/onchain/tx-flow.ts`): pide la tx a `/tx/build`, la firma con la wallet y la manda a `/tx/submit`, rearma una vez si venció el blockhash y traduce los errores (403, 409, 429, 503, firma cancelada). Los datos siguen siendo ficticios hasta que existan los endpoints de `access` y `records` y la firma en `useSaluaWallet`. También extraje el diálogo de confirmación y el bloque "Primero identificá al paciente".
+- **Archivos clave:** `hcd_app/components/access/`, `components/onchain/tx-flow.ts`, `components/confirm-dialog.tsx`, `components/needs-patient.tsx`, `app/(paciente)/accesos/page.tsx`, `app/(medico)/solicitar/page.tsx`.
+- **Próximo paso:** tests de las pantallas de accesos y de `runTx`.
+
 ## 2026-10-07 · test(app): cover patient and doctor screens with Playwright
 - **Qué hice:** 35 tests nuevos con Playwright (el runner que ya usa la app; Vitest no está en el stack del frontend). Lógica: código del QR (formato, ida y vuelta del payload, códigos escritos, cuenta regresiva), búsqueda del escáner, validación de archivos y que el cifrado sea real (la huella es del archivo cifrado y cambia con cada llave). Pantallas: pedir sesión sin login, nombre de la sesión en el shell, Mi QR sin wallet, Mis estudios con filtros y "No es mío", escáner con DNI y errores, y la carga completa con error y reintento. La sesión se simula igual que en los tests de login de Mati. Pasan los 41 tests, también repetidos.
 - **Archivos clave:** `hcd_app/e2e/app-logic.spec.ts`, `e2e/app-shell.spec.ts`, `e2e/patient-studies.spec.ts`, `e2e/doctor-flow.spec.ts`, `e2e/support/session.ts`.
