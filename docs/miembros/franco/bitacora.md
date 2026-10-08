@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · chore(build): exclude anchor tests from root tsconfig
+- **Qué hice:** `tsc --noEmit` de staging fallaba en `tests/hcd.test.mts` (vino del merge #16: usa `web3.` sin import y `program.account.record` sin tipar — se ejecuta con el runner de Anchor que transpila sin typecheck, no con `tsc`). Saqué `tests/**/*` del `include` del `tsconfig.json` raíz; `tsconfig.build.json` ya lo excluía, así que el comportamiento queda consistente. No toqué el archivo del test (es de Misael). `tsc --noEmit` y `nest build` limpios.
+- **Archivos clave:** `hcd_api/tsconfig.json`.
+- **Próximo paso:** enchufar `SupabaseAuthGuard` a `/tx` + validar `signer` = `wallet_pubkey`.
+
 ## 2026-10-08 · fix(keys): fail-closed release — no DEK without a confirmed log_access
 - **Qué hice:** invertí el fallback de `/keys/release` según la decisión de Franco (sin Solana no hay Salua): si `log_access` no confirma on-chain —rechazo del programa o infra caída tras 2 reintentos— no se entrega la DEK. Infra → 503 y fila `failed` (antes entregaba igual y quedaba `pending`); el médico reintenta la request completa. Caso borde aceptado: una tx que confirmó aunque el RPC no respondió deja log sin entrega, preferible a entrega sin log. `KeyCryptoService` queda exportado para que el `/records` de Mati envuelva la DEK al registrar el estudio. Spec actualizado (§5, §6, §7, §8). 14/14 tests verdes, lint y build limpios.
 - **Archivos clave:** `src/keys/keys.service.ts`, `keys.service.spec.ts`, `keys.module.ts`, `docs/proyecto/servicio-llaves.md`.
