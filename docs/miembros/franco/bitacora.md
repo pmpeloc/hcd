@@ -3,7 +3,7 @@
 Una entrada por commit, la más nueva arriba.
 
 ## 2026-10-08 · fix(tx): fail closed on identity lookup errors
-- **Qué hice:** punto de Mati en coordinación — si la consulta de `app_user` falla (DB/red), `/tx/build` devolvía 403 como si el usuario no tuviera wallet; ahora una query con error da 503 (reintentable) y solo la ausencia real de wallet verificada da 403. Mismo criterio aplicado en `/keys`. Tests 17/17, lint limpio. Va en `hcd_api#19`.
+- **Qué hice:** punto de Mati en coordinación — si la consulta de `app_user` falla (DB/red), `/tx/build` devolvía 403 como si el usuario no tuviera wallet; ahora una query con error da 503 (reintentable) y solo la ausencia real de wallet verificada da 403. Mismo criterio aplicado en `/keys` (rama `fix/keys-fail-closed`, nuevo test de lookup caído → 503). Tests 17/17 tx + 16/16 keys, lint limpio. Va en `hcd_api#19` y `hcd_api#17`.
 - **Archivos clave:** `hcd_api/src/tx/tx.service.ts`, `tx.service.spec.ts`.
 - **Próximo paso:** mismo fix en `keys.service.ts` (rama `fix/keys-fail-closed`), rebase de #20, coordinar contrato con Mati.
 
