@@ -3,7 +3,7 @@
 Una entrada por commit, la más nueva arriba.
 
 ## 2026-10-08 · feat(tx): prove wallet ownership before first-use binding
-- **Qué hice:** hallazgo de Mati en review de #19 — el binding anterior registraba `wallet_pubkey` sin probar posesión (cualquiera podía ligar la clave de otro). Ahora el primer `build` exige `wallet_proof` (firma ed25519 de `salua:bind-wallet:<user.id>:<signer>:<ts>`, frescura ≤5 min) + `wallet_proof_ts`; verificación nativa con `crypto.verify` + JWK — cero dependencias nuevas. Sin proof → 400, firma inválida o stale → 403. 3 tests nuevos (19/19 en tx), lint/build limpios.
+- **Qué hice:** hallazgo de Mati en review de #19 — el binding anterior registraba `wallet_pubkey` sin probar posesión (cualquiera podía ligar la clave de otro). Ahora el primer `build` exige `wallet_proof` (firma ed25519 de `salua:bind-wallet:<user.id>:<signer>:<ts>`, frescura ≤5 min) + `wallet_proof_ts`; verificación nativa con `crypto.verify` + JWK — cero dependencias nuevas. Sin proof → 400, firma inválida o stale → 403. 3 tests nuevos (19/19 en tx), lint/build limpios. Va en `hcd_api#19`.
 - **Archivos clave:** `src/tx/{tx.service,tx-schemas,tx.service.spec}.ts`.
 - **Próximo paso:** la app firma ese mensaje con Privy `signMessage` en el primer build (aviso a Maxi/Mati); luego smoke E2E.
 
