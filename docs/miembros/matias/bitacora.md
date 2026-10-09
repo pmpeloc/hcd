@@ -1,5 +1,11 @@
 # Bitácora · Matías
 
+## 2026-10-08 · fix(auth): bind enrollment to visible account and audit atomically
+- **Qué hice:** desafío v2 con correo del JWT y UUID; validación de cuenta/origen/wallet/desafío; índice único de médicos y trigger de coherencia; auditoría wallet_enrolled en la misma transacción. Factory compartida de #19 y cliente reutilizado, rate limit antes de JWT y configuración validada al iniciar.
+- **Archivos clave:** hcd_api/src/auth/wallet-enrollment*, supabase-session.guard.ts, auth.module.ts, supabase-admin.factory.ts, WALLET_ENROLLMENT.md, supabase/migrations/20261008020000_wallet_enrollment.sql y supabase/tests/wallet_enrollment.sql.
+- **Validación:** 87 tests API, build/lint aprobados; SQL local desde cero, rollback por fallo de auditoría y dos carreras reales (misma wallet / mismo desafío), siempre un éxito y un evento. Sin migración a Supabase ni firma de wallets reales.
+- **Próximo paso:** nueva revisión de API #22; después migración/despliegue y firma explícita con Privy antes de habilitar consumidores #17/#19. Actualizado el orden en enrolamiento-wallet.md.
+
 ## 2026-10-08 · feat(auth): share wallet enrollment request schemas
 - **Qué hice:** copia exacta del contrato de inicialización, desafío y verificación para la próxima integración de Privy, sin modificar pantallas ni ejecutar firmas reales.
 - **Archivos clave:** hcd_app/lib/schemas/wallet-enrollment.ts.

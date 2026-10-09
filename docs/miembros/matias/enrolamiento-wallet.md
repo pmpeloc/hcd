@@ -14,7 +14,7 @@ No se puede elegir rol, organización, usuario ni mensaje en la verificación. N
 
 ## Coordinación con Franco
 
-- Eliminar el guardado del primer signer en #19. Un JWT de Supabase no prueba propiedad de una wallet.
+- Franco ya retiró el binding inicial en #19 y exige enrolamiento verificado en #19/#17. Se debe desplegar nuestra migración y completar enrolamiento antes de habilitar esos consumidores.
 - Exigir `app_user.wallet_verified_at` no nulo y dirección coincidente antes de autorizar tx/keys; una wallet de `doctors` sola tampoco basta.
 - Los valores anteriores permanecen sin verificar hasta completar el desafío. No migrarlos como válidos por defecto.
 - Records debe adoptar la misma comprobación al integrar su rama.
@@ -25,5 +25,24 @@ No se puede elegir rol, organización, usuario ni mensaje en la verificación. N
 - Revisar `20261008020000_wallet_enrollment.sql`, aplicar atómicamente tras init y wallet_audit. Todavía no aplicada a Supabase.
 - Configurar `WALLET_ENROLLMENT_ORIGIN` con el origen exacto de la app, sin barra final; HTTPS salvo localhost/127.0.0.1. Nunca derivarlo libremente del request.
 - Un índice único impide vincular dos cuentas a la misma wallet. Si existen duplicados, la migración debe detenerse para investigarlos.
-- 73 tests API, build/lint, migraciones SQL locales y carrera real de dos conexiones aprobados. Sin datos reales ni firmas de wallets del equipo.
+- 87 tests API, build/lint, migraciones SQL locales y carreras reales de dos conexiones aprobados tras la revisión. Sin datos reales ni firmas de wallets del equipo.
 - Prueba Privy real y firma de transacciones: pendientes, no incluidos en esta entrega.
+
+## Correcciones de la revisión de API #22 · 2026-10-08
+
+- Desafío v2 con correo del JWT verificado y UUID de cuenta; nunca se toma del body. La app debe mostrar cuenta y origen antes de abrir la firma explícita de Privy. El correo visible mitiga el engaño; no convierte una firma engañosa en imposible.
+- La verificación compara versión, cuenta, wallet, desafío y origen. Un cambio de correo/origen exige un desafío nuevo. Los desafíos v1 dejan de servir.
+- Índice único parcial también en doctors.wallet_pubkey. Un trigger exige que las nuevas escrituras de wallet del médico correspondan a un app_user ya verificado, usando el mismo bloqueo de dirección. Las altas iniciales de app_user pasan por la RPC; recuperación administrativa es otro flujo.
+- wallet_enrolled se inserta junto a la vinculación y consumo del desafío. Si falla la auditoría, se revierte todo. El evento no incluye correo ni firma; el mensaje del desafío sí contiene el correo y permanece en la tabla privada hasta reemplazo o eliminación.
+- AuthModule exporta la misma factory administrativa de #19; el repositorio reutiliza su cliente. Rate limit antes de validar JWT; configuración del origen validada al iniciar.
+- Pruebas locales: auditoría atómica, duplicados de médicos, reenrolamiento de la misma wallet, dos cuentas reclamando una wallet y dos llamadas consumiendo el mismo desafío. En ambas carreras hubo un solo éxito, consumo y evento.
+- Los JSON de entrada no cambian: app #10 conserva su contrato. Queda pendiente implementar la confirmación visible y firma real con Privy; no se hizo una prueba de navegador/devnet.
+
+### Orden de integración
+
+1. Nueva revisión de API #22; comprobar duplicados históricos antes de aplicar la migración en una transacción.
+2. Aplicar migración wallet_enrollment a Supabase y configurar WALLET_ENROLLMENT_ORIGIN antes de desplegar la API. **Todavía no aplicada.**
+3. Integrar pantalla de confirmación/firma Privy y enrolar cuentas de prueba. Las wallets antiguas siguen sin verificar.
+4. Integrar #17/#19 respetando el orden de la pila de Franco; después probar tx/keys con esas cuentas. tx_stores ya se aplicó anteriormente, no repetirla a ciegas.
+
+El chequeo opcional del header Origin no sustituye la prueba de firma; no se añadió como dependencia para clientes no navegador. Los esquemas públicos quedan iguales en API/app; se actualizó el estilo Zod de las filas internas de persistencia.
