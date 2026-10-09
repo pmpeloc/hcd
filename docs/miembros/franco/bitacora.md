@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · refactor(tx): require enrolled wallet, drop first-use binding
+- **Qué hice:** siguiendo la revisión de Mati y su enrolamiento (#22), `/tx/build` ya no bindea el primer signer ni acepta `wallet_proof`: exige que `signer` coincida con `app_user.wallet_pubkey` y que `wallet_verified_at` no sea nulo (la prueba de posesión la hace el desafío de enrolamiento). Sin wallet enrolada o wallet no verificada → 403. Esquemas sin `wallet_proof`/`wallet_proof_ts`, 16/16 tests, lint/tsc/build limpios. Va en `hcd_api#19`.
+- **Archivos clave:** `hcd_api/src/tx/tx.service.ts`, `tx-schemas.ts`, `tx.service.spec.ts`.
+- **Próximo paso:** mismo requisito `wallet_verified_at` en `/keys` (rama `fix/keys-fail-closed`); rebase de #20 sobre el nuevo tip de #19.
+
 ## 2026-10-08 · feat(tx): prove wallet ownership before first-use binding
 - **Qué hice:** hallazgo de Mati en review de #19 — el binding anterior registraba `wallet_pubkey` sin probar posesión (cualquiera podía ligar la clave de otro). Ahora el primer `build` exige `wallet_proof` (firma ed25519 de `salua:bind-wallet:<user.id>:<signer>:<ts>`, frescura ≤5 min) + `wallet_proof_ts`; verificación nativa con `crypto.verify` + JWK — cero dependencias nuevas. Sin proof → 400, firma inválida o stale → 403. 3 tests nuevos (19/19 en tx), lint/build limpios. Va en `hcd_api#19`.
 - **Archivos clave:** `src/tx/{tx.service,tx-schemas,tx.service.spec}.ts`.
