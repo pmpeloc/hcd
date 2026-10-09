@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · refactor(keys): only verified enrolled wallets get grants
+- **Qué hice:** `/keys/release` ya no confía en `doctors.wallet_pubkey` ni en `app_user.wallet_pubkey` pelado: la única wallet que habilita grants es la del `app_user` con `wallet_verified_at` no nulo (post-enrolamiento de #22). Wallets legacy o cargadas por admin sin prueba quedan afuera. Mock del spec actualizado, nuevo test de wallet sin verificar → 403, 15/15 tests, lint/build limpios. Va en `hcd_api#17`.
+- **Archivos clave:** `hcd_api/src/keys/keys.service.ts`, `keys.service.spec.ts`.
+- **Próximo paso:** rebase de #20 sobre el nuevo tip de #19; revisión de API #22 en curso.
+
 ## 2026-10-08 · refactor(tx): require enrolled wallet, drop first-use binding
 - **Qué hice:** siguiendo la revisión de Mati y su enrolamiento (#22), `/tx/build` ya no bindea el primer signer ni acepta `wallet_proof`: exige que `signer` coincida con `app_user.wallet_pubkey` y que `wallet_verified_at` no sea nulo (la prueba de posesión la hace el desafío de enrolamiento). Sin wallet enrolada o wallet no verificada → 403. Esquemas sin `wallet_proof`/`wallet_proof_ts`, 16/16 tests, lint/tsc/build limpios. Va en `hcd_api#19`.
 - **Archivos clave:** `hcd_api/src/tx/tx.service.ts`, `tx-schemas.ts`, `tx.service.spec.ts`.
