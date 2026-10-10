@@ -1,15 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-07
+**Última actualización:** 2026-10-10
 
 ## En qué estoy
-`src/tx/` mergeado en staging (#8) y adaptado al IDL v1 (`storage_ref` = UUID minúscula, 13 tests). Revisión cruzada del programa hecha y aprobada: PR hcd_api#10 mergeada (IDL v1 con `update_config`, ya en devnet). Ojo: el informe de Colosseum pone el cierre el **domingo 11/10 23:59** con pitch ≤2:00 y demo ≤3:00 en inglés.
+MVP cableado de punta a punta en código. Lado API: los tres módulos stub quedaron implementados (`organizations`, `access`, `indexer`) + el enrolamiento de Mati integrado, alias `SAL-XXXX` dictables, metadata de estudios, grants revocables y migraciones aplicadas a Supabase (8) con el bucket `records` privado. Lado app: reemplacé todos los placeholders por llamadas reales — QR, lookup, upload cifrado, estudios, accesos, historial nuevo y enrolamiento Privy challenge→firma→verify. Validación: API 126/126 tests + build/lint; app 80/80 Playwright + tsc/eslint limpios.
 
 ## Próximo paso
-- Revisar PRs de Mati (#11 `key_releases`/`wallet_pubkey`, #12 auth guard) — destraban `src/keys/` (día 6) y la conexión auth↔tx.
-- `src/keys/`: envoltura DEK + `/keys/release` + `log_access` con Memo `key_releases.id`.
-- Integración `lib/crypto` ↔ subida de Maxi (día 5, depende de su merge).
+- Smoke E2E contra devnet con dos sesiones reales: enroll → upload → `issue_record` → indexer baja el evento → request → `grant_access` → `/keys/release` → visor "Es el archivo original".
+- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 (app).
 
 ## Bloqueos
-- `issue_record` no valida aún el QR/sesión del paciente: el backend co-firma cualquier `issue_record` de médico verificado. Se cierra con auth (PR #12) + `src/keys/`.
-- `pending_tx`/`fee_payer_spend` siguen en memoria hasta que entre el schema de Mati (#11).
+- El flujo completo nunca corrió en vivo: los tests validan cada pieza por separado (mocks + fixtures demo); el smoke E2E es el paso que falta.
+- Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
+- Verificación runtime pendiente: `signMessage` de Privy contra challenge real, PUT del blob a la signed URL desde el browser, `onLogs` del indexer en devnet.
