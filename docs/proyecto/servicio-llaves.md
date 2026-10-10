@@ -32,7 +32,7 @@ Response 200: `{ dek: base64(32 B), download_url, expires_in: 60, content_hash: 
 
 6. Si role `doctor`: armo la tx `log_access` (cuentas `key_service` firmante, `config`, `grant` mut, `record`, `doctor_provider`) y la envío firmada por `KEY_SERVICE` con `FEE_PAYER` como pagador — keypairs distintos, los dos firman la misma tx. El programa re-valida todo (grant activo, Clock < expires_at, record no Disputed/Voided, provider verificado); yo lo leí antes para no gastar una tx que revienta.
    - **Rechazo del programa** (Anchor 6001/6003/6004/6007/6008) → **403, no se entrega nada**: entre mi lectura y la tx el estado cambió (venció, se revocó, se disputó). El rechazo del programa ES la autorización definitiva; no hay entrega "a medio permiso".
-   - **Falla de infraestructura** (RPC caído, timeout, sin confirmación tras 2 reintentos) → **entrego igual** y la fila queda `log_access_status = 'pending'` para reintento en background. Justificación: el permiso ya se verificó leyendo la cuenta; un RPC caído no debe dejar al paciente sin su propia historia clínica, y el médico con grant vigente podía haber pedido la DEK un minuto antes igual.
+   - **Falla de infraestructura** (RPC caído, timeout, sin confirmación tras 2 reintentos) → **503, tampoco se entrega** y la fila queda `failed` (decisión 2026-10-08, fail-closed: *sin Solana no hay Salua* — ningún acceso de un tercero existe sin su registro on-chain). El médico reintenta la request completa; una entrega "a posteriori" sin log confirmado nunca ocurre. El único caso borde: la tx puede haber confirmado aunque el RPC no respondió — ahí queda un log on-chain sin entrega, preferible a una entrega sin log.
 7. `KEK_org = HKDF(master_key, salt=org_id, info="salua-org-kek")` → `unwrapDek`. Si el open de GCM falla (blob corrupto o manipulado) → 500, nunca 200.
 8. Insert en `key_releases` (§3) con `tx_signature` y `log_access_status` según el paso 6.
 9. URL firmada de **60 s** de Supabase Storage sobre `storage_path` (service role, bucket privado).
@@ -69,8 +69,9 @@ Escritura solo con el rol backend; la RLS actual (el paciente ve las de sus reco
 | Record inexistente (fila o PDA sin cuenta) | 404 |
 | Usuario suspendido · Record Disputed/Voided · requester sin derecho · grant ausente/Revoked/`expires_at` vencido · provider no verificado · `log_access` rechazado por el programa | 403 |
 | Unwrap falla · storage o RPC caído sin lectura posible · config/env inválida · excepción inesperada | 500 |
+| `log_access` no confirma en la cadena (RPC caído / timeout tras reintentos) | 503 |
 
-Regla: un error inesperado siempre sale 403 o 500, **nunca 200 sin entrega autorizada y verificada**.
+Regla: un error inesperado siempre sale 403, 500 o 503, **nunca 200 sin entrega autorizada y verificada on-chain**.
 
 ## 6. Env vars
 
@@ -83,7 +84,7 @@ Guardarraíl al boot: `pubkey(KEY_SERVICE_SECRET) != pubkey(FEE_PAYER_SECRET)` y
 Positivos:
 - Paciente pide su record → 200, fila `role=patient`, `log_access_status=skipped`, sin tx.
 - Emisor → 200, `role=issuer`. Otro médico con grant Active vigente → 200, `access_count` sube on-chain, fila `confirmed` con `tx_signature`.
-- Grant revocado y re-otorgado → 200. RPC caído en `log_access` → 200 con `pending` y el reintento confirma después.
+- Grant revocado y re-otorgado → 200. RPC caído en `log_access` → 503, nada entregado, fila `failed` (fail-closed).
 - Roundtrip: `wrapDek` → `unwrapDek` → descifra el archivo y matchea `content_hash`. `dek_fingerprint` == `sha256(dek)` y la DEK no aparece en ninguna fila ni log.
 
 Negativos:
@@ -97,4 +98,4 @@ Negativos:
 1. ~~`log_access` no puede registrar entregas a paciente/emisor~~ — **resuelto** ([decisión 2026-10-05](decisiones.md)): auditoría on-chain solo de accesos de terceros; paciente y emisor quedan solo en `key_releases`.
 2. `app_user` no tiene `wallet_pubkey` del paciente y se necesita para comparar contra `Record.patient`. Propuesta: columna `wallet_pubkey text` en `app_user` (Mati).
 3. Dueño de `GET /audit/:recordId` (§1) — propuesta: indexer de Mati.
-4. Reintentos de las `pending`: worker con backoff o reintento lazy en el próximo release.
+4. ~~Reintentos de las `pending`~~ — con fail-closed (2026-10-08) las filas `pending` solo existen transitoriamente entre el insert y el confirm; ya no hace falta worker de reintento para entregas.
