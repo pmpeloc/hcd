@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-09 · fix(app): use the shared API client and map its errors
+- **Qué hice:** correcciones de la review de Franco en hcd_app#11. Borré mi `components/onchain/api-client.ts` y paso a usar el cliente de Mati (`lib/api.ts` + `lib/api-client.ts`, hcd_app#7, que mergeé en la rama): ya trae `redirect: 'error'` (el JWT no viaja en una redirección), `credentials: 'omit'`, origen fijo y sesión leída en cada llamada. `toTxError` ahora lee `ApiError.status`/`.code` en vez de parsear el texto del error; el 410 (`tx_id` vencido o usado) se rearma una vez como el 409; una sesión que no se puede restaurar es 503 ("El servicio no responde"). `BuildResponse` usa los campos reales (`last_valid_block_height`, `expires_in_seconds`). 35 tests de lógica + 14 de transporte en verde.
+- **Archivos clave:** `hcd_app/components/onchain/tx-flow.ts`, `e2e/app-logic.spec.ts`; se borró `components/onchain/api-client.ts`.
+- **Próximo paso:** correcciones de hcd_app#12 (visor). Orden de merge: #7 → #11 → #12.
+
 ## 2026-10-08 · feat(app): send the session token to the API and explain program errors
 - **Qué hice:** `createApiClient` (`components/onchain/api-client.ts`): toda llamada a la API pasa por ahí y lleva `Authorization: Bearer <token>` de Supabase, leído en cada llamada (Supabase lo renueva solo); así nada da 401 cuando entre hcd_api#19. `runTx` ahora traduce los 20 errores del programa (el backend los devuelve como 422 con el nombre del IDL), incluidos los 3 nuevos (`KeyServiceIsAdmin`, `IssuerIsPatient`, `InvalidContentHash`), y el 401 a "Tu sesión venció"; los errores del programa no se reintentan. 9 tests nuevos. El lint (`npm run lint`) pasa limpio: el "circular structure" que vio el equipo sale de no correr `npm ci` después de traer `staging`.
 - **Archivos clave:** `hcd_app/components/onchain/api-client.ts`, `components/onchain/tx-flow.ts`, `e2e/app-logic.spec.ts`.
