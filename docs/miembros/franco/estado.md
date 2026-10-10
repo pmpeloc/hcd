@@ -1,15 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-08
+**Última actualización:** 2026-10-10
 
 ## En qué estoy
-Instalé la skill Archify en `.devin/skills/` (disponible para todo el equipo) y generé el diagrama de arquitectura de Salua con evidencia pinneada al repo — SVG + HTML interactivo en `docs/proyecto/assets/`, ya embebido en el README (que seguía diciendo "Code is coming"). Privy quedó configurado (Custom Auth + JWKS) — la wallet ya debería crearse al loguear.
+MVP cableado de punta a punta en código. Lado API: los tres módulos stub quedaron implementados (`organizations`, `access`, `indexer`) + el enrolamiento de Mati integrado, alias `SAL-XXXX` dictables, metadata de estudios, grants revocables y migraciones aplicadas a Supabase (8) con el bucket `records` privado. Lado app: reemplacé todos los placeholders por llamadas reales — QR, lookup, upload cifrado, estudios, accesos, historial nuevo y enrolamiento Privy challenge→firma→verify. Validación: API 126/126 tests + build/lint; app 80/80 Playwright + tsc/eslint limpios.
 
 ## Próximo paso
-- Smoke E2E contra devnet: build → firma → submit → release.
-- Verificar en la app que la wallet Privy se crea tras el fix de Misael.
-- Coordinar con Mati: correr la migración `tx_stores` en Supabase antes de desplegar.
+- Smoke E2E contra devnet con dos sesiones reales: enroll → upload → `issue_record` → indexer baja el evento → request → `grant_access` → `/keys/release` → visor "Es el archivo original".
+- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 (app).
 
 ## Bloqueos
-- PRs propias esperando aprobación: `hcd_api#17` (fail-closed), `#18` (tsconfig), `#19` (auth en /tx), `#20` (Postgres) y `hcd#23` (docs de esas) + esta PR de README/Archify. #19 y #20 van apiladas — mergear en orden.
-- Nota: con auth en `/tx`, los flujos de la app y scripts tienen que mandar el Bearer token — el primer build de cada usuario bindea su wallet.
+- El flujo completo nunca corrió en vivo: los tests validan cada pieza por separado (mocks + fixtures demo); el smoke E2E es el paso que falta.
+- Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
+- Verificación runtime pendiente: `signMessage` de Privy contra challenge real, PUT del blob a la signed URL desde el browser, `onLogs` del indexer en devnet.

@@ -2,6 +2,31 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-08 · test(app): cover access screens and the tx flow
+- **Qué hice:** 20 tests nuevos. Lógica: `runTx` con una API falsa (orden de fases, rearma una vez ante 409, se rinde al segundo, firma cancelada no envía nada, mensajes para 403/429/503) y los helpers de permisos (tiempo restante, "se cierra hoy/mañana/el dd/mm", vencimiento, progreso, estado vencido). Pantallas: solicitud con 24 h por defecto, cambio de duración, aprobar, rechazar, revocar con cancelar y confirmar, historial; y Pedir acceso sin paciente, envío con motivo y error con reintento. Pasan los 61 tests y el build.
+- **Archivos clave:** `hcd_app/e2e/access.spec.ts`, `e2e/app-logic.spec.ts`.
+- **Próximo paso:** visor (día 7) contra `/keys/release`; conectar `runTx` cuando Mati sume la firma a `useSaluaWallet`.
+
+## 2026-10-08 · feat(app): add access requests, approvals and revocation
+- **Qué hice:** día 6. Paciente (`/accesos`): solicitud pendiente con quién pide (matrícula, centro, motivo), selector 1 h / 24 h / 7 días con número grande y hora de cierre, aprobar o rechazar; permisos activos con tiempo restante, barra y "Revocar" con confirmación; historial de permisos vencidos y revocados. Médico (`/solicitar`): paciente, qué pide (toda la historia, sin descarga, duración que elige el paciente), motivo opcional, enviado y error con reintento. Sumé `runTx` (`components/onchain/tx-flow.ts`): pide la tx a `/tx/build`, la firma con la wallet y la manda a `/tx/submit`, rearma una vez si venció el blockhash y traduce los errores (403, 409, 429, 503, firma cancelada). Los datos siguen siendo ficticios hasta que existan los endpoints de `access` y `records` y la firma en `useSaluaWallet`. También extraje el diálogo de confirmación y el bloque "Primero identificá al paciente".
+- **Archivos clave:** `hcd_app/components/access/`, `components/onchain/tx-flow.ts`, `components/confirm-dialog.tsx`, `components/needs-patient.tsx`, `app/(paciente)/accesos/page.tsx`, `app/(medico)/solicitar/page.tsx`.
+- **Próximo paso:** tests de las pantallas de accesos y de `runTx`.
+
+## 2026-10-07 · test(app): cover patient and doctor screens with Playwright
+- **Qué hice:** 35 tests nuevos con Playwright (el runner que ya usa la app; Vitest no está en el stack del frontend). Lógica: código del QR (formato, ida y vuelta del payload, códigos escritos, cuenta regresiva), búsqueda del escáner, validación de archivos y que el cifrado sea real (la huella es del archivo cifrado y cambia con cada llave). Pantallas: pedir sesión sin login, nombre de la sesión en el shell, Mi QR sin wallet, Mis estudios con filtros y "No es mío", escáner con DNI y errores, y la carga completa con error y reintento. La sesión se simula igual que en los tests de login de Mati. Pasan los 41 tests, también repetidos.
+- **Archivos clave:** `hcd_app/e2e/app-logic.spec.ts`, `e2e/app-shell.spec.ts`, `e2e/patient-studies.spec.ts`, `e2e/doctor-flow.spec.ts`, `e2e/support/session.ts`.
+- **Próximo paso:** Pedir acceso y solicitudes del paciente (día 6), con sus tests.
+
+## 2026-10-07 · feat(app): add patient studies list with "not mine" dispute
+- **Qué hice:** pantalla Mis estudios (`/estudios`) con el diseño «Salua · App C»: lista con estado (Activo, En disputa, Anulado) y origen de cada estudio ("Emitido por" o "Copia digitalizada por"), filtros por estado con contador, número grande de estudios activos, y el botón "No es mío" con confirmación que deja el estudio en disputa. Tiene estados de carga, error, vacío y filtro sin resultados. Los datos y la disputa son ficticios (`getMyStudies`, `disputeStudy`) hasta que exista `GET /patients/me/records` y se firme `dispute_record` con `/tx`.
+- **Archivos clave:** `hcd_app/components/patient-studies/`, `app/(paciente)/estudios/page.tsx`.
+- **Próximo paso:** Pedir acceso y solicitudes del paciente (día 6).
+
+## 2026-10-07 · feat(app): connect patient and doctor shells to the real session
+- **Qué hice:** los layouts de paciente y médico ahora usan la sesión de Supabase y la wallet de Privy que integró Mati (PR #4). El shell muestra el nombre real y lleva a `/login` desde la cuenta; sin sesión pide iniciar sesión. Mi QR usa la wallet real del paciente, con estados para "preparando tu cuenta" y error. Si Supabase no está configurado queda un modo demo con datos de ejemplo y un aviso (sin Supabase, el puente de Privy rompía la página). Los saludos de Inicio y del panel salen de la sesión. Arreglé el único error de lint del escáner.
+- **Archivos clave:** `hcd_app/components/app-shell/session-shell.tsx`, `app/(paciente)/layout.tsx`, `app/(medico)/layout.tsx`, `components/patient-qr/`.
+- **Próximo paso:** lista de estudios del paciente.
+
 ## 2026-10-06 · feat(app): add doctor study upload with in-browser encryption
 - **Qué hice:** pantalla Cargar estudio (`/cargar`) con el diseño «Salua · App C». Llega con el paciente desde el escáner (`?paciente=SAL-XXXX`); sin paciente pide escanear primero. Tiene pasos, tipo de estudio con sugerencias, fecha, origen ("Emitido por" o "Copia digitalizada por"), zona para arrastrar el archivo con validación de formato y tamaño (50 MB), resumen antes de confirmar y progreso grande por fases. El cifrado ya es real: usa `lib/crypto` de Franco (AES-256-GCM en el navegador y SHA-256 del archivo cifrado). La subida, el depósito de la llave y la firma de `issue_record` son ficticios hasta que exista la API; un archivo con "error" en el nombre muestra el estado de error.
 - **Archivos clave:** `hcd_app/components/doctor-upload/`, `app/(medico)/cargar/page.tsx`.

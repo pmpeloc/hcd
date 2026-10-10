@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-10 · fix: integrate MVP merge chain and fix live-flow bugs
+- **Qué hice:** revisé hcd_api#21 y hcd_app#13 (con agentes) y dejé las cadenas de merge listas para entrar en orden sin conflictos. API: pre-resolví #17→#19 (`keys.module`) y metí #22, #18 y #20 en #21 (gate de reserva de `issue_record` + wallet verificada del firmante + stores en Postgres, spec de tx unificado). App: unifiqué los dos clientes HTTP de #11 y #13 (`ApiError` con status/code detrás de `createApiClient`/`SessionError`). Docs: #29 dentro de #30. Arreglé lo que rompía la prueba en vivo: timeline siempre 503 (`actor_wallet` no existía), indexer que espejaba tx fallidas y activaba la reserva equivocada, wallets sin verificar en `issue_record`, revocar que fingía éxito sin wallet, permisos revocados que volvían como activos, aprobaciones a medias sin reintento (409) y reintento de subida con el código ya quemado. Decisión del estado de permisos en `decisiones.md`. API 185/185 tests; app 101/101 e2e, tsc, lint y build limpios.
+- **Archivos clave:** `hcd_api/src/{access,indexer,tx,records}/`, `hcd_app/lib/api-client.ts`, `hcd_app/components/{access,doctor-upload,onchain,viewer,doctor-scanner}/`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** que se aprueben y mergeen en orden (API #22→#17→#18→#19→#20→#21; app #7→#9→#10→#11→#12→#13; docs) y smoke E2E en vivo contra devnet.
+
 ## 2026-10-08 · test(program): add full journey integration test
 - **Qué hice:** puerta G4. Escenario `full journey` en la suite de Anchor: un mismo paciente y médico recorren alta → `issue_record` → `grant_access` → 2× `log_access` → `revoke_access` (el log siguiente se rechaza) → `dispute_record` → `void_record` → reemisión con `supersedes` → grant y log sobre el estudio nuevo (el anulado ya no acepta grants). En devnet imprime los links del explorer de cada transacción, para el formulario final. Verde en devnet (7/7, y la suite completa 58 ok / 0 fallas) y en local (68 ok / 0 fallas).
 - **Archivos clave:** `tests/hcd.test.mts`.
