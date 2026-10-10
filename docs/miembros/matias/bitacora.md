@@ -1,5 +1,24 @@
 # Bitácora · Matías
 
+## 2026-10-08 · fix(auth): bind enrollment to visible account and audit atomically
+- **Qué hice:** desafío v2 con correo del JWT y UUID; validación de cuenta/origen/wallet/desafío; índice único de médicos y trigger de coherencia; auditoría wallet_enrolled en la misma transacción. Factory compartida de #19 y cliente reutilizado, rate limit antes de JWT y configuración validada al iniciar.
+- **Archivos clave:** hcd_api/src/auth/wallet-enrollment*, supabase-session.guard.ts, auth.module.ts, supabase-admin.factory.ts, WALLET_ENROLLMENT.md, supabase/migrations/20261008020000_wallet_enrollment.sql y supabase/tests/wallet_enrollment.sql.
+- **Validación:** 87 tests API, build/lint aprobados; SQL local desde cero, rollback por fallo de auditoría y dos carreras reales (misma wallet / mismo desafío), siempre un éxito y un evento. Sin migración a Supabase ni firma de wallets reales.
+- **Próximo paso:** nueva revisión de API #22; después migración/despliegue y firma explícita con Privy antes de habilitar consumidores #17/#19. Actualizado el orden en enrolamiento-wallet.md.
+
+## 2026-10-08 · feat(auth): share wallet enrollment request schemas
+- **Qué hice:** copia exacta del contrato de inicialización, desafío y verificación para la próxima integración de Privy, sin modificar pantallas ni ejecutar firmas reales.
+- **Archivos clave:** hcd_app/lib/schemas/wallet-enrollment.ts.
+- **Validación:** TypeScript y lint aprobados; contrato idéntico a la API por comparación de hash.
+- **Próximo paso:** consumir el contrato desde una acción explícita del usuario y enviar la firma del mensaje exacto con el token vigente.
+
+## 2026-10-08 · feat(auth): verify wallet ownership before enrollment
+- **Qué hice:** endpoints de perfil y enrolamiento; alta solo como paciente sin organización, desafío persistido de cinco minutos ligado a usuario/origen/wallet, verificación Ed25519 y vinculación atómica de un solo uso. Wallets históricas no se marcan como verificadas automáticamente.
+- **Archivos clave:** hcd_api/src/auth/wallet-enrollment*, supabase-session.guard.ts, src/app.module.ts, .env.example, supabase/migrations/20261008020000_wallet_enrollment.sql, supabase/tests/wallet_enrollment.sql.
+- **Validación:** 73 tests API aprobados (33 nuevos), build y lint aprobados. PostgreSQL local: migraciones, expiración, replay, conflictos, preservación de permisos/RLS y carrera real de dos conexiones sobre una wallet (una aceptada, otra rechazada). Servidor detenido; no se aplicó migración a Supabase.
+- **Próximo paso:** revisión con Franco: eliminar binding automático de #19 y exigir wallet_verified_at en tx/keys; exigirlo también al integrar records. Conectar firma de mensajes Privy después; todavía no hubo prueba real en navegador ni transacciones devnet.
+
+
 ## 2026-10-08 · feat(records): share record preparation schemas
 - **Qué hice:** copia exacta del contrato Zod de records en la app, para que Maxi conecte las pantallas sin duplicar criterios de validación.
 - **Archivos clave:** hcd_app/lib/schemas/records.ts.

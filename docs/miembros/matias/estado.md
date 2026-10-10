@@ -3,13 +3,13 @@
 **Última actualización:** 2026-10-08
 
 ## En qué estoy
-Primera entrega de records en feat/records-storage: carga cifrada, reserva autorizada por código temporal, DEK envuelta e IV, listado RLS y estado pending_chain. Contrato compartido en app feat/records-contract. Plan por entregas en [plan-integracion.md](plan-integracion.md).
+Correcciones de la revisión de API #22 en feat/wallet-enrollment: cuenta visible en la firma (correo del JWT), unicidad de wallet de médicos, auditoría atómica y controles adicionales. Contrato de app #10 sin cambios de JSON. Records sigue en API #21/app #9, separado.
 
 ## Validación
-Migración de IV/pending_chain probada en PostgreSQL 18 local con datos sintéticos, rollback y servidor detenido; no aplicada a Supabase. Suite API de 70 pruebas aprobada. Ver PRs para comprobaciones finales de compilación y lint.
+87 tests API, build y lint aprobados. PostgreSQL local: migración desde cero, auditoría y rollback ante fallo, conflictos, reenrolamiento y carreras reales de dos conexiones (misma wallet y mismo desafío: un éxito, un rechazo, un evento). Servidor local detenido. No se aplicó wallet_enrollment a Supabase. Las suites de records y enrolamiento son ramas separadas.
 
 ## Próximo paso
-Revisión con Franco del contrato records → tx: hoy se devuelve build_request, no transacción armada. Antes de cofirmar debe comprobarse el registro autorizado persistido. Luego enrolamiento seguro de wallet y firma Privy; después access/indexer y E2E, sin implementar todo junto.
+Nueva revisión de Franco en API #22. Tras aprobar: migración atómica, configuración del origen y despliegue del backend. Sigue conectar confirmación visible y firma de mensajes Privy, enrolar cuentas de prueba y habilitar #17/#19 con ellas. Records → tx e indexer siguen pendientes.
 
 ## Bloqueos y límites
-Esta entrega no emite en Solana ni completa el visor. Necesita revisión, migración IV, secreto de tokens y bucket privado con límite de tamaño; el binding inicial de #19 requiere prueba de propiedad de wallet. Coordinar IV con Maxi y servicio de llaves de Franco. tx_stores ya fue aplicada a Supabase en el trabajo anterior (docs #25), y el cliente Bearer está en app #7. Ninguna de estas tareas equivale al smoke E2E real.
+La firma real con Privy y el smoke E2E están pendientes. El correo visible mitiga phishing, no elimina el engaño si el usuario firma una cuenta ajena. Franco ya exige wallet_verified_at en #17/#19; no habilitarlos antes del esquema y enrolamiento. Duplicados históricos bloquean la migración: no corregirlos automáticamente. tx_stores ya aplicada; IV/pending_chain y wallet_enrollment solo probadas localmente. No se modificaron módulos tx/keys ni se aprobaron/mergearon PRs ajenos.
