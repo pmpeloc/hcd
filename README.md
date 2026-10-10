@@ -6,7 +6,17 @@ Built for the Superteam Argentina hackathon (Road to Colosseum).
 
 📊 **Pitch deck (Spanish):** https://claude.ai/artifact/KoaaYCW2DJJAyeZpHPSB5S — idea, architecture diagram, user flow, Solana stack, prior Colosseum projects and legal framework.
 
-> 🚧 Early stage: the repository currently holds the team's rules and project docs. Code is coming.
+> 🚧 Early stage: this repository holds the team's rules and project docs. Code lives in the sibling repos listed below.
+
+## Architecture
+
+![Salua architecture](docs/proyecto/assets/salua-architecture.svg)
+
+- **Client-side encryption:** studies are encrypted with AES-256-GCM in the browser; only ciphertext ever reaches storage.
+- **Solana is the source of truth:** identity, access grants, content hashes and access logs live on-chain — no medical data, not even encrypted.
+- **Backend enforces consent:** `hcd_api` builds and co-signs transactions and only unwraps a record's key after verifying the grant on-chain.
+
+Interactive version (clickable nodes with source references): [`docs/proyecto/assets/salua-architecture.html`](docs/proyecto/assets/salua-architecture.html). Full design doc (Spanish): [`docs/proyecto/arquitectura.md`](docs/proyecto/arquitectura.md).
 
 ## Team
 
