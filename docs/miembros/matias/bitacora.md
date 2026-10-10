@@ -1,5 +1,19 @@
 # Bitácora · Matías
 
+## 2026-10-08 · feat(records): share record preparation schemas
+- **Qué hice:** copia exacta del contrato Zod de records en la app, para que Maxi conecte las pantallas sin duplicar criterios de validación.
+- **Archivos clave:** hcd_app/lib/schemas/records.ts.
+- **Validación:** TypeScript y lint aprobados; copia idéntica al contrato de API comprobada por hash.
+- **Próximo paso:** revisar contrato con Maxi y Franco antes de merge; integrar con cliente autenticado de app #7.
+
+## 2026-10-08 · feat(records): prepare encrypted record uploads and patient listing
+- **Qué hice:** primera entrega del plan: código temporal de paciente, reserva de carga ligada a médico/organización, comprobación de ciphertext y registro con DEK envuelta e IV. Listado RLS y estado pending_chain, sin afirmar emisión on-chain.
+- **Archivos clave:** hcd_api/src/records/, src/common/zod-validation.pipe.ts, .env.example, supabase/migrations/20261009000000_record_encryption_iv.sql y supabase/tests/record_encryption_iv.sql.
+- **Validación:** migraciones probadas en PostgreSQL 18 local descartable: IV de 12 bytes, estado inicial pendiente, estados históricos, RLS y permisos. Datos sintéticos y rollback; servidor detenido. No se aplicó esta migración a Supabase.
+- **Validación de código:** 70 pruebas API aprobadas (30 nuevas), build y lint de archivos modificados aprobados; pruebas HTTP con servidor local y servicios simulados.
+- **Próximo paso:** revisión de la propuesta build_request con Franco; integrar autorización antes de cofirma y confirmar emisión con indexer. Continuar después con enrolamiento verificable y firma Privy. Plan detallado en plan-integracion.md.
+
+
 ## 2026-10-08 · feat(api): send current Supabase session with requests
 - **Qué hice:** cliente API que obtiene el token vigente por solicitud, conserva códigos de error del programa, rechaza URLs externas y evita reintentos automáticos de escrituras.
 - **Archivos clave:** hcd_app/lib/api.ts, lib/api-client.ts, e2e/api.spec.ts, playwright.api.config.ts y README.md.
@@ -27,3 +41,5 @@
 - **Archivos clave:** hcd_api/supabase/migrations/20261005000000_wallet_audit.sql, supabase/tests/wallet_audit.sql y README.md.
 - **Validación:** PostgreSQL 18 local descartable: migraciones, conservación de historial, inserciones válidas, siete casos inválidos y preservación de RLS/permisos. Sin aplicar a Supabase ni probar el aislamiento completo.
 - **Próximo paso:** revisión con Franco y despliegue controlado; continuar con guard de autenticación. Integración de Memo fuera de esta tarea.
+
+
