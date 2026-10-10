@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-09 · fix(app): use the shared API client and map its errors
+- **Qué hice:** correcciones de la review de Franco en hcd_app#11. Borré mi `components/onchain/api-client.ts` y paso a usar el cliente de Mati (`lib/api.ts` + `lib/api-client.ts`, hcd_app#7, que mergeé en la rama): ya trae `redirect: 'error'` (el JWT no viaja en una redirección), `credentials: 'omit'`, origen fijo y sesión leída en cada llamada. `toTxError` ahora lee `ApiError.status`/`.code` en vez de parsear el texto del error; el 410 (`tx_id` vencido o usado) se rearma una vez como el 409; una sesión que no se puede restaurar es 503 ("El servicio no responde"). `BuildResponse` usa los campos reales (`last_valid_block_height`, `expires_in_seconds`). 35 tests de lógica + 14 de transporte en verde.
+- **Archivos clave:** `hcd_app/components/onchain/tx-flow.ts`, `e2e/app-logic.spec.ts`; se borró `components/onchain/api-client.ts`.
+- **Próximo paso:** correcciones de hcd_app#12 (visor). Orden de merge: #7 → #11 → #12.
+
 ## 2026-10-08 · feat(app): add the study viewer with hash check before decrypting
 - **Qué hice:** día 7. Visor `visor/[recordId]`: pide la llave a `/keys/release` (con Bearer), descarga el archivo, calcula su SHA-256 y lo compara con la huella firmada **antes** de descifrar; si no coincide muestra "Estudio alterado" y no lo descifra. Si coincide, descifra en el navegador y dibuja el PDF con pdf.js (o la imagen) en canvas, con la marca de agua (nombre, matrícula y fecha) dentro de los píxeles; no hay link, blob ni botón de descarga, se bloquea el clic derecho y la impresión. Muestra el tiempo restante del permiso (al vencer, borra el documento de la pantalla y de memoria), la integridad y el origen. Estados: abriendo por fases, vencido, sin acceso, sesión vencida, Solana caída (con reintento) y archivo que no abre con su llave. "Mis accesos" del médico lista tres estudios de ejemplo (vigente, alterado, vencido) que pasan por el cifrado real. La carga ahora guarda `iv || cifrado` y la huella es de esos bytes (ver ideas).
 - **Archivos clave:** `hcd_app/components/viewer/`, `app/(medico)/visor/[recordId]/page.tsx`, `app/(medico)/mis-accesos/page.tsx`, `components/doctor-upload/upload-record.ts`, `e2e/viewer.spec.ts`, `e2e/viewer-logic.spec.ts`.

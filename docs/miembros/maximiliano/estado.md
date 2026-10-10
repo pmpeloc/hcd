@@ -1,6 +1,6 @@
 # Estado · Maximiliano
 
-**Última actualización:** 2026-10-08
+**Última actualización:** 2026-10-09
 
 ## En qué estoy
 Ya están en `staging` (hcd_app#6) el sistema de diseño, los inicios en bento, Mi QR, el escáner y Cargar estudio. En PRs apilados, un tema por PR:
@@ -11,15 +11,16 @@ Ya están en `staging` (hcd_app#6) el sistema de diseño, los inicios en bento, 
 79 tests de Playwright en verde (`npm run test:e2e`), lint y build limpios. Lo que depende del backend sigue detrás de funciones ficticias (`lookupPatient`, `uploadRecord` salvo el cifrado, `getMyStudies`, `disputeStudy`, accesos y metadatos del visor); el visor ya llama a `/keys/release` de verdad para ids reales.
 
 ## Próximo paso
-- Línea de tiempo de accesos del paciente (día 8).
+- Correcciones de la review de Franco en hcd_app#12 (visor).
+- Visor `visor/[recordId]` (día 7) contra `/keys/release`: hash antes de descifrar, "Estudio alterado", marca de agua, sin descarga.
 - Conectar `runTx` a "No es mío", aprobar y revocar cuando haya firma en `useSaluaWallet` y record PDAs reales.
 - Conectar la carga y las listas cuando existan `/records` y `/access-requests`.
 
 ## Bloqueos
-- `hcd_api`: los módulos `records` y `access` siguen vacíos (Mati). Sin `/records` no hay estudios reales para el visor.
-- Falta acordar el formato del archivo guardado (`iv || cifrado`, ver ideas) con Franco y Mati: hoy nadie guarda el IV.
-- El visor compara contra la huella que devuelve `/keys/release`; leer la del Record on-chain necesita el cliente Codama (`lib/hcd-client`, Mati con Franco).
-- `useSaluaWallet` (Mati) solo da la dirección: falta firmar transacciones.
-- `records` no guarda tipo de estudio, fecha ni origen.
+- hcd_app#11 ahora depende de hcd_app#7 (cliente de API de Mati): orden de merge #7 → #11 → #12.
+- `hcd_api`: los módulos `records` y `access` siguen vacíos (sin upload-url, registrar estudio, listar mis estudios ni solicitudes). Lo tiene Mati.
+- `useSaluaWallet` (Mati) solo da la dirección: falta una función para firmar transacciones con Privy.
+- `records` no guarda tipo de estudio, fecha ni origen: sin eso la lista real no puede mostrar nombres.
+- `/tx` va a pedir sesión cuando se mergee hcd_api#19.
 - El equipo tiene que aprobar los tonos AA sumados a la paleta (`#0A6FC2`, `#0B7A74`, `#5F6B80`).
 - El login (`/login`, de Mati) está en inglés.
