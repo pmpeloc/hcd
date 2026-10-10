@@ -2,6 +2,16 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-10 · feat(app): wire the real API end to end
+- **Qué hice:** reemplacé los placeholders de la app por llamadas reales: QR contra `POST /patients/me/record-code` (exige wallet enrolada), lookup + `POST /access-requests`, upload cifrado (AES-256-GCM en el browser → `/records/upload-url` → PUT del blob sellado a la signed URL → `POST /records` → `issue_record` vía `runTx`), estudios desde `GET /patients/me/records` con `dispute_record` firmado por el paciente, centro de accesos con `grant_access`/`revoke_access` por PDA, y la página de historial nueva contra `GET /patients/me/timeline`. Enrolamiento Privy challenge→firma→verify integrado en `WalletBridge` (la firma es siempre la acción del usuario en el modal). `DEMO_DATA` (`NEXT_PUBLIC_DEMO_RECORDS=1`) conserva los fixtures para e2e. tsc + eslint limpios, Playwright 80/80.
+- **Archivos clave:** `lib/auth-providers.tsx`, `lib/enrollment.ts`, `lib/demo.ts`, `components/{patient-qr,doctor-scanner,doctor-upload,patient-studies,access,timeline}/`.
+- **Próximo paso:** smoke E2E devnet con dos sesiones reales (paciente + médico).
+
+## 2026-10-10 · feat(api): complete MVP modules and wallet enrollment
+- **Qué hice:** cerré los tres módulos stub (organizations, access, indexer), integré el enrolamiento de Mati (#22), alias dictables `SAL-XXXX` sobre el mismo nonce de un solo uso, metadata de estudios (título/fecha/origen/emisor), grants revocables (`reason`, `granted_expires_at`, `grant_pda`), el formato sealed `iv‖ct+tag` con el IV declarado verificado contra el blob, y reserva de `issue_record` contra la reserva de upload persistida. El indexer baja los 7 eventos del programa a `audit_events` y activa los `pending_chain` con PDA derivada localmente. Migraciones aplicadas a Supabase (8, vía pooler) + bucket `records` privado. 126/126 tests, lint/build limpios.
+- **Archivos clave:** `src/{organizations,access,indexer}/`, `src/auth/wallet-enrollment.*`, `src/records/*`, `supabase/migrations/2026101{0,1,2,3}*`.
+- **Próximo paso:** merges en orden (#22 → #17–#20) y smoke E2E devnet.
+
 ## 2026-10-08 · fix(tx): fail closed on identity lookup errors
 - **Qué hice:** punto de Mati en coordinación — si la consulta de `app_user` falla (DB/red), `/tx/build` devolvía 403 como si el usuario no tuviera wallet; ahora una query con error da 503 (reintentable) y solo la ausencia real de wallet verificada da 403. Mismo criterio aplicado en `/keys` (rama `fix/keys-fail-closed`, nuevo test de lookup caído → 503). Tests 17/17 tx + 16/16 keys, lint limpio. Va en `hcd_api#19` y `hcd_api#17`.
 - **Archivos clave:** `hcd_api/src/tx/tx.service.ts`, `tx.service.spec.ts`.

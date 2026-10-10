@@ -1,17 +1,15 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-08 (tarde)
+**Última actualización:** 2026-10-10
 
 ## En qué estoy
-Convergencia con el enrolamiento de Mati (#22) completa: `/tx/build` (#19) ya no bindea el primer signer ni acepta `wallet_proof` — exige `signer === app_user.wallet_pubkey` y `wallet_verified_at` no nulo. `/keys/release` (#17) igual: solo la wallet verificada del `app_user` habilita grants; `doctors.wallet_pubkey` pelado no basta. Error de lectura de identidad → 503 (fail closed), no 403 — punto de Mati, cubierto en ambos módulos. Review de API #22 hecha en dos rondas: bloqueante de phishing (mensaje sin identificador legible) resuelto por Mati con email del JWT en el mensaje → aprobada con comentarios menores. Aprobadas también app#10 y hcd#28.
+MVP cableado de punta a punta en código. Lado API: los tres módulos stub quedaron implementados (`organizations`, `access`, `indexer`) + el enrolamiento de Mati integrado, alias `SAL-XXXX` dictables, metadata de estudios, grants revocables y migraciones aplicadas a Supabase (8) con el bucket `records` privado. Lado app: reemplacé todos los placeholders por llamadas reales — QR, lookup, upload cifrado, estudios, accesos, historial nuevo y enrolamiento Privy challenge→firma→verify. Validación: API 126/126 tests + build/lint; app 80/80 Playwright + tsc/eslint limpios.
 
 ## Próximo paso
-- Smoke E2E contra devnet: enroll → build → firma Privy → submit → release.
-- Cuando Mati conecte la firma de mensajes Privy, probar el circuito completo.
-- Fix pendiente mío: links de solscan simulados en `demo/app.js`.
+- Smoke E2E contra devnet con dos sesiones reales: enroll → upload → `issue_record` → indexer baja el evento → request → `grant_access` → `/keys/release` → visor "Es el archivo original".
+- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 (app).
 
 ## Bloqueos
-- Orden de merge obligatorio: **#22 + migración `wallet_enrollment` + `WALLET_ENROLLMENT_ORIGIN` primero**, después #17 → #18 → #19 → #20. Mis consumidores exigen `wallet_verified_at`; si entran antes que la migración, todo da 403.
-- Mati duplicó `supabase-admin.factory.ts` en `src/auth/` (docstring viejo de keys) — consolidar una sola copia en el segundo merge.
-- Migraciones pendientes de aplicar en Supabase: `wallet_enrollment` (y `record_encryption_iv` de la rama de records).
-- PRs propias en cola: `hcd_api` #17/#18/#19/#20, `hcd` #23/#24.
+- El flujo completo nunca corrió en vivo: los tests validan cada pieza por separado (mocks + fixtures demo); el smoke E2E es el paso que falta.
+- Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
+- Verificación runtime pendiente: `signMessage` de Privy contra challenge real, PUT del blob a la signed URL desde el browser, `onLogs` del indexer en devnet.
