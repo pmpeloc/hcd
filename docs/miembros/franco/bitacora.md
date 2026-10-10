@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-10 · docs(skills): e2e-smoke playbook + doctor on-chain activation
+- **Qué hice:** skill `.devin/skills/e2e-smoke` con el playbook completo del smoke devnet (prerequisitos, scripts helper, SQL de setup, el circuito ordenado y la tabla de problemas ya vistos) para que cualquier agente del equipo corra la prueba desde cero. Además: `register_patient` ahora verifica el PatientProfile PDA on-chain antes de pedir firma (no más modales en cada navegación), y tarjeta `ProviderActivation` en `/panel` que chequea el Provider on-chain del médico y firma `register_provider` (org leída de `NEXT_PUBLIC_DOCTOR_ORG` para el smoke). En la API: `scripts/register-clinic-provider.mts` para dar de alta la clínica Provider con fee payer. Estado del smoke real: enrolamiento, QR y `register_patient` verificados; pendiente desde el paso 2.4 (activación del médico + `set-provider-verified`, que necesita la key admin de Misael).
+- **Archivos clave:** `.devin/skills/e2e-smoke/SKILL.md`, `hcd_app/components/doctor/provider-activation.tsx`, `hcd_app/lib/auth-providers.tsx`, `hcd_app/app/(medico)/panel/page.tsx`, `hcd_api/scripts/register-clinic-provider.mts`.
+- **Próximo paso:** un compañero corre el smoke con la skill desde el paso 2.4; Misael verifica el Provider del médico o pasa la keypair admin.
+
 ## 2026-10-10 · fix(db): grant table privileges to service_role and authenticated
 - **Qué hice:** las migraciones se aplicaron por el pooler como `postgres`, entonces los default privileges de Supabase (que cubren tablas creadas por `supabase_admin`) nunca corrieron — `service_role` y `authenticated` no tenían permisos sobre ninguna tabla nueva y todo PostgREST devolvía "permission denied". Migración correctiva: `service_role` recibe DML completo + sequences, `authenticated` recibe SELECT por tabla (respetando los revokes deliberados y la lista de columnas de `records`), y default privileges de ambos quedan alineados para tablas futuras. Aplicada a Supabase compartida; el enrolamiento de wallet arrancó a funcionar inmediatamente.
 - **Archivos clave:** `supabase/migrations/20261014000000_role_privileges.sql`.
