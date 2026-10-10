@@ -3,13 +3,12 @@
 **Última actualización:** 2026-10-10
 
 ## En qué estoy
-MVP cableado de punta a punta en código. Lado API: los tres módulos stub quedaron implementados (`organizations`, `access`, `indexer`) + el enrolamiento de Mati integrado, alias `SAL-XXXX` dictables, metadata de estudios, grants revocables y migraciones aplicadas a Supabase (8) con el bucket `records` privado. Lado app: reemplacé todos los placeholders por llamadas reales — QR, lookup, upload cifrado, estudios, accesos, historial nuevo y enrolamiento Privy challenge→firma→verify. Validación: API 126/126 tests + build/lint; app 80/80 Playwright + tsc/eslint limpios.
+Smoke E2E devnet en curso — ya van bien: login Supabase, wallet Privy, **enrolamiento completo** (challenge→firma→verify, `wallet_verified_at` en DB) y **`register_patient` on-chain** (PatientProfile PDA confirmada en devnet, 57 bytes). El smoke destapó y ya corregí: migración `20261014` de privilegios (`service_role`/`authenticated` sin grants porque las migraciones se aplicaron como `postgres` por el pooler), `register_patient` que la app nunca llamaba, login sin redirect por rol, home `/inicio` hardcodeado (ahora carga datos reales), y la config `solana:devnet` que Privy 3.x exige para firmar.
 
 ## Próximo paso
-- Smoke E2E contra devnet con dos sesiones reales: enroll → upload → `issue_record` → indexer baja el evento → request → `grant_access` → `/keys/release` → visor "Es el archivo original".
-- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 (app).
+- Continuar el smoke: QR del paciente (`SAL-XXXX`), segunda cuenta como médico (rol/org por SQL), pedido de acceso, aprobación con `grant_access`, upload cifrado, `issue_record`, indexer y visor con verificación de hash.
+- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 → #13 (app).
 
 ## Bloqueos
-- El flujo completo nunca corrió en vivo: los tests validan cada pieza por separado (mocks + fixtures demo); el smoke E2E es el paso que falta.
+- **`set_provider_verified` requiere la wallet admin** (`6AdUWfF…`, upgrade authority = wallet dev de Misael): sin esa firma el médico no puede anclar `grant_access` ni `issue_record` on-chain. Todo el flujo off-chain se puede probar igual.
 - Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
-- Verificación runtime pendiente: `signMessage` de Privy contra challenge real, PUT del blob a la signed URL desde el browser, `onLogs` del indexer en devnet.

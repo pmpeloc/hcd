@@ -2,6 +2,16 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-10 · fix(db): grant table privileges to service_role and authenticated
+- **Qué hice:** las migraciones se aplicaron por el pooler como `postgres`, entonces los default privileges de Supabase (que cubren tablas creadas por `supabase_admin`) nunca corrieron — `service_role` y `authenticated` no tenían permisos sobre ninguna tabla nueva y todo PostgREST devolvía "permission denied". Migración correctiva: `service_role` recibe DML completo + sequences, `authenticated` recibe SELECT por tabla (respetando los revokes deliberados y la lista de columnas de `records`), y default privileges de ambos quedan alineados para tablas futuras. Aplicada a Supabase compartida; el enrolamiento de wallet arrancó a funcionar inmediatamente.
+- **Archivos clave:** `supabase/migrations/20261014000000_role_privileges.sql`.
+- **Próximo paso:** smoke E2E — ya validado el enrolamiento; falta QR, acceso y upload.
+
+## 2026-10-10 · fix(app): live devnet smoke fixes
+- **Qué hice:** correcciones que salieron del primer smoke E2E real: la app nunca llamaba `register_patient` (ahora firma el alta on-chain post-enrolamiento; el fee payer cubre el rent), el login no redirigía (ahora lleva a `/inicio` o `/panel` según el rol del profile), el home `/inicio` estaba 100% hardcodeado (ahora carga solicitudes, permiso activo con revocación real, estudios y registro de accesos desde la API), y Privy 3.x pedía RPC de Solana explícito (`solana:devnet` con clientes kit + `chain` en `signTransaction`). `TxRequest` suma `register_patient` y `register_provider`. Verificado en vivo: enrolamiento completo y PatientProfile creado en devnet.
+- **Archivos clave:** `lib/auth-providers.tsx`, `components/onchain/tx-flow.ts`, `app/(auth)/login/page.tsx`, `app/(paciente)/inicio/page.tsx`.
+- **Próximo paso:** seguir el smoke — QR del paciente, cuenta médico, pedido/aprobación de acceso y upload cifrado. Bloqueo: `set_provider_verified` requiere la wallet admin (upgrade authority) de Misael.
+
 ## 2026-10-10 · feat(app): wire the real API end to end
 - **Qué hice:** reemplacé los placeholders de la app por llamadas reales: QR contra `POST /patients/me/record-code` (exige wallet enrolada), lookup + `POST /access-requests`, upload cifrado (AES-256-GCM en el browser → `/records/upload-url` → PUT del blob sellado a la signed URL → `POST /records` → `issue_record` vía `runTx`), estudios desde `GET /patients/me/records` con `dispute_record` firmado por el paciente, centro de accesos con `grant_access`/`revoke_access` por PDA, y la página de historial nueva contra `GET /patients/me/timeline`. Enrolamiento Privy challenge→firma→verify integrado en `WalletBridge` (la firma es siempre la acción del usuario en el modal). `DEMO_DATA` (`NEXT_PUBLIC_DEMO_RECORDS=1`) conserva los fixtures para e2e. tsc + eslint limpios, Playwright 80/80.
 - **Archivos clave:** `lib/auth-providers.tsx`, `lib/enrollment.ts`, `lib/demo.ts`, `components/{patient-qr,doctor-scanner,doctor-upload,patient-studies,access,timeline}/`.
