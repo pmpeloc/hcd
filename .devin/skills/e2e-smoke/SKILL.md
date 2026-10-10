@@ -1,146 +1,117 @@
 ---
 name: e2e-smoke
-description: Guía completa del smoke E2E contra devnet para Salua/HCD — levantar api+app, enrolar dos cuentas reales (paciente y médico) y validar el circuito entero: QR → lookup → upload cifrado → issue_record → indexer → grant_access → keys/release → visor "Es el archivo original". Usar cuando alguien pida probar la app de punta a punta en vivo.
+description: Test Salua on devnet with a patient, an issuing doctor and a separate reading doctor. Verify issuance, consent, key release, integrity, audit and revocation.
 ---
 
-# e2e-smoke · Prueba de punta a punta en devnet
+# e2e-smoke · Salua devnet integration
 
-Corre el circuito real completo del MVP con dos cuentas y devnet. El agente ejecuta los pasos técnicos (SQL, scripts on-chain, verificaciones) y le indica a la persona los pasos en el browser (login, firmas en Privy, uploads). **No commitees nada del smoke** — es una prueba en vivo.
+Run only when the user requests the live smoke. Reading this guide is not permission to execute it. Use synthetic documents and dedicated test accounts. Do not commit smoke artifacts or credentials. Mark each step PASS, FAIL or BLOCKED; setup success is not a full E2E pass.
 
-## 0. Prerequisitos
+## 0. Prerequisites
 
-- API corriendo: `cd hcd_api && npm run start:dev` en `:3001`. En el boot buscá `ProgramLogs`/`indexer subscribed` en el log — confirma que el indexer escucha devnet.
-- App corriendo: `cd hcd_app && npm run dev` en `:3000`.
-- `.env` de la API: `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE`, `SOLANA_RPC_URL`, `FEE_PAYER_SECRET`, `KEY_SERVICE_SECRET` (distinta del fee payer), `PROGRAM_ID`, `WALLET_ENROLLMENT_ORIGIN`, `CORS_ORIGIN=http://localhost:3000`.
-- `.env` de la app: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_PRIVY_APP_ID`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOLANA_RPC_URL`, `NEXT_PUBLIC_PROGRAM_ID`. Si sumás una `NEXT_PUBLIC_*`, **reiniciá `npm run dev`**.
-- Migraciones de `hcd_api/supabase/migrations/` aplicadas al Supabase compartido — en particular `20261014_role_privileges` (sin ella, `service_role` recibe "permission denied" en todo).
-- Fee payer con SOL en devnet (verificar con `balance.cjs` abajo). Si no alcanza, `solana airdrop` o faucet.
-- **La keypair del admin** (`6AdUWfFL…diQ` = upgrade authority, la tiene Misael) o Misael online para correr `set-provider-verified`. Sin eso el médico no puede firmar `issue_record`/`grant_access` (todo lo demás sí funciona).
-- Dos cuentas: paciente y médico. Mails distintos; `tu+doctor@gmail.com` funciona si Gmail respeta el alias.
+- Node.js 24, npm, and code repos nested inside `hcd`. Check local changes before updating staging; never discard another contributor's work.
+- App #14 supplies devnet configuration and registration. Its registration recovery review must be addressed or reported as a blocker. API #23 supplies the clinic helper. Verify current merge status rather than assuming either is on staging.
+- Obtain API configuration privately. Compare variable names only against `hcd_api/.env.example`: database and Supabase settings, devnet RPC, program ID, distinct fee-payer/key-service secrets, `MASTER_KEY`, `RECORDS_TOKEN_SECRET`, `STORAGE_BUCKET`, and enrollment/CORS origins. Preserve shared encryption secrets; replacing `MASTER_KEY` makes existing wrapped keys unreadable. Enable the indexer.
+- App variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_PRIVY_APP_ID`, `NEXT_PUBLIC_API_URL=http://localhost:3001`, `NEXT_PUBLIC_SOLANA_RPC_URL`, `NEXT_PUBLIC_PROGRAM_ID`, and `NEXT_PUBLIC_DOCTOR_ORG`. Restart after changes. Disable `NEXT_PUBLIC_DEMO_RECORDS` for live testing. Never put secrets in public variables.
+- Confirm API and app use the same Supabase project, program and devnet. Check fee-payer balance without printing its secret. Never operate on mainnet.
+- The DB and deployed program are shared. Do not migrate, deploy, rotate keys or change global grants during routine smoke setup. Ask the administrator to confirm migrations and effective privileges.
+- **Unresolved dependency:** previous notes mention `20261014_role_privileges.sql`, absent from API staging and API #23 as reviewed on 2026-10-10. Ask Franco/Misael for the committed migration or reviewed equivalent and confirmation of the shared database state. Mark affected steps BLOCKED if privileges cannot be established. Do not invent blanket grants or disable RLS.
+- Install locked dependencies if needed. Start the API with `npm run start:dev` inside `hcd_api` and the app with `npm run dev` inside `hcd_app`. Confirm the indexer subscription. Use `http://localhost:3000` directly, not a preview proxy.
 
-## Scripts helper (recrearlos si no están)
+## 1. Three identities
 
-`balance.cjs` en `hcd_api/` — corre con `node`:
+| Identity | Purpose | On-chain requirement |
+|---|---|---|
+| Patient P | Owns the record and signs consent/revocation | PatientProfile |
+| Doctor A | Issues the synthetic record | Verified doctor Provider |
+| Doctor B | Requests and reads A's record | Separate verified doctor Provider |
 
-```js
-const { Connection, Keypair } = require('@solana/web3.js');
-const bs58 = require('bs58');
-const env = require('fs').readFileSync('.env', 'utf8');
-const get = (k) => env.match(new RegExp('^' + k + '=(.*)$', 'm'))[1].trim();
-const c = new Connection(get('SOLANA_RPC_URL'), 'confirmed');
-const kp = Keypair.fromSecretKey(bs58.decode(get('FEE_PAYER_SECRET')));
-c.getBalance(kp.publicKey).then((b) => console.log(kp.publicKey.toBase58(), (b / 1e9).toFixed(4), 'SOL'));
-```
+Use three distinct Supabase users and wallets, with separate browser profiles. A clinic Provider is an additional organizational account, not a substitute for B. Check the visible identity before every signature.
 
-`check-pda.cjs` — verifica PatientProfile/Provider por wallet:
+For each account, log in and approve the Privy enrollment challenge. Confirm matching `app_user.wallet_pubkey` and populated `wallet_verified_at`. Confirm the PatientProfile PDA exists after `register_patient`; wallet enrollment alone is not on-chain registration. Cancelled signatures and RPC errors are not success. Never sign automatically for the user.
 
-```js
-const { Connection, PublicKey } = require('@solana/web3.js');
-const env = require('fs').readFileSync('.env', 'utf8');
-const get = (k) => env.match(new RegExp('^' + k + '=(.*)$', 'm'))[1].trim();
-const seed = process.argv[2]; // 'patient' | 'provider'
-const wallet = process.argv[3];
-const [pda] = PublicKey.findProgramAddressSync(
-  [Buffer.from(seed), new PublicKey(wallet).toBuffer()], new PublicKey(get('PROGRAM_ID')));
-new Connection(get('SOLANA_RPC_URL')).getAccountInfo(pda).then((a) =>
-  console.log(pda.toBase58(), a ? a.data.length + ' bytes' : 'MISSING'));
-```
+If a magic link expires, request a fresh one. Do not silently reset passwords or confirm emails. An administrator-assisted password workaround requires explicit authorization for that dedicated synthetic account; never apply it to teammates' or real users' accounts. Never output session tokens.
 
-`clinic-provider.mts` — registra la clínica on-chain (corre con `node` — Node ≥22 corre TS nativo; **no uses `npx tsx`, no está instalado y npx cuelga pidiendo instalar**):
+### 1.1 Doctor database setup
 
-```ts
-import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
-const require = createRequire(import.meta.url);
-const anchor = require('@anchor-lang/core');
-const { AnchorProvider, Program, Wallet, web3 } = anchor;
-const { Connection, Keypair, PublicKey, SystemProgram } = web3;
-const bs58 = require('bs58');
-const env = readFileSync('.env', 'utf8');
-const get = (k: string) => env.match(new RegExp('^' + k + '=(.*)$', 'm'))![1].trim();
-const feePayer = Keypair.fromSecretKey(bs58.decode(get('FEE_PAYER_SECRET')));
-const clinic = Keypair.generate();
-const conn = new Connection(get('SOLANA_RPC_URL'), 'confirmed');
-const program = new Program(JSON.parse(readFileSync('idl/hcd.json', 'utf8')),
-  new AnchorProvider(conn, new Wallet(clinic), { commitment: 'confirmed' }));
-const tx = await program.methods
-  .registerProvider({ clinic: {} }, clinic.publicKey)
-  .accountsPartial({
-    payer: feePayer.publicKey, authority: clinic.publicKey,
-    provider: PublicKey.findProgramAddressSync([Buffer.from('provider'), clinic.publicKey.toBuffer()], program.programId)[0],
-    systemProgram: SystemProgram.programId,
-  }).transaction();
-tx.feePayer = feePayer.publicKey;
-tx.recentBlockhash = (await conn.getLatestBlockhash()).blockhash;
-tx.sign(clinic, feePayer);
-const sig = await conn.sendRawTransaction(tx.serialize());
-await conn.confirmTransaction(sig, 'confirmed');
-console.log('clinic_wallet:', clinic.publicKey.toBase58()); // guardar: es el `organization` del médico
-console.log('signature:', sig);
-```
-
-SQL útil (psql por el pooler, password de `DATABASE_URL`):
+Confirm the two dedicated doctor user IDs before targeted writes. Enroll them first. Run this template separately for A and B with distinct synthetic license numbers. If the doctor already exists, inspect and reuse the setup instead of rerunning it.
 
 ```sql
--- usuarios y enrolamiento
-select id, role, left(wallet_pubkey,10) as wallet, wallet_verified_at is not null as verified from app_user;
-
--- convertir cuenta en médico verificado (user_id + wallet de la query anterior)
-with org as (insert into organizations (name, kind) values ('Clinica E2E','clinic') returning id),
-upd as (update app_user set role='doctor', organization_id=(select id from org) where id='<USER_ID>' returning id)
-insert into doctors (user_id, organization_id, license_number, specialty, wallet_pubkey, verified)
-select '<USER_ID>', org.id, 'MN 99.001', 'Clinico', u.wallet_pubkey, true from org, app_user u where u.id='<USER_ID>';
-
--- verificación de cada paso
-select code, patient_wallet, expires_at > now() as valid from patient_codes;
-select status, reason, created_at from access_requests;
-select id, title, status, record_pda from records;
-select event_type, tx_signature from audit_events order by created_at desc;
+begin;
+with org as (
+  insert into organizations (name, kind)
+  values ('Synthetic E2E Clinic', 'clinic') returning id
+), updated_user as (
+  update app_user
+  set role = 'doctor', organization_id = (select id from org)
+  where id = '<DOCTOR_USER_ID>'::uuid
+    and wallet_verified_at is not null and wallet_pubkey is not null
+  returning id, organization_id, wallet_pubkey
+)
+insert into doctors
+  (user_id, organization_id, license_number, specialty, wallet_pubkey, verified)
+select id, organization_id, '<UNIQUE_SYNTHETIC_LICENSE>', 'Clinico', wallet_pubkey, true
+from updated_user;
+-- Check exactly one inserted row before choosing COMMIT; otherwise ROLLBACK.
 ```
 
-## 1. Paciente
+Verify the intended user, wallet and organization in both tables. Database verification does not replace on-chain verification. Refresh the profile/session after a role change. The setup template creates one DB organization per doctor; the smoke can use the same on-chain clinic authority for both.
 
-1. **Login** en `http://localhost:3000/login` (browser directo, no preview/proxy — los WebSockets y locks de Supabase fallan por proxy). Magic link o Google si está habilitado.
-   - *Si Gmail se come el OTP* (scanner consume el link de un solo uso, error `otp_expired`): generá sesión por admin API — `PUT /auth/v1/admin/users/<id>` con `{"password":"<temp>","email_confirm":true}`, luego `POST /auth/v1/token?grant_type=password` con la anon key, y pegá el JSON de sesión en `localStorage["sb-<project-ref>-auth-token"]` en consola. O simplemente pedí el link y abrilo lo antes posible.
-2. **Enrolamiento**: la app crea la wallet Privy, pide firmar el challenge en el modal (acción del usuario, nunca automática) y verifica. Verificar: `app_user` con `wallet_verified_at` seteado.
-3. **`register_patient`**: la app firma el alta on-chain solo si el PatientProfile PDA no existe (chequeo previo, no pide firma de nuevo). Verificar: `node check-pda.cjs patient <wallet>` → ~57 bytes.
-4. **Mi QR** (`/qr`): código `SAL-XXXX` real, vence a los 2 min. Verificar: fila en `patient_codes` ligada a la wallet del paciente. **Generá uno fresco justo antes del lookup** — vence rápido.
+### 1.2 Clinic and doctor Providers
 
-## 2. Médico
+Reuse a known dedicated smoke clinic when possible. Otherwise use `scripts/register-clinic-provider.mts` from API #23 once, from `hcd_api`. It reads the program address from `idl/hcd.json` and currently expects a base58 fee-payer secret; confirm these match the environment. It prints a disposable clinic secret: **never expose raw output in agent logs, chat or recordings**. For a disposable smoke clinic, forward only public evidence in PowerShell:
 
-1. Segunda cuenta (incógnito): login + enrolamiento + `register_patient` igual que el paciente.
-2. **Setup DB** (el agente, SQL de arriba): org + `app_user.role='doctor'` + `doctors` row con `verified=true`, `license_number`, `wallet_pubkey`.
-3. **Clínica on-chain**: `node clinic-provider.mts` una vez; guardá `clinic_wallet`. Ponelo en `hcd_app/.env` como `NEXT_PUBLIC_DOCTOR_ORG=<clinic_wallet>` y reiniciá el dev.
-4. **Provider del médico**: en `/panel` aparece "Activá tu cuenta profesional" → "Registrar en la cadena" → firma. Verificar: `node check-pda.cjs provider <wallet>` → 90 bytes.
-5. **Verificación on-chain** (el paso que necesita al admin): `scripts/set-provider-verified.mts <providerPda>` firmado por `6AdUWfFL…`. Si no tenés la keypair, pasale el PDA a Misael.
+```powershell
+node scripts/register-clinic-provider.mts | Select-String '^(clinic_wallet|provider_pda|signature):'
+```
 
-## 3. El circuito
+If the authority must be retained, its operator must arrange secure storage separately. Never use a disposable authority for production. Set `NEXT_PUBLIC_DOCTOR_ORG` to `clinic_wallet`, not `provider_pda`, and restart the app.
 
-En este orden (los grants cubren estudios existentes — el upload va **antes** de aprobar):
+For A and B, open `/panel`, activate the professional account and approve `register_provider`. Check Provider authority, type, organization and verification status. Reuse an existing account rather than registering it twice.
 
-1. **Médico** `/escanear` → tipea el `SAL-XXXX` (o escanea el QR) → resuelve nombre y cantidad de estudios → **Pedir acceso**. Verificar `access_requests` `pending`.
-2. **Médico** `/cargar?code=SAL-XXXX` (o desde la resolución) → subí un PDF sintético → la app cifra en el browser (AES-256-GCM, `iv‖ct+tag`), pide `upload-url`, hace PUT del blob y firma `issue_record`. Necesita el Provider verificado (paso 2.5). Verificar `records` `pending_chain`.
-3. **Indexer**: en ~10-30 s baja el evento `RecordIssued` → `records.status='active'` con `record_pda`, y aparece una fila en `audit_events`. Si no baja: el log del API muestra el error de `onLogs`.
-4. **Paciente** `/accesos` → la solicitud lista el estudio nuevo → aprobar 24 h → firma un `grant_access` por cada estudio cubierto (un modal por firma). Verificar PDA de grant on-chain y `access_requests.status='approved'`.
-5. **Médico** abre el estudio → `POST /keys/release` (autorizado solo con grant vigente on-chain) → unwrap de la DEK con la wallet → descarga → visor muestra **"Es el archivo original"** (SHA-256 del blob descifrado == hash on-chain).
-6. **Paciente** `/linea-de-tiempo` → eventos `record_issued`, `access_granted` y el `access_logged` de la apertura del médico, con links al explorer.
+Send Misael both doctor authority wallets, optionally with their PDAs as evidence. From `hcd_api` in the admin's environment, the actual command is:
 
-## Problemas ya vistos (chequeá antes de debuggear)
+```sh
+node scripts/set-provider-verified.mts <DOCTOR_AUTHORITY_WALLET> true
+```
 
-| Síntoma | Causa | Fix |
-|---|---|---|
-| `permission denied for table app_user` | Migraciones aplicadas como `postgres` por el pooler → faltan default privileges | Migración `20261014_role_privileges.sql` |
-| Modal de firma "Something went wrong" | Blockhash expirado (modal abierto >90 s) | Retry o recargar — el build rehace la tx |
-| Firma pedida en cada navegación | `register_patient` se reintentaba siempre | La app ya chequea el PDA on-chain antes de pedir firma |
-| `No RPC configuration found for chain solana:mainnet` | Privy 3.x exige `config.solana.rpcs` + `chain` explícito | Provider configurado con `solana:devnet` |
-| `otp_expired` al abrir el magic link | Scanner de Gmail consume el OTP | Sesión por admin API (paso 1.1) o abrir el link al instante |
-| `provider is not enabled` en Google | Google OAuth deshabilitado en el proyecto Supabase | Usar magic link o habilitarlo en el dashboard |
-| `/login` u otra ruta da 404 en dev | `.next` corrupto tras matar el dev a medias | `rm -rf .next && npm run dev` |
-| `next dev` "existing server" | PID viejo sostiene el lock | `taskkill /PID <pid> /F` (en cmd, o `cmd //c` desde git-bash) |
-| `npx tsx` cuelga | tsx no instalado, npx espera el prompt | `node archivo.mts` (Node ≥22 strip-types nativo) |
-| "Restoring your session…" infinito en el preview | `navigator.locks` + proxy | Usar `localhost:3000` directo en Chrome |
-| `issue_record`/`grant_access` rechazado on-chain | Provider del médico sin `verified` | `set-provider-verified` con la wallet admin |
+The script derives the PDA and requires the boolean. The signer must match current `Config.admin`; do not assume a historical upgrade authority still holds that role. Keep the admin key with its owner. Confirm both Providers have `verified=true`. Otherwise mark issuance/grant steps BLOCKED.
 
-## Reporte esperado
+## 2. One consuming action per QR
 
-Tabla por paso: OK / falló (con error exacto y paso para reproducir). Evidencia: pubkeys (patient/provider/record/grant PDAs), firmas de tx en `explorer.solana.com/?cluster=devnet`, filas DB (`patient_codes`, `access_requests`, `records`, `audit_events`), y screenshot del visor con "Es el archivo original". Limitación conocida: un grant revocado sigue listándose activo hasta su expiración natural (el indexer no actualiza `access_requests`).
+The short `SAL-XXXX` alias and signed token share a nonce. Lookup does not consume it; `POST /records/upload-url` and `POST /access-requests` do. Generate a **new code per consuming action**, even before the two-minute expiry. Failed uploads may already have consumed a code/reservation; obtain fresh authorization instead of replaying it. Do not publish active codes.
+
+## 3. Ordered circuit
+
+1. **Issue (A + P).** P generates a fresh QR. A resolves it and uploads a synthetic PDF without first choosing “Pedir acceso” with that code. The browser seals AES-256-GCM output as `iv || ciphertext || tag`. Upload through `/records/upload-url`, register through `/records`, and approve `issue_record` as A. `storage_ref` must be the lowercase `records.id` UUID. Record public transaction signature and Record PDA only.
+2. **Index.** Confirm the transaction, `records.status='active'`, `record_pda` and the `record_issued` audit event. `pending_chain` is not completed issuance. Wait with a bounded timeout and diagnose the indexer if it does not advance.
+3. **Deny before consent (B).** Make an authenticated `POST /keys/release` for that `record_id` as B. Expect 403 and no DEK/download URL. Do not use A: the issuer can reread without a grant. Keep credentials and response secrets out of output.
+4. **Request (B + P).** P generates another fresh QR. B resolves it and requests access. Confirm the pending request belongs to B and P. This consumes the second code.
+5. **Grant (P).** Approve B's request in `/accesos`, choose a duration and sign every `grant_access` for the existing covered records. Confirm Record PDA, B's wallet and expiry on-chain; API request status alone does not prove every signature completed.
+6. **Read (B).** Open A's record. `/keys/release` must validate the grant and confirm `log_access` before releasing keys. The service unwraps the DEK, not the wallet. The browser compares SHA-256 of the **sealed encrypted bytes** with the on-chain hash before decryption. Confirm chain-hash retrieval succeeded instead of relying on the API-hash fallback. Expect the original synthetic document and integrity indicator.
+7. **Audit.** Confirm B's key-release row has `role='doctor'`, `log_access_status='confirmed'` and the matching signature. Confirm `access_logged` and the grant's incremented `access_count`. Correlate by this run's Record/Grant PDAs and signature, not the latest global row. Verify patient timeline evidence and devnet explorer links.
+8. **Revoke (P), deny (B).** Sign `revoke_access`, wait for confirmation and inspect grant state. Make a **new** key-release request as B: expect 403 without DEK/URL. Closing an already-open viewer is not this test. Revocation cannot erase previously received files or keys.
+9. **Expiry.** Create another grant using the API's shortest supported duration: 3600 seconds (one hour; the other options are 24 hours and seven days). Confirm a permitted release before expiry, then wait until on-chain expiry and request again as B: expect 403. Do not alter clocks or shared configuration. If time prevents this check, report BLOCKED rather than PASS.
+10. **Owner/issuer controls.** P and A can request keys for their active record without B's grant. Expect `role='patient'` / `role='issuer'`, `log_access_status='skipped'` and no new `log_access`. These reads do not validate third-party consent.
+
+## 4. Troubleshooting
+
+| Symptom | Response |
+|---|---|
+| Postgres permission denied | Confirm role and exact missing privilege with the administrator; resolve section 0's migration dependency. No broad grants. |
+| Privy missing RPC configuration | Check #14's devnet RPC and signing chain; restart after environment changes. |
+| Enrollment succeeds but PatientProfile is absent | Check cancelled signing/RPC errors and registration confirmation; use the corrected retry UI. |
+| Used/expired QR | Generate a fresh code for that operation. Request and upload cannot share a nonce. |
+| Provider unverified | Ask the current admin to verify the correct authority wallet using section 1.2. |
+| No access_logged | Check reader is B, not P/A, and inspect the correlated release role. |
+| Key release 503 | Fail-closed: no keys without confirmed access log. Retry after recovery; do not interrupt shared RPC services for fault injection. |
+| Expired transaction | Rebuild and request a new signature; never replay expired bytes. |
+| Expired OTP / disabled Google | Request a fresh supported login method. No automatic credential changes. |
+| Dev-server lock/port busy | Identify process and directory; stop only this smoke's process, never unrelated processes. |
+| Revoked grant still visible | Compare confirmed on-chain state and a fresh release response. Report stale UI/indexer state separately. |
+
+## 5. Evidence and completion
+
+For each step report expected/actual result, PASS/FAIL/BLOCKED and reproducible errors. Include only public test wallets, PDAs, signatures, scoped row IDs/statuses and synthetic screenshots. Transaction links: `https://explorer.solana.com/tx/<signature>?cluster=devnet`. No environment values, passwords, bearer tokens, DEKs, private keys, active codes or signed download URLs.
+
+List exact repo commits, unresolved prerequisites and unexecuted steps. A full pass requires B's authorized access plus denial before consent, after revocation and after expiry, with corresponding audit evidence. Never label a two-account issuer read a successful third-party E2E smoke.
