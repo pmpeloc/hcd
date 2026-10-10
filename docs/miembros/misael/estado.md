@@ -1,14 +1,13 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-06
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-Programa endurecido tras una revisión de seguridad independiente (nada crítico ni alto): `update_config`, emisor ≠ paciente, hash no nulo y `storage_ref` = UUID de `records`. IDL v1 publicado (solo agrega cosas) y redeploy en devnet.
+Puerta G4 cumplida: test de integración `full journey` (alta → emitir → grant → log → revoke → disputar → anular → reemitir → grant/log) en verde contra devnet y en local; imprime los links del explorer de cada transacción. Menores de la revisión cruzada de Franco cerrados (hcd_api#15, esperando aprobación).
 
 ## Próximo paso
-- Avisar al grupo del IDL v1 y que el builder de `issue_record` mande `records.id` como `storage_ref` (Franco/Mati).
-- Revisión cruzada de Franco sobre el programa endurecido.
-- Test de integración del recorrido completo en devnet (puerta G4).
+- Avisar al grupo del IDL v1 (Mati y Maxi regeneran clientes si hace falta).
+- Sábado 10/10: casos negativos extra y comentarios en las restricciones de Anchor.
 
 ## Bloqueos
 Ninguno.

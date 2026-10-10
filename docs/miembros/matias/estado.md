@@ -1,15 +1,15 @@
 # Estado · Matías
 
-**Última actualización:** 2026-10-06
+**Última actualización:** 2026-10-08
 
 ## En qué estoy
-Tres tareas preparadas para revisión: migración wallet/auditoría (API #11), guard Supabase (API #12) y login Supabase/Privy en feat/supabase-privy-login (app). Documentación consolidada en la rama del PR #16.
+Primera entrega de records en feat/records-storage: carga cifrada, reserva autorizada por código temporal, DEK envuelta e IV, listado RLS y estado pending_chain. Contrato compartido en app feat/records-contract. Plan por entregas en [plan-integracion.md](plan-integracion.md).
 
 ## Validación
-Login: seis pruebas simuladas en Edge, build y lint aprobados. API: 25 pruebas de auth/tx y compilación aprobadas. Migración: probada en PostgreSQL local; no aplicada a Supabase.
+Migración de IV/pending_chain probada en PostgreSQL 18 local con datos sintéticos, rollback y servidor detenido; no aplicada a Supabase. Suite API de 70 pruebas aprobada. Ver PRs para comprobaciones finales de compilación y lint.
 
 ## Próximo paso
-Prueba real de email/Google y creación/reutilización de wallet con cuenta de prueba. Implementar alta de app_user y vinculación verificada de wallet en backend. Coordinar con Franco la protección de tx/keys y la asociación de signer/tx_id a la identidad autenticada.
+Revisión con Franco del contrato records → tx: hoy se devuelve build_request, no transacción armada. Antes de cofirmar debe comprobarse el registro autorizado persistido. Luego enrolamiento seguro de wallet y firma Privy; después access/indexer y E2E, sin implementar todo junto.
 
 ## Bloqueos y límites
-Dashboards reales pendientes de verificar (redirect URLs, Google, JWT auth Privy y orígenes). Login no implica registro on-chain ni acceso a estudios. Las rutas ajenas a /login todavía no tienen protección de sesión en esta entrega. PR pendientes de revisión; no hubo despliegues ni migraciones remotas.
+Esta entrega no emite en Solana ni completa el visor. Necesita revisión, migración IV, secreto de tokens y bucket privado con límite de tamaño; el binding inicial de #19 requiere prueba de propiedad de wallet. Coordinar IV con Maxi y servicio de llaves de Franco. tx_stores ya fue aplicada a Supabase en el trabajo anterior (docs #25), y el cliente Bearer está en app #7. Ninguna de estas tareas equivale al smoke E2E real.
