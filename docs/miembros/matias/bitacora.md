@@ -1,5 +1,11 @@
 # Bitácora · Matías
 
+## 2026-10-11 · fix(db): reconcile explicit service and browser privileges
+- **Qué hice:** propuesta nueva de reconciliación de permisos, diagnóstico de catálogos sin filas clínicas y guía de aplicación/reversión. No reconstruye el SQL histórico faltante ni modifica Supabase compartido.
+- **Archivos clave:** hcd_api/supabase/migrations/20261015000000_reconcile_role_privileges.sql, diagnostics/role_privileges.sql, ROLE_PRIVILEGES.md y tests/role_privileges.sql + run-role-privileges.mjs.
+- **Validación:** PostgreSQL 18.4 local descartable: instalación limpia, permisos directos excesivos y rechazo de privilegios heredados con rollback; repetición idempotente; operaciones reales service_role, RPCs, aislamiento RLS y columnas sensibles bloqueadas. Políticas, propietarios y defaults sin cambios.
+- **Próximo paso:** revisión cruzada; operador confirma proyecto e historial, compara el diagnóstico con el SQL aplicado y decide la migración. No ejecutar db push general ni inventar historia de migraciones.
+
 ## 2026-10-08 · fix(auth): bind enrollment to visible account and audit atomically
 - **Qué hice:** desafío v2 con correo del JWT y UUID; validación de cuenta/origen/wallet/desafío; índice único de médicos y trigger de coherencia; auditoría wallet_enrolled en la misma transacción. Factory compartida de #19 y cliente reutilizado, rate limit antes de JWT y configuración validada al iniciar.
 - **Archivos clave:** hcd_api/src/auth/wallet-enrollment*, supabase-session.guard.ts, auth.module.ts, supabase-admin.factory.ts, WALLET_ENROLLMENT.md, supabase/migrations/20261008020000_wallet_enrollment.sql y supabase/tests/wallet_enrollment.sql.
