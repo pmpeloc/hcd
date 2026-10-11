@@ -1,5 +1,23 @@
 # Bitácora · Matías
 
+## 2026-10-11 · fix(smoke): reject failed clinic registration transactions
+- **Qué hice:** corrección de API #23: confirmar con blockhash y altura límite, rechazar errores de ejecución y comprobar el Provider de clínica antes de informar éxito. Eliminé la salida de la clave privada.
+- **Archivos clave:** hcd_api/scripts/register-clinic-provider.mts, confirm-registration.mts y confirm-registration.test.mts.
+- **Validación:** cuatro pruebas offline aprobadas (error on-chain, cuenta ausente, éxito y timeout) y comprobación de sintaxis. No se ejecutó el helper real ni se leyeron secretos.
+- **Próximo paso:** revisión cruzada de #23 y confirmar prerrequisitos compartidos antes del smoke.
+
+## 2026-10-11 · fix(app): decode doctor provider verification correctly
+- **Qué hice:** corrección de app #14: leer verified en byte 41 y validar dueño, discriminador, autoridad, tipo de médico, longitud y booleano. Conservé las correcciones de registro publicadas en 7341ad3.
+- **Archivos clave:** hcd_app/lib/provider-account.ts, components/doctor/provider-activation.tsx, e2e/provider-account.spec.ts y playwright.api.config.ts.
+- **Validación:** 22 pruebas locales de transporte/registro/Provider aprobadas; casos con organización independiente de verified y cuentas malformadas. Sin Supabase ni devnet.
+- **Próximo paso:** revisión cruzada de #14 y validación real posterior; no autoaprobar.
+
+## 2026-10-10 · fix(auth): recover patient registration before redirect
+- **Qué hice:** con autorización de Franco, corregí app #14: estado separado para registro on-chain, error visible y reintento explícito, coordinación entre montajes del proveedor y redirección solo tras confirmar el PatientProfile. Cada reintento consulta el PDA antes de pedir otra firma.
+- **Archivos clave:** hcd_app/lib/patient-registration.ts, lib/auth-providers.tsx, app/(auth)/login/page.tsx, e2e/patient-registration.spec.ts y playwright.api.config.ts.
+- **Validación:** tipos y lint de los archivos afectados aprobados; 20 pruebas de transporte/registro aprobadas, incluidas seis nuevas sobre cancelación, RPC, concurrencia, confirmación y aislamiento. Sin servicios reales ni transacciones.
+- **Próximo paso:** revisión cruzada de app #14 y smoke con tres identidades una vez confirmados los prerrequisitos de #32.
+
 ## 2026-10-10 · docs(smoke): correct third-party consent playbook
 - **Qué hice:** con autorización de Franco, corregí la skill de la PR #32: paciente, emisor y médico tercero; QR nuevo por operación; comando real de verificación; hash del archivo cifrado; controles de denegación, revocación, vencimiento y auditoría. Aclaré configuración, credenciales y la dependencia de privilegios aún no versionada.
 - **Archivos clave:** .devin/skills/e2e-smoke/SKILL.md y mi estado.
