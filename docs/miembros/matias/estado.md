@@ -3,13 +3,16 @@
 **Última actualización:** 2026-10-11
 
 ## En qué estoy
-Entrega de reconciliación de privilegios Supabase en fix/role-privileges (API) y docs/matias-role-privileges (docs). Es una propuesta nueva basada en staging; no intenta recuperar el contenido desconocido de 20261014_role_privileges.sql.
+Entrega de permisos contrastada con catálogos reales de Supabase: API #24 (fix/role-privileges) y Docs #33 (docs/matias-role-privileges). Ambas abiertas y sin revisión humana al consultar. No hubo cambios nuevos en staging ni conflictos.
+
+## Hallazgos
+El backend ya tiene permisos. anon y authenticated conservan TRUNCATE, REFERENCES, TRIGGER y MAINTAIN en 12 tablas. wrapped_dek/storage_path y RPCs sensibles siguen bloqueados para esos roles. No existe supabase_migrations.schema_migrations; no se conoce el SQL histórico. Hay defaults amplios para futuros objetos que la propuesta acotada no modifica.
 
 ## Validación
-PostgreSQL 18.4 descartable: instalación limpia, permisos excesivos, aplicación repetida, operaciones service_role, RPCs, aislamiento paciente/organización y bloqueo de claves/almacenes internos al navegador. Privilegios heredados inseguros rechazan la migración y revierten los cambios. Diagnóstico ejecutado; políticas, propietarios, RLS y defaults preservados.
+Diagnóstico alojado en PostgreSQL 17.11 con conexión forzada a solo lectura, sin filas clínicas. Cuatro escenarios locales en PostgreSQL 18.4 aprobados: limpio, permisos excesivos, patrón observado y acceso heredado rechazado con rollback. Incluye TRUNCATE denegado, operaciones service_role/RPC, aislamiento, idempotencia y preservación de políticas/propietarios/defaults. Servidor descartable detenido.
 
 ## Próximo paso
-Revisión de la PR por Franco/Misael. El operador debe confirmar el proyecto, extraer diagnóstico de catálogos e historial de versiones y contrastarlos con el SQL manual antes de aplicar únicamente la migración revisada. Luego repetir diagnóstico y smoke con cuentas sintéticas.
+Revisión cruzada de API #24/Docs #33 y confirmación del proyecto por el administrador. Acordar cómo registrar la migración sin inventar historia, revisar integraciones y tratar defaults futuros por separado. Tras autorización de aplicación: solo migración acordada, diagnóstico posterior y smoke alojado.
 
 ## Bloqueos y límites
-No se modificó Supabase compartido ni se hicieron operaciones en devnet. No conocemos el SQL histórico ni el estado actual de permisos del proyecto compartido. Las pruebas locales no validan PostgREST, Storage, JWT o el circuito E2E alojado. Las correcciones anteriores en API #23/app #14/docs #32 siguen separadas; esta entrega no las mergea ni reemplaza la revisión cruzada.
+No se aplicaron migraciones compartidas ni se hizo merge. La referencia de conexión coincide con la configuración local, pendiente confirmación humana en dashboard. El patrón local no es un clon de la base. No se probó explotación HTTP ni hay evidencia de uso de los permisos excesivos. El smoke de aplicación/Storage/devnet sigue pendiente. Informe: relevamientos/2026-10-11-permisos-supabase.md.

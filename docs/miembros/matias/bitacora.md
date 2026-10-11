@@ -1,5 +1,11 @@
 # Bitácora · Matías
 
+## 2026-10-11 · test(db): verify observed shared privilege pattern
+- **Qué hice:** diagnóstico real de catálogos Supabase en modo solo lectura. El backend ya tiene permisos; anon/authenticated conservan TRUNCATE y otros permisos excesivos en 12 tablas. No existe el historial estándar de migraciones. Agregué el contraste, límites y siguiente paso del operador a API #24/Docs #33.
+- **Archivos clave:** hcd_api/supabase/ROLE_PRIVILEGES.md, diagnostics/role_privileges.sql, tests/role_privileges.sql y run-role-privileges.mjs; relevamientos/2026-10-11-permisos-supabase.md.
+- **Validación:** cuatro escenarios PostgreSQL 18.4 local aprobados, incluido patrón observado y denegación real de TRUNCATE solo en local. Diagnóstico compartido sobre PostgreSQL 17.11 sin filas clínicas ni escrituras. Servidor local detenido.
+- **Próximo paso:** revisión cruzada y confirmación humana de proyecto/historial; acordar registro de migración y tratamiento separado de defaults. No se aplicaron migraciones ni se hizo merge.
+
 ## 2026-10-11 · fix(db): reconcile explicit service and browser privileges
 - **Qué hice:** propuesta nueva de reconciliación de permisos, diagnóstico de catálogos sin filas clínicas y guía de aplicación/reversión. No reconstruye el SQL histórico faltante ni modifica Supabase compartido.
 - **Archivos clave:** hcd_api/supabase/migrations/20261015000000_reconcile_role_privileges.sql, diagnostics/role_privileges.sql, ROLE_PRIVILEGES.md y tests/role_privileges.sql + run-role-privileges.mjs.
