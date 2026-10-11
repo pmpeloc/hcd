@@ -1,13 +1,18 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-10
+**Última actualización:** 2026-10-11
 
 ## En qué estoy
-Smoke E2E devnet en curso — ya van bien: login Supabase, wallet Privy, **enrolamiento completo** (challenge→firma→verify, `wallet_verified_at` en DB) y **`register_patient` on-chain** (PatientProfile PDA confirmada en devnet, 57 bytes). El smoke destapó y ya corregí: migración `20261014` de privilegios (`service_role`/`authenticated` sin grants porque las migraciones se aplicaron como `postgres` por el pooler), `register_patient` que la app nunca llamaba, login sin redirect por rol, home `/inicio` hardcodeado (ahora carga datos reales), y la config `solana:devnet` que Privy 3.x exige para firmar.
+**Smoke E2E devnet completo** — circuito probado de punta a punta: enrolamiento de ambas cuentas, `register_patient`/`register_provider` on-chain, Provider del médico verificado por admin (keypair que Misael pasó, usada local sin commitear), QR real, lookup + pedido, upload ECG → `issue_record` → indexer `active`, aprobación → `grant_access`, visor "Es el archivo original", y revocación → `access_revoked` en la línea de tiempo del paciente.
+
+Correcciones del día: `expires_at` i64 → `BN` en `tx-builder` (rompía `/tx/build`), endpoints doctor-side (`/doctors/me/records`, `/records/:id`), panel y `/mis-accesos` del médico con datos reales (se fue lo ficticio), visor resolviendo metadata real, grants leyendo estado on-chain (revocado deja de figurar vigente) y chips honestos Emitido/Vigente/Vencido.
 
 ## Próximo paso
-- El smoke queda para el equipo con la skill `.devin/skills/e2e-smoke` (playbook completo + scripts + SQL + troubleshooting de todo lo que ya vimos). Retoma en el paso **2.4**: médico en `/panel` → "Activá tu cuenta profesional" → `register_provider`; después `set-provider-verified` (key de Misael) y el circuito §3.
+- Revisar **api#24** de Mati (recorte de privilegios de mi migración 20261014 — `authenticated` quedó con TRUNCATE/TRIGGER de más).
+- Decisión pendiente para el equipo: el emisor conserva acceso a su estudio aun tras revocar el grant (por diseño de `keys/release`); si revocar también debe cortar al emisor hay que cambiarlo.
+- Path del segundo médico para probar grant + `log_access` on-chain.
+- Conflictos de #32 por resolver.
 
 ## Bloqueos
-- **`set_provider_verified` requiere la wallet admin** (`6AdUWfF…`, upgrade authority = wallet dev de Misael): sin esa firma el médico no puede anclar `grant_access` ni `issue_record` on-chain. Todo el flujo off-chain se puede probar igual.
-- Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
+- Ninguno del smoke. La keypair admin quedó en `D:\hackathon\keys\admin.json` (fuera de repos, sin commitear).
+- Cuenta médico con password temporal de prueba (`SaluaSmoke62589!`) — rotar o quitar antes de producción.
