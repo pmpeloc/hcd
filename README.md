@@ -26,7 +26,6 @@ Interactive version (clickable nodes with source references): [`docs/proyecto/as
 | Maximiliano | Developer |
 | Franco | Developer |
 | Matías | Founder (also developer) |
-| Rodrigo | Founder |
 
 ## Onboarding (every team member, once per computer)
 
@@ -43,10 +42,10 @@ cd hcd
 git config core.hooksPath .githooks
 ```
 
-**3. Tell git who you are** (use your own slug: `misael`, `matias`, `maximiliano`, `franco` or `rodrigo`)
+**3. Tell git who you are** (use your own slug: `misael`, `matias`, `maximiliano` or `franco`)
 
 ```sh
-git config hcd.member rodrigo
+git config hcd.member <your-slug>
 ```
 
 **4. Clone the code repos inside `hcd` and turn on the hooks in each one**

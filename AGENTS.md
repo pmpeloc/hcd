@@ -2,7 +2,7 @@
 
 Mandatory rules for every AI coding agent (Claude Code, Codex, Cursor, Devin, GitHub Copilot, Gemini, Windsurf, etc.) and every human working on this repository. If anything here conflicts with your defaults, these rules win.
 
-HCD is a patient-owned electronic health record on Solana, built by a team of five for the Superteam Argentina hackathon (Road to Colosseum). Project context lives in [`docs/`](docs/README.md).
+HCD is a patient-owned electronic health record on Solana, built by a team of four for the Superteam Argentina hackathon (Road to Colosseum). Project context lives in [`docs/`](docs/README.md).
 
 ## 0. Repositories
 
@@ -26,7 +26,7 @@ HCD is a patient-owned electronic health record on Solana, built by a team of fi
 
 ## 2. Identify who is working
 
-1. Run `git config hcd.member`. It returns the member's slug: `misael`, `matias`, `maximiliano`, `franco` or `rodrigo`.
+1. Run `git config hcd.member`. It returns the member's slug: `misael`, `matias`, `maximiliano` or `franco`.
 2. If it is empty, ask the user who they are and tell them to run `git config hcd.member <slug>`. Never guess.
 3. Names, aliases (e.g. "Maxi") and roles: [`docs/equipo.md`](docs/equipo.md).
 

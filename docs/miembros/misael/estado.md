@@ -1,13 +1,13 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-08
+**Última actualización:** 2026-10-12
 
 ## En qué estoy
-Puerta G4 cumplida: test de integración `full journey` (alta → emitir → grant → log → revoke → disputar → anular → reemitir → grant/log) en verde contra devnet y en local; imprime los links del explorer de cada transacción. Menores de la revisión cruzada de Franco cerrados (hcd_api#15, esperando aprobación).
+Cierre de la entrega en Colosseum: perfil de fundador completo. Equipo actualizado a cuatro integrantes (sale Rodrigo). Cadenas de merge de API, app y docs listas para entrar en orden.
 
 ## Próximo paso
-- Avisar al grupo del IDL v1 (Mati y Maxi regeneran clientes si hace falta).
-- Sábado 10/10: casos negativos extra y comentarios en las restricciones de Anchor.
+- Que el equipo reasigne pitch, demo y landing (eran de Rodrigo).
+- Smoke E2E en vivo contra devnet cuando estén mergeadas las cadenas.
 
 ## Bloqueos
 Ninguno.

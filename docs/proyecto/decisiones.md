@@ -2,6 +2,11 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-12 · El equipo queda en cuatro integrantes · Misael
+- Rodrigo ya no forma parte del equipo. Integrantes: Misael, Matías, Maximiliano y Franco.
+- Se sacó de `equipo.md`, de los README, de `AGENTS.md` y del hook `pre-commit`. Sus carpetas (`docs/miembros/rodrigo/`, `docs/tareas/rodrigo.md`) quedan como historial.
+- **Pendiente:** reasignar lo que tenía a cargo (pitch, demo y landing) y actualizar las menciones en las tareas de cada uno.
+
 ## 2026-10-06 · Programa endurecido tras la revisión de seguridad (IDL v1) · Misael
 Una revisión independiente del programa no encontró nada crítico ni alto. Cambios:
 - **`storage_ref` es el `id` (UUID) de la fila de `records`.** El programa solo acepta un UUID en minúsculas, así que no se puede grabar on-chain una ruta legible, un nombre o un DNI. **Impacto (Franco/Mati):** el builder de `issue_record` tiene que mandar `records.id`, no `storage_path`; conviene que el esquema Zod pase de `z.string().max(64)` a `z.string().uuid()`.

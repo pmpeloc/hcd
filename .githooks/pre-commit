@@ -12,7 +12,7 @@ fi
 
 member=$(git config hcd.member || git -C "$hcd" config hcd.member)
 if [ -z "$member" ]; then
-  echo "HCD: who are you? Run in the hcd folder: git config hcd.member <misael|matias|maximiliano|franco|rodrigo>" >&2
+  echo "HCD: who are you? Run in the hcd folder: git config hcd.member <misael|matias|maximiliano|franco>" >&2
   exit 1
 fi
 log="docs/miembros/$member/bitacora.md"

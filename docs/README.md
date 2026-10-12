@@ -36,7 +36,7 @@ Se puede abrir como bóveda de Obsidian (abrir la carpeta `docs/` como vault). L
 git clone https://github.com/pmpeloc/hcd.git
 cd hcd
 git config core.hooksPath .githooks   # activa los hooks del equipo
-git config hcd.member <tu-slug>       # misael, matias, maximiliano, franco o rodrigo
+git config hcd.member <tu-slug>       # misael, matias, maximiliano o franco
 ```
 
 Después, **dentro de la carpeta `hcd`**, clonar los repos de código y activarles los hooks:
