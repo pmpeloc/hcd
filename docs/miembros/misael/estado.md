@@ -1,13 +1,13 @@
 # Estado · Misael
 
-**Última actualización:** 2026-10-10
+**Última actualización:** 2026-10-14
 
 ## En qué estoy
-Integración del MVP: las cadenas de PRs de la API (#22→#21), la app (#7→#13) y docs quedaron sin conflictos y con los bugs del flujo en vivo arreglados (ver bitácora). API 185/185 tests, app 101/101 e2e.
+Deploy de producción: API en Railway, app y landing en Vercel, todo desde `main`. Supabase al día (9 migraciones aplicadas). Arreglo del build de Railway (`railpack.json` fuerza Node).
 
 ## Próximo paso
-- Aprobaciones y merges en orden; después, smoke E2E en vivo contra devnet (enrolar → subir → emitir → grant → liberar → visor → revocar).
-- Confirmar que la migración `20261008000000_tx_stores.sql` (#20) esté aplicada en Supabase; Franco aplicó las de #21.
+- Redeploy de la API en Railway y cargar las variables de entorno; después la app en Vercel con `NEXT_PUBLIC_API_URL`.
+- Arreglar el lint de hcd_api#25 (Franco) para que entre antes del smoke; hcd_api#24 (permisos, Matías) después del deploy.
 
 ## Pendientes conocidos (no rompen la demo)
 - `records.repository` baja el archivo de hasta 50 MB entero a memoria al registrar (riesgo de OOM con muchos pedidos).

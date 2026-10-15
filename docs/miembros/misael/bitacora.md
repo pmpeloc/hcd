@@ -2,6 +2,21 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · Merge staging into docs/misael-railway-deploy
+- **Qué hice:** traje `staging` a la rama del PR hcd#34 y resolví el conflicto de `estado.md`: quedó el estado del 14/10 (deploy) y conservé los pendientes conocidos del MVP.
+- **Archivos clave:** `docs/miembros/misael/estado.md`.
+- **Próximo paso:** aprobación de otro miembro para mergear hcd#34 a `staging`.
+
+## 2026-10-14 · style(records): fix lint errors in doctor record access
+- **Qué hice:** en el PR hcd_api#25 de Franco (con su rama y a pedido del equipo, para llevarlo a `staging`) arreglé los 6 errores de lint: formato de prettier, tipo de retorno explícito en `findRecord` en lugar del cast que eslint marcaba como innecesario, y un `eslint-disable` justificado en `new anchor.BN(...)` porque `bn.js` no trae tipos. Sin cambios de lógica; tsc, build y 185/185 tests verdes.
+- **Archivos clave:** `hcd_api/src/records/records.repository.ts`, `hcd_api/src/records/records.service.ts`, `hcd_api/src/tx/tx-builder.service.ts`.
+- **Próximo paso:** aprobar y mergear hcd_api#25 y #24 a `staging`; la migración de #24 se aplica en Supabase después del deploy.
+
+## 2026-10-14 · build(deploy): force Node provider for Railway build
+- **Qué hice:** el deploy de la API en Railway fallaba con `npm: not found` porque Railpack ve el `Cargo.toml` del programa Anchor en la raíz y arma la imagen como Rust. Agregué `railpack.json` en `hcd_api` con `provider: node` y `startCommand: npm run start:prod`. Antes abrí los PRs `staging → main` de api, app y landing, y confirmé que las 9 migraciones ya estaban aplicadas en Supabase.
+- **Archivos clave:** `hcd_api/railpack.json`.
+- **Próximo paso:** redeploy en Railway desde `main`; lint de hcd_api#25 (Franco) y #24 (Matías) después del deploy.
+
 ## 2026-10-10 · fix: integrate MVP merge chain and fix live-flow bugs
 - **Qué hice:** revisé hcd_api#21 y hcd_app#13 (con agentes) y dejé las cadenas de merge listas para entrar en orden sin conflictos. API: pre-resolví #17→#19 (`keys.module`) y metí #22, #18 y #20 en #21 (gate de reserva de `issue_record` + wallet verificada del firmante + stores en Postgres, spec de tx unificado). App: unifiqué los dos clientes HTTP de #11 y #13 (`ApiError` con status/code detrás de `createApiClient`/`SessionError`). Docs: #29 dentro de #30. Arreglé lo que rompía la prueba en vivo: timeline siempre 503 (`actor_wallet` no existía), indexer que espejaba tx fallidas y activaba la reserva equivocada, wallets sin verificar en `issue_record`, revocar que fingía éxito sin wallet, permisos revocados que volvían como activos, aprobaciones a medias sin reintento (409) y reintento de subida con el código ya quemado. Decisión del estado de permisos en `decisiones.md`. API 185/185 tests; app 101/101 e2e, tsc, lint y build limpios.
 - **Archivos clave:** `hcd_api/src/{access,indexer,tx,records}/`, `hcd_app/lib/api-client.ts`, `hcd_app/components/{access,doctor-upload,onchain,viewer,doctor-scanner}/`, `docs/proyecto/decisiones.md`.
