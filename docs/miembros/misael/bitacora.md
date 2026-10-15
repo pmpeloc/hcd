@@ -2,6 +2,112 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · Merge main into staging to unblock the release PR
+- **Qué hice:** el PR hcd#36 (staging → main) tenía conflictos porque `main` conserva commits de antes de proteger las ramas. 9 de los 11 ya estaban en `staging` con otro hash; en los conflictos me quedé con `staging` y reapliqué los 2 únicos cambios faltantes: los ajustes de CSS del demo de Franco (tipografía un paso más grande y sidebar centrada).
+- **Archivos clave:** `demo/styles.css`.
+- **Próximo paso:** aprobar este PR a `staging`; después hcd#36 queda sin conflictos para mergear a `main`.
+
+## 2026-10-15 · feat(app): add Open Graph image, favicon and app icons
+- **Qué hice:** metadata completa de hcd_app (`metadataBase` desde `NEXT_PUBLIC_APP_URL` o `VERCEL_PROJECT_PRODUCTION_URL`, Open Graph es_AR y tarjeta grande de Twitter), imagen OG 1200×630 con `next/og`, favicon e ícono de Apple generados del logo y manifest con íconos. Coordinado con Maxi (dueño de hcd_app). Lint, tsc y build verdes; meta tags verificados con el build local.
+- **Archivos clave:** `hcd_app/app/layout.tsx`, `hcd_app/app/opengraph-image.tsx`, `hcd_app/app/icon.png`, `hcd_app/app/apple-icon.png`, `hcd_app/public/manifest.webmanifest`.
+- **Próximo paso:** revisión de Maxi; tras el deploy, validar la tarjeta con el depurador de LinkedIn o de Facebook.
+
+## 2026-10-15 · fix(records): align shared schemas with the current API contract
+- **Qué hice:** en el PR hcd_app#9 de Matías (a pedido del equipo, para dejarlo listo) actualicé `lib/schemas/records.ts` al contrato vigente de `hcd_api`: blob sellado iv+ciphertext+tag (mínimo 29 bytes), metadata `title`/`study_date`/`origin` y listado no estricto para tolerar cache-busters. Sin consumidores todavía en la app.
+- **Archivos clave:** `hcd_app/lib/schemas/records.ts`.
+- **Próximo paso:** aprobación de otro miembro para mergear hcd_app#9.
+
+## 2026-10-15 · fix(doctor): satisfy lint in doctor access and panel pages
+- **Qué hice:** en el PR hcd_app#14 de Franco (bloquea el registro on-chain y la redirección tras enrolar la wallet en Vercel) arreglé el error de lint del último commit: el `setState` síncrono del effect sin sesión pasa a un valor derivado en el render, sin cambiar lo que se ve; saqué un import sin uso. Lint, tsc, 22/22 tests y build verdes.
+- **Archivos clave:** `hcd_app/app/(medico)/mis-accesos/page.tsx`, `hcd_app/app/(medico)/panel/page.tsx`.
+- **Próximo paso:** que Matías descarte su revisión vieja (ya resuelta) y otro miembro apruebe; después promover `staging` a `main` para Vercel.
+
+## 2026-10-15 · Merge staging into docs/misael-railway-deploy
+- **Qué hice:** traje `staging` a la rama del PR hcd#34 y resolví el conflicto de `estado.md`: quedó el estado del 14/10 (deploy) y conservé los pendientes conocidos del MVP.
+- **Archivos clave:** `docs/miembros/misael/estado.md`.
+- **Próximo paso:** aprobación de otro miembro para mergear hcd#34 a `staging`.
+
+## 2026-10-14 · style(records): fix lint errors in doctor record access
+- **Qué hice:** en el PR hcd_api#25 de Franco (con su rama y a pedido del equipo, para llevarlo a `staging`) arreglé los 6 errores de lint: formato de prettier, tipo de retorno explícito en `findRecord` en lugar del cast que eslint marcaba como innecesario, y un `eslint-disable` justificado en `new anchor.BN(...)` porque `bn.js` no trae tipos. Sin cambios de lógica; tsc, build y 185/185 tests verdes.
+- **Archivos clave:** `hcd_api/src/records/records.repository.ts`, `hcd_api/src/records/records.service.ts`, `hcd_api/src/tx/tx-builder.service.ts`.
+- **Próximo paso:** aprobar y mergear hcd_api#25 y #24 a `staging`; la migración de #24 se aplica en Supabase después del deploy.
+
+## 2026-10-14 · build(deploy): force Node provider for Railway build
+- **Qué hice:** el deploy de la API en Railway fallaba con `npm: not found` porque Railpack ve el `Cargo.toml` del programa Anchor en la raíz y arma la imagen como Rust. Agregué `railpack.json` en `hcd_api` con `provider: node` y `startCommand: npm run start:prod`. Antes abrí los PRs `staging → main` de api, app y landing, y confirmé que las 9 migraciones ya estaban aplicadas en Supabase.
+- **Archivos clave:** `hcd_api/railpack.json`.
+- **Próximo paso:** redeploy en Railway desde `main`; lint de hcd_api#25 (Franco) y #24 (Matías) después del deploy.
+
+## 2026-10-10 · fix: integrate MVP merge chain and fix live-flow bugs
+- **Qué hice:** revisé hcd_api#21 y hcd_app#13 (con agentes) y dejé las cadenas de merge listas para entrar en orden sin conflictos. API: pre-resolví #17→#19 (`keys.module`) y metí #22, #18 y #20 en #21 (gate de reserva de `issue_record` + wallet verificada del firmante + stores en Postgres, spec de tx unificado). App: unifiqué los dos clientes HTTP de #11 y #13 (`ApiError` con status/code detrás de `createApiClient`/`SessionError`). Docs: #29 dentro de #30. Arreglé lo que rompía la prueba en vivo: timeline siempre 503 (`actor_wallet` no existía), indexer que espejaba tx fallidas y activaba la reserva equivocada, wallets sin verificar en `issue_record`, revocar que fingía éxito sin wallet, permisos revocados que volvían como activos, aprobaciones a medias sin reintento (409) y reintento de subida con el código ya quemado. Decisión del estado de permisos en `decisiones.md`. API 185/185 tests; app 101/101 e2e, tsc, lint y build limpios.
+- **Archivos clave:** `hcd_api/src/{access,indexer,tx,records}/`, `hcd_app/lib/api-client.ts`, `hcd_app/components/{access,doctor-upload,onchain,viewer,doctor-scanner}/`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** que se aprueben y mergeen en orden (API #22→#17→#18→#19→#20→#21; app #7→#9→#10→#11→#12→#13; docs) y smoke E2E en vivo contra devnet. Durante el merge sincronicé `staging` dentro de #21 (y de las ramas que lo necesiten) porque GitHub no resuelve bien las cadenas con varias bases comunes.
+
+## 2026-10-08 · test(program): add full journey integration test
+- **Qué hice:** puerta G4. Escenario `full journey` en la suite de Anchor: un mismo paciente y médico recorren alta → `issue_record` → `grant_access` → 2× `log_access` → `revoke_access` (el log siguiente se rechaza) → `dispute_record` → `void_record` → reemisión con `supersedes` → grant y log sobre el estudio nuevo (el anulado ya no acepta grants). En devnet imprime los links del explorer de cada transacción, para el formulario final. Verde en devnet (7/7, y la suite completa 58 ok / 0 fallas) y en local (68 ok / 0 fallas).
+- **Archivos clave:** `tests/hcd.test.mts`.
+- **Ejemplos en devnet:** [issue_record](https://explorer.solana.com/tx/4B8jY14aJ8jnWB8KpocTudPMfZtGog11SEP9C8kH1sSQnj4NCpBYrSMTjMYBo5C8wPZEGC3XCDRx3sfpTDcKDkvQ?cluster=devnet), [grant_access](https://explorer.solana.com/tx/qtAYVrj6ZVJaAVkid2BPWRZXd5Zon5CLDSwSn9AQwYqfr89eZzxaNq71b2vAHbmZGqPZ2EVEcvuW8yBvEXEAtAY?cluster=devnet), [log_access](https://explorer.solana.com/tx/3ua4HzzvhRzD1mqNywkfGqU6sj9TQMuEDEbYrZiPKEFadwgc4R6fWHswk3g64ueHbJH1ECE1qPBqWuGXc56ZCK1o?cluster=devnet).
+- **Próximo paso:** avisar al grupo del IDL v1; sábado: casos negativos extra y comentarios en las restricciones de Anchor.
+
+## 2026-10-08 · fix(program): address cross-review minor findings
+- **Qué hice:** cerré los dos menores de la revisión cruzada de Franco (hcd_api#10). Saqué el "ponytail:" que había quedado en un comentario de `register_provider.rs` (solo comentario: el bytecode no cambia y no hace falta redeploy). `update_config` valida solo el par nuevo, así que al traspasar el admin se podía dejar al admin saliente como `key_service`; ahora lo bloquea `scripts/update-config.mts` antes de firmar, sin tocar el programa.
+- **Archivos clave:** `programs/hcd/src/instructions/register_provider.rs`, `scripts/update-config.mts`.
+- **Próximo paso:** test de integración del recorrido completo en devnet (puerta G4) y avisar al grupo del IDL v1.
+
+## 2026-10-06 · feat(program): harden program after security review (IDL v1)
+- **Qué hice:** como Franco se quedó sin tokens para la revisión cruzada, corrí una revisión independiente del programa con un agente sin contexto: nada crítico ni alto. Con eso agregué `update_config` (rotar `key_service`/admin/duración; `key_service` ≠ admin, también en `initialize_config`), `issue_record` rechaza emisor = paciente y hash en cero, y `storage_ref` pasa a ser un UUID en minúsculas (`records.id`). 18 tests nuevos (62 en local) cubren los huecos que marcó la revisión, más un test unitario de Rust del validador de UUID. Script `scripts/update-config.mts`. IDL v1 publicado (solo agrega cosas). Redeploy en devnet; los riesgos aceptados quedaron en el README del programa y en `decisiones.md`.
+- **Archivos clave:** `programs/hcd/src/instructions/{update_config,issue_record,initialize_config}.rs`, `programs/hcd/src/{lib,errors,events}.rs`, `tests/hcd.test.mts`, `scripts/update-config.mts`, `idl/hcd.json`, `programs/hcd/README.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** que Franco revise igual el programa (puede partir de los hallazgos) y ajuste el builder para mandar `records.id`; test de integración del recorrido completo (G4).
+
+## 2026-10-06 · docs(program): add program README with design and security decisions
+- **Qué hice:** `programs/hcd/README.md` documenta el programa: cómo compilar, testear y desplegar, las 5 cuentas con sus semillas, las 9 instrucciones con firmantes y reglas, eventos, errores y las decisiones de seguridad (doble firma en `issue_record`, suspensión inmediata, `Clock`, auditoría con Memo, rent del sponsor, nada médico on-chain, Config inmutable). Lo enlacé desde el README de `hcd_api`. Le pedí a Franco la revisión cruzada del programa.
+- **Archivos clave:** `hcd_api/programs/hcd/README.md`, `hcd_api/README.md`.
+- **Próximo paso:** test de integración del recorrido completo en devnet (puerta G4).
+
+## 2026-10-05 · feat(scripts): add admin script to verify or suspend providers
+- **Qué hice:** `scripts/set-provider-verified.mts <authority> <true|false>` verifica o suspende un prestador con la wallet de autoridad: muestra tipo, organización y estado; falla si el prestador no está registrado y no manda transacción si ya está en ese estado. Saqué la conexión compartida a `scripts/program.mts` (RPC de `SOLANA_RPC_URL`, wallet, programa) y `initialize-config.mts` la reutiliza. Probado en devnet con una clínica sintética: verificar, repetir (no hace nada) y suspender; también los errores de uso y de prestador inexistente.
+- **Archivos clave:** `hcd_api/scripts/set-provider-verified.mts`, `hcd_api/scripts/program.mts`, `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`.
+- **Próximo paso:** soporte de integración a Matías (indexer) y Franco (`log_access`, fee payer); revisión cruzada del programa con Franco.
+
+## 2026-10-05 · test(program): run the suite against devnet
+- **Qué hice:** `npm run anchor:test:devnet` corre la misma suite contra el programa desplegado, sin redeploy. En devnet saltea los tests que crean la Config (ya existe), firma con la `key_service` real (`KEY_SERVICE_SECRET` del `.env`), usa el RPC de `SOLANA_RPC_URL` (con chequeo de que sea devnet) y fondea con transferencias en vez de airdrop. Sumé el caso "médico verificado sin permiso". En el camino aparecieron dos problemas de devnet: dos `log_access` idénticos se deduplican en la red (lo resolví en los tests y lo dejé como propuesta para Franco en `ideas.md`) y el test del permiso vencido tenía un margen de 2 s más chico que el desfase del reloj. Resultado: 44/44 en local y 3 corridas seguidas en devnet con 42 OK, 0 fallas y 3 salteados (~0,07 SOL por corrida).
+- **Archivos clave:** `hcd_api/tests/hcd.test.mts`, `hcd_api/package.json`, `hcd_api/README.md`, `docs/miembros/misael/ideas.md`.
+- **Próximo paso:** script de admin para verificar prestadores (`set_provider_verified`).
+
+## 2026-10-05 · feat(scripts): add initialize-config script and set up devnet config
+- **Qué hice:** script `scripts/initialize-config.mts` (recibe la pubkey de `key_service` y los días máximos; firma la upgrade authority; se niega a correr si la Config ya existe o si `key_service` es el admin). Lo corrí en devnet con la pubkey que pasó Franco y 7 días (tx `48ALdjywBEbLtFSkD6ZHEvPaFzbboXL2yWCXmgzk2fwWyp4tk6v4FmqbHjA793SA6LL1BKgox6rDL9mQUPnv2Sz6`). Antes verifiqué que la pubkey coincide con `KEY_SERVICE_SECRET` de mi `.env` local y no con el fee payer. Datos en el README y en `decisiones.md`.
+- **Archivos clave:** `hcd_api/scripts/initialize-config.mts`, `hcd_api/README.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** tests negativos contra devnet (puerta G3).
+
+## 2026-10-05 · chore(scripts): use anchor program deploy for devnet
+- **Qué hice:** `npm run anchor:deploy` pasa de `anchor deploy` (deprecado en Anchor 1.2) a `anchor program deploy --provider.cluster devnet`. Mismas opciones y también sube el IDL. Lo probé con un redeploy en devnet (tx `9YaFMRhMEsGgJrxxA6H1Uh99D2MUazmMnPsLkqJcUrdWATzWkCjNt3nzBReincYHmzQ7S4WpQ4ATzdnDBRX88xe`): costó ~0,002 SOL porque el buffer se devuelve, y el binario y el IDL on-chain siguen iguales al repo.
+- **Archivos clave:** `hcd_api/package.json`.
+- **Próximo paso:** `initialize_config` en devnet cuando Franco pase la pubkey de `key_service`.
+
+## 2026-10-05 · docs(program): record devnet redeploy of the full program
+- **Qué hice:** redeploy en devnet del programa completo (9 instrucciones) desde `staging` (`4a58133`), mismo program id. El binario creció de 236 KB a 314 KB y se extendió solo; hizo falta cargar SOL de devnet por el faucet web porque el airdrop por CLI estaba limitado. Verifiqué que el binario on-chain es idéntico al compilado y que el IDL on-chain es igual a `idl/hcd.json`. En devnet todavía no hay cuentas: falta `initialize_config`. Documenté en el README el program id, la autoridad, el explorer y cuánto SOL pide un upgrade.
+- **Archivos clave:** `hcd_api/README.md`.
+- **Próximo paso:** `initialize_config` en devnet (necesito la pubkey de `key_service` de Franco) y tests negativos contra devnet.
+
+## 2026-10-05 · docs(agents): require PR approval on main and staging
+- **Qué hice:** copié la plantilla actualizada de `AGENTS.md` en `hcd_api`, `hcd_app` y `hcd_landing`: suma la regla de trabajar en una rama desde `staging` y mergear por PR con 1 aprobación de otro integrante. Un PR por repo.
+- **Archivos clave:** `AGENTS.md` de `hcd_api`, `hcd_app` y `hcd_landing`.
+- **Próximo paso:** que alguien del equipo apruebe los PRs; redeploy del programa en devnet.
+
+## 2026-10-05 · docs(rules): require PR approval on main and staging
+- **Qué hice:** creé en GitHub un ruleset en los 4 repos que protege `main` y `staging`: solo se entra por PR con 1 aprobación de otro integrante, sin excepciones (tampoco el dueño), y sin push directo, force push ni borrado. Lo documenté en `AGENTS.md` (sección 6), en la plantilla de los repos de código y en `decisiones.md`.
+- **Archivos clave:** `AGENTS.md`, `templates/code-repo/AGENTS.md`, `docs/proyecto/decisiones.md`.
+- **Próximo paso:** avisar al equipo del flujo nuevo; redeploy del programa en devnet.
+
+## 2026-10-05 · feat(program): implement access grants and publish IDL v0
+- **Qué hice:** `grant_access` (paciente; solo a médico verificado; Record Active; vencimiento futuro y dentro del máximo contra `Clock`; re-otorgar reactiva la misma cuenta con `init_if_needed` y conserva `access_count`), `revoke_access` (paciente; Revoked sin cerrar) y `log_access` (solo `key_service`; grant Active y vigente, estudio no disputado ni anulado y médico todavía verificado). Las 9 instrucciones quedan completas, 43 tests pasando, y publiqué el IDL v0 en `idl/hcd.json`. Saqué el error `Unimplemented`.
+- **Archivos clave:** `programs/hcd/src/instructions/{grant_access,revoke_access,log_access}.rs`, `programs/hcd/Cargo.toml`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `idl/hcd.json`.
+- **Próximo paso:** avisar al grupo del IDL v0, abrir PR a `main` para revisión de Franco y deploy en devnet.
+
+## 2026-10-05 · feat(program): implement issue, dispute and void record
+- **Qué hice:** `issue_record` exige la firma del médico verificado (no clínica) y la co-firma de `key_service`; usa `next_record_id` como semilla, guarda `rent_payer` y acepta un `superseded_record` opcional (debe estar Voided, mismo paciente y emisor) para la reemisión. `dispute_record` (paciente: Active → Disputed) y `void_record` (emisor: Disputed → Voided; un emisor suspendido igual puede anular). Emiten sus eventos. Errores nuevos: `NotADoctor`, `InvalidStorageRef`, `RecordNotVoided`, `RecordNotDisputed`. 29 tests pasando en local.
+- **Archivos clave:** `programs/hcd/src/instructions/{issue_record,dispute_record,void_record}.rs`, `programs/hcd/src/errors.rs`, `programs/hcd/src/state/record.rs`, `tests/hcd.test.mts`.
+- **Próximo paso:** `grant_access`, `revoke_access` y `log_access`; publicar el IDL v0 esta noche.
+
 ## 2026-10-04 · feat(program): implement config, provider and patient registration
 - **Qué hice:** cerré el esquema de las 5 PDAs (semillas como constantes `SEED`) e implementé `initialize_config` (solo la upgrade authority), `register_provider` (clínica o médico, nace sin verificar), `set_provider_verified` (solo admin; sirve para verificar y suspender) y `register_patient`. El rent lo paga un `payer` aparte, así el usuario no necesita SOL. 13 tests (positivos y negativos) con `node:test`, sin dependencias nuevas. `Anchor.toml` pasa a `localnet` por defecto: `anchor test` había desplegado en devnet por error; el deploy a devnet queda explícito (`npm run anchor:deploy`).
 - **Archivos clave:** `programs/hcd/src/instructions/`, `programs/hcd/src/state/`, `programs/hcd/src/errors.rs`, `tests/hcd.test.mts`, `Anchor.toml`.

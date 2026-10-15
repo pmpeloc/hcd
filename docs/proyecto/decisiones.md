@@ -2,6 +2,52 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-10 · El estado de un permiso lo dice la cadena, no `access_requests` · Misael
+- **`GET /access-requests/mine`** lee cada `AccessGrant` on-chain y devuelve `grant_status` por estudio: `active`, `revoked`, `expired`, `missing` (aprobado pero nunca firmado) o `unknown` (RPC caído). Si todos los grants firmados están revocados o vencidos, la solicitud sale como `revoked` o `expired` aunque la fila diga `approved`.
+- **Aprobar dos veces ya no da 409:** si la aprobación quedó a medias (el paciente canceló la firma o falló un `grant_access`), `POST /access-requests/:id/approve` devuelve solo los grants que faltan, con el vencimiento original. La app la vuelve a mostrar en la bandeja para terminar de firmar.
+- Por qué: `revoke_access` y el vencimiento nunca tocan la base, así que la app mostraba como activo un permiso revocado. Así no hace falta un endpoint ni una migración nuevos.
+- **Impacto (Franco/Maxi):** contrato nuevo en `hcd_api#21` y `hcd_app#13`.
+
+## 2026-10-06 · Programa endurecido tras la revisión de seguridad (IDL v1) · Misael
+Una revisión independiente del programa no encontró nada crítico ni alto. Cambios:
+- **`storage_ref` es el `id` (UUID) de la fila de `records`.** El programa solo acepta un UUID en minúsculas, así que no se puede grabar on-chain una ruta legible, un nombre o un DNI. **Impacto (Franco/Mati):** el builder de `issue_record` tiene que mandar `records.id`, no `storage_path`; conviene que el esquema Zod pase de `z.string().max(64)` a `z.string().uuid()`.
+- **`update_config` (solo el admin)** reemplaza admin, `key_service` y duración máxima. Si se filtra `key_service` se rota en una transacción (`scripts/update-config.mts`), en vez de tener que actualizar el programa. `key_service` nunca puede ser el admin.
+- **`issue_record`** rechaza que el médico se emita a sí mismo y un `content_hash` en cero.
+- **IDL v1:** suma `update_config`, el evento `ConfigUpdated` y 3 errores nuevos. No cambia ninguna instrucción existente, cuenta ni código de error: los clientes actuales siguen andando sin regenerarse.
+- **Riesgos aceptados para el MVP** (detalle en `hcd_api/programs/hcd/README.md`): un estudio anulado puede reemplazarse más de una vez (la app muestra el más reciente); verificar de nuevo a un médico suspendido reactiva sus permisos vigentes (el admin los revisa antes); la relación paciente-médico es visible on-chain sin datos médicos.
+
+## 2026-10-06 · Cada `log_access` lleva un Memo con el id de `key_releases` · Misael (aceptado por Franco)
+- Cuando se implemente `src/keys`, cada transacción de `log_access` incluye una instrucción **Memo con `key_releases.id`**.
+- Por qué: dos `log_access` seguidos del mismo permiso pueden ser transacciones idénticas; si comparten blockhash, la red descarta la segunda y `access_count` subcuenta aunque las dos llamadas devuelvan éxito (visto en devnet el 2026-10-05). El Memo hace única cada transacción y además enlaza el registro on-chain con la fila de la base.
+- No cambia el programa ni el IDL. Detalle en [ideas de Misael](../miembros/misael/ideas.md).
+
+## 2026-10-05 · Config del programa en devnet · Franco y Misael
+- **`key_service`:** `DmiHb7zTyWhaLtRCXhCTNkM8Ga1G2S36XzCUx1GUH4yG`, la del `.env` definitivo del backend. Es distinta del fee payer.
+- **Duración máxima de un permiso:** 7 días (604800 s).
+- **Admin:** la upgrade authority del programa (`6AdUWfFLkpBCHNSsnCLKbEPB8khvGcnFHZczx6zjTdiQ`, wallet de Misael).
+- Config PDA: `7tChRt4bpCXD8PAsREFpW82i4qrxZwXnfqYYmv2p1EZA`. **No se puede cambiar** sin agregar una instrucción nueva al programa. Si se rota `key_service`, hay que sumar esa instrucción primero.
+
+## 2026-10-05 · `main` y `staging` protegidas: todo entra por PR con aprobación · Misael
+- En los 4 repos (`hcd`, `hcd_api`, `hcd_app`, `hcd_landing`) hay un ruleset de GitHub ("Require approval on main and staging") sobre `main` y `staging`: no se puede hacer push directo, force push ni borrar la rama.
+- Todo entra por PR con **1 aprobación de otro integrante**. Nadie está exento, tampoco el dueño de los repos.
+- Impacto: los commits de docs en `hcd` (bitácora y estado) también van en una rama y con su propio PR. Detalle en `AGENTS.md`, sección 6.
+
+## 2026-10-05 · Auditoría on-chain solo de accesos de terceros · Franco y Misael
+- **`log_access` registra solo los accesos de médicos con permiso.** No se agrega `log_self_access`: la auditoría on-chain existe para mostrarle al paciente quién **más** accedió a sus datos.
+- Las lecturas del **propio paciente** no se registran on-chain: no aportan a la auditoría y costarían una transacción por lectura.
+- Las relecturas del **emisor** quedan solo en `key_releases` (Supabase), que el servicio de llaves escribe en cada entrega.
+- Si más adelante queremos al emisor on-chain: `log_issuer_access` (firma solo `key_service` y solo emite un evento). Es un cambio aditivo, no rompe el IDL.
+
+## 2026-10-05 · Programa: permisos solo a médicos verificados y suspensión inmediata · Misael
+- **`grant_access` solo acepta como destinatario a un médico verificado** (no clínicas ni wallets sueltas).
+- **`log_access` vuelve a chequear que el médico siga verificado y que el estudio no esté disputado ni anulado.** Suspender a un prestador con `set_provider_verified(false)` corta el acceso al instante, sin tener que revocar permiso por permiso. Impacto para el servicio de llaves (Franco): si `log_access` falla, no entregar la DEK.
+- **Cuentas que pasa el backend:** `issue_record` (`payer`, `issuer`, `keyService`, opcional `supersededRecord`), `grant_access` (`payer`, `patient`, `record`, `doctorProvider`, `grant`), `log_access` (`keyService`, `grant`, `record`, `doctorProvider`). Detalle en `hcd_api/idl/hcd.json`.
+## 2026-10-05 · `hcd_app` se reparte entre Maxi y Mati · Franco (por confirmar con Mati y Maxi)
+- **Maxi** se queda con lo que ve el jurado: rutas `(paciente)` y `(medico)`, `components/` (visor, marca de agua, QR, listas), la marca Salua en lo visible y la publicación del demo.
+- **Mati** suma la plomería de la app: `app/(auth)/login`, `(clinica)/avalar-medicos`, `(admin)/verificar`, `lib/api.ts`, `lib/supabase.ts`, `lib/privy.ts`, `lib/schemas/` (copia de los esquemas Zod que él mismo escribe en la API), `lib/hcd-client/` (con Franco), guards de ruta, estados globales de carga/error y la PWA (manifest + Serwist + Web Push).
+- **Por qué:** la app era la carga más pesada del proyecto y estaba toda en una sola persona. Todo lo que se movió empalma con el backend que escribe Mati: cada uno hace el endpoint y la pantalla que lo consume, con menos coordinación y sin errores de traducción de contratos.
+- **Regla de territorio:** un archivo, una sola persona. Si Maxi necesita un cambio en la plomería se lo pide a Mati (y viceversa con las pantallas); nunca dos personas editan lo mismo en paralelo.
+
 ## 2026-10-04 · Programa: calendario, re-otorgar permisos y cuentas pagadas por el sponsor · Misael
 - **Las 6 instrucciones del ciclo** (`issue_record`, `dispute_record`, `void_record`, `grant_access`, `revoke_access`, `log_access`) entran el **lunes 5**, con el IDL v0 esa noche, como dice el plan de Franco (`Plan_Completo_Salua.pdf`). Deploy con tests negativos el martes 6.
 - **Re-otorgar un permiso revocado o vencido:** se reactiva el **mismo** AccessGrant (`["grant", record, doctor]`) con un vencimiento nuevo; `access_count` sigue sumando. Sin esto, un paciente no podía volver a darle acceso al mismo médico, porque la cuenta revocada no se cierra.
@@ -66,3 +112,8 @@ Cada integrante tiene su carpeta en `docs/miembros/` y la actualiza en el mismo 
 
 ## 2026-10-03 · Nada médico en la cadena · propuesta de la investigación
 En Solana solo van identidad, permisos, hashes, firmas y registro de accesos. Los documentos van cifrados en almacenamiento que se pueda borrar. Ver [arquitectura.md](arquitectura.md).
+
+## 2026-10-06 · Dependencias de la integración Privy en la app · implementación de Matías para revisión
+- La integración usa Supabase PKCE y el hook useSyncJwtBasedAuthState de Privy para eventos de sesión y renovación de tokens. El cliente no acredita por sí mismo la propiedad de la wallet ante la API.
+- Para compilar el SDK Solana de Privy se agregan sus peer dependencies: @solana/kit 8.4.0 (ya parte del stack), @solana-program/memo 0.15.0, @solana-program/system 0.15.0 y @solana-program/token 0.17.0. Versiones fijadas con npm y lockfile. No se introduce otro proveedor de wallets.
+- El recorrido de esta entrega termina en sesión y wallet. El alta de app_user y vinculación verificable quedan en backend de Matías; protección de tx/keys y asociación al signer requieren integración con Franco.

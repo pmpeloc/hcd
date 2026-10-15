@@ -102,7 +102,7 @@
 
       'tl.title': 'Línea de tiempo',
       'tl.sub': 'Cada emisión, permiso y lectura queda registrado en Solana. Esto es tu evidencia.',
-      'tl.viewtx': 'Ver transacción en solscan (devnet)',
+      'tl.viewtx': 'Ver el programa en Solana Explorer (devnet)',
       'tl.empty': 'Todavía no hay eventos.',
       'tl.strip': 'Los eventos guardan quién, cuándo y la firma — nunca el contenido del estudio',
       'log.issued': function (x) { return 'Emitió "' + x + '"'; },
@@ -305,7 +305,7 @@
 
       'tl.title': 'Timeline',
       'tl.sub': 'Every issuance, permission and read is logged on Solana. This is your evidence.',
-      'tl.viewtx': 'View transaction on solscan (devnet)',
+      'tl.viewtx': 'View the program on Solana Explorer (devnet)',
       'tl.empty': 'No events yet.',
       'tl.strip': 'Events store who, when and the signature — never the record content',
       'log.issued': function (x) { return 'Issued "' + x + '"'; },
@@ -429,7 +429,11 @@
   }
   function hash64() { var h = ''; for (var i = 0; i < 4; i++) h += Math.random().toString(16).slice(2, 18); return h.slice(0, 64); }
   function sig() { return rnd(87); }
-  function solscan(s) { return 'https://solscan.io/tx/' + s + '?cluster=devnet'; }
+  // Signatures in the demo are simulated, so every link lands on the real
+  // program deployed to devnet — the judge sees live on-chain history there
+  // instead of a not-found page for a made-up signature.
+  var PROGRAM_ID = '8FNP6rs3DQ4h6bqWNeD9meHt5mUNEhcaXbrbJxSJniyd';
+  function solscan() { return 'https://explorer.solana.com/address/' + PROGRAM_ID + '?cluster=devnet'; }
   function short(a) { return a.slice(0, 8) + '…' + a.slice(-6); }
   function locale() { return state.lang === 'en' ? 'en-US' : 'es-AR'; }
   function fmtTime(ts) { return new Date(ts).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }); }

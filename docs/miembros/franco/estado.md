@@ -1,14 +1,18 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-04
+**Última actualización:** 2026-10-11
 
 ## En qué estoy
-El demo de Salua ya está deployado en https://salua.vercel.app/ (Vercel deploya `main` automáticamente). Última iteración: logo oficial, toggle ES/EN con traducción completa y dos aumentos de escala tipográfica por feedback de Misael. Antes: base de los tres repos de código (`hcd_api`, `hcd_app`, `hcd_landing` con builds verificados).
+**Smoke E2E devnet completo** — circuito probado de punta a punta: enrolamiento de ambas cuentas, `register_patient`/`register_provider` on-chain, Provider del médico verificado por admin (keypair que Misael pasó, usada local sin commitear), QR real, lookup + pedido, upload ECG → `issue_record` → indexer `active`, aprobación → `grant_access`, visor "Es el archivo original", y revocación → `access_revoked` en la línea de tiempo del paciente.
+
+Correcciones del día: `expires_at` i64 → `BN` en `tx-builder` (rompía `/tx/build`), endpoints doctor-side (`/doctors/me/records`, `/records/:id`), panel y `/mis-accesos` del médico con datos reales (se fue lo ficticio), visor resolviendo metadata real, grants leyendo estado on-chain (revocado deja de figurar vigente) y chips honestos Emitido/Vigente/Vencido.
 
 ## Próximo paso
-- Ensayo final del guion bilingüe del demo (menos de 2 minutos).
-- Enviar los pasos 3 y 4 de la preselección antes del domingo 4/10 a las 13:00.
-- Kickoff técnico del domingo: congelar cuentas del programa y contratos de API.
+- Revisar **api#24** de Mati (recorte de privilegios de mi migración 20261014 — `authenticated` quedó con TRUNCATE/TRIGGER de más).
+- Decisión pendiente para el equipo: el emisor conserva acceso a su estudio aun tras revocar el grant (por diseño de `keys/release`); si revocar también debe cortar al emisor hay que cambiarlo.
+- Path del segundo médico para probar grant + `log_access` on-chain.
+- Conflictos de #32 por resolver.
 
 ## Bloqueos
-- Los formularios de los pasos 3 y 4 hay que leerlos hoy para saber qué piden exactamente.
+- Ninguno del smoke. La keypair admin quedó en `D:\hackathon\keys\admin.json` (fuera de repos, sin commitear).
+- Cuenta médico con password temporal de prueba — rotar o quitar antes de producción.

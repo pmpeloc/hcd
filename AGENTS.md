@@ -58,8 +58,8 @@ The `pre-commit` hook rejects commits that touch code without the member's `bita
 
 **When working in a code repo (`hcd_api`, `hcd_app`, `hcd_landing`):** the docs live in the parent folder, `../docs/`, which is a different repo.
 1. Update `../docs/miembros/<slug>/bitacora.md` and `estado.md` **before** committing the code (the hook checks it's pending in `hcd`).
-2. Commit and push the code repo.
-3. Commit and push the `hcd` repo with the docs, message `docs(<slug>): <same summary>`.
+2. Commit and push the code repo, on a working branch (see section 6).
+3. Commit and push the `hcd` repo with the docs, message `docs(<slug>): <same summary>`, also on a working branch, and open its own PR.
 
 Rules for `docs/`:
 - Only edit **your own** folder in `docs/miembros/`. Other members' folders are read-only.
@@ -81,6 +81,12 @@ Run `git pull` first if the user wants the latest status.
   - Types: `feat` `fix` `docs` `refactor` `test` `chore` `style` `perf` `build` `ci`.
   - Example: `feat(consent): add time-bound access grant instruction`.
 - The `commit-msg` hook rejects messages that don't follow the format or contain non-ASCII characters (accents, ñ, ¿, ¡).
+
+### Branches and pull requests
+
+- `main` and `staging` are protected in **all four repos** by a GitHub ruleset: no direct pushes, no force pushes, no deletion. Changes land only through a PR with **1 approval from another team member**. Nobody is exempt, not even the repo owner.
+- Always work on a branch created from an up-to-date `staging` (`feat/...`, `fix/...`, `docs/...`), push it and open a PR to `staging`.
+- Don't reuse a branch that was already merged: start a new one from `staging`.
 
 ## 7. Setup (once per computer)
 
