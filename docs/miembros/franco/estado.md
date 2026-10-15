@@ -1,15 +1,18 @@
 # Estado · Franco
 
-**Última actualización:** 2026-10-10
+**Última actualización:** 2026-10-11
 
 ## En qué estoy
-MVP cableado de punta a punta en código. Lado API: los tres módulos stub quedaron implementados (`organizations`, `access`, `indexer`) + el enrolamiento de Mati integrado, alias `SAL-XXXX` dictables, metadata de estudios, grants revocables y migraciones aplicadas a Supabase (8) con el bucket `records` privado. Lado app: reemplacé todos los placeholders por llamadas reales — QR, lookup, upload cifrado, estudios, accesos, historial nuevo y enrolamiento Privy challenge→firma→verify. Validación: API 126/126 tests + build/lint; app 80/80 Playwright + tsc/eslint limpios.
+**Smoke E2E devnet completo** — circuito probado de punta a punta: enrolamiento de ambas cuentas, `register_patient`/`register_provider` on-chain, Provider del médico verificado por admin (keypair que Misael pasó, usada local sin commitear), QR real, lookup + pedido, upload ECG → `issue_record` → indexer `active`, aprobación → `grant_access`, visor "Es el archivo original", y revocación → `access_revoked` en la línea de tiempo del paciente.
+
+Correcciones del día: `expires_at` i64 → `BN` en `tx-builder` (rompía `/tx/build`), endpoints doctor-side (`/doctors/me/records`, `/records/:id`), panel y `/mis-accesos` del médico con datos reales (se fue lo ficticio), visor resolviendo metadata real, grants leyendo estado on-chain (revocado deja de figurar vigente) y chips honestos Emitido/Vigente/Vencido.
 
 ## Próximo paso
-- Smoke E2E contra devnet con dos sesiones reales: enroll → upload → `issue_record` → indexer baja el evento → request → `grant_access` → `/keys/release` → visor "Es el archivo original".
-- Merges en orden: **#22 + migración `wallet_enrollment` primero**, después #17 → #18 → #19 → #20 → #21 (api) y #7 → #9 → #10 → #11 → #12 (app).
+- Revisar **api#24** de Mati (recorte de privilegios de mi migración 20261014 — `authenticated` quedó con TRUNCATE/TRIGGER de más).
+- Decisión pendiente para el equipo: el emisor conserva acceso a su estudio aun tras revocar el grant (por diseño de `keys/release`); si revocar también debe cortar al emisor hay que cambiarlo.
+- Path del segundo médico para probar grant + `log_access` on-chain.
+- Conflictos de #32 por resolver.
 
 ## Bloqueos
-- El flujo completo nunca corrió en vivo: los tests validan cada pieza por separado (mocks + fixtures demo); el smoke E2E es el paso que falta.
-- Limitación conocida: un grant revocado sigue listándose como activo hasta su expiración natural — el indexer registra el evento en `audit_events` pero no actualiza `access_requests`.
-- Verificación runtime pendiente: `signMessage` de Privy contra challenge real, PUT del blob a la signed URL desde el browser, `onLogs` del indexer en devnet.
+- Ninguno del smoke. La keypair admin quedó en `D:\hackathon\keys\admin.json` (fuera de repos, sin commitear).
+- Cuenta médico con password temporal de prueba — rotar o quitar antes de producción.

@@ -1,5 +1,40 @@
 # Bitácora · Matías
 
+## 2026-10-11 · test(db): verify observed shared privilege pattern
+- **Qué hice:** diagnóstico real de catálogos Supabase en modo solo lectura. El backend ya tiene permisos; anon/authenticated conservan TRUNCATE y otros permisos excesivos en 12 tablas. No existe el historial estándar de migraciones. Agregué el contraste, límites y siguiente paso del operador a API #24/Docs #33.
+- **Archivos clave:** hcd_api/supabase/ROLE_PRIVILEGES.md, diagnostics/role_privileges.sql, tests/role_privileges.sql y run-role-privileges.mjs; relevamientos/2026-10-11-permisos-supabase.md.
+- **Validación:** cuatro escenarios PostgreSQL 18.4 local aprobados, incluido patrón observado y denegación real de TRUNCATE solo en local. Diagnóstico compartido sobre PostgreSQL 17.11 sin filas clínicas ni escrituras. Servidor local detenido.
+- **Próximo paso:** revisión cruzada y confirmación humana de proyecto/historial; acordar registro de migración y tratamiento separado de defaults. No se aplicaron migraciones ni se hizo merge.
+
+## 2026-10-11 · fix(db): reconcile explicit service and browser privileges
+- **Qué hice:** propuesta nueva de reconciliación de permisos, diagnóstico de catálogos sin filas clínicas y guía de aplicación/reversión. No reconstruye el SQL histórico faltante ni modifica Supabase compartido.
+- **Archivos clave:** hcd_api/supabase/migrations/20261015000000_reconcile_role_privileges.sql, diagnostics/role_privileges.sql, ROLE_PRIVILEGES.md y tests/role_privileges.sql + run-role-privileges.mjs.
+- **Validación:** PostgreSQL 18.4 local descartable: instalación limpia, permisos directos excesivos y rechazo de privilegios heredados con rollback; repetición idempotente; operaciones reales service_role, RPCs, aislamiento RLS y columnas sensibles bloqueadas. Políticas, propietarios y defaults sin cambios.
+- **Próximo paso:** revisión cruzada; operador confirma proyecto e historial, compara el diagnóstico con el SQL aplicado y decide la migración. No ejecutar db push general ni inventar historia de migraciones.
+## 2026-10-11 · fix(smoke): reject failed clinic registration transactions
+- **Qué hice:** corrección de API #23: confirmar con blockhash y altura límite, rechazar errores de ejecución y comprobar el Provider de clínica antes de informar éxito. Eliminé la salida de la clave privada.
+- **Archivos clave:** hcd_api/scripts/register-clinic-provider.mts, confirm-registration.mts y confirm-registration.test.mts.
+- **Validación:** cuatro pruebas offline aprobadas (error on-chain, cuenta ausente, éxito y timeout) y comprobación de sintaxis. No se ejecutó el helper real ni se leyeron secretos.
+- **Próximo paso:** revisión cruzada de #23 y confirmar prerrequisitos compartidos antes del smoke.
+
+## 2026-10-11 · fix(app): decode doctor provider verification correctly
+- **Qué hice:** corrección de app #14: leer verified en byte 41 y validar dueño, discriminador, autoridad, tipo de médico, longitud y booleano. Conservé las correcciones de registro publicadas en 7341ad3.
+- **Archivos clave:** hcd_app/lib/provider-account.ts, components/doctor/provider-activation.tsx, e2e/provider-account.spec.ts y playwright.api.config.ts.
+- **Validación:** 22 pruebas locales de transporte/registro/Provider aprobadas; casos con organización independiente de verified y cuentas malformadas. Sin Supabase ni devnet.
+- **Próximo paso:** revisión cruzada de #14 y validación real posterior; no autoaprobar.
+
+## 2026-10-10 · fix(auth): recover patient registration before redirect
+- **Qué hice:** con autorización de Franco, corregí app #14: estado separado para registro on-chain, error visible y reintento explícito, coordinación entre montajes del proveedor y redirección solo tras confirmar el PatientProfile. Cada reintento consulta el PDA antes de pedir otra firma.
+- **Archivos clave:** hcd_app/lib/patient-registration.ts, lib/auth-providers.tsx, app/(auth)/login/page.tsx, e2e/patient-registration.spec.ts y playwright.api.config.ts.
+- **Validación:** tipos y lint de los archivos afectados aprobados; 20 pruebas de transporte/registro aprobadas, incluidas seis nuevas sobre cancelación, RPC, concurrencia, confirmación y aislamiento. Sin servicios reales ni transacciones.
+- **Próximo paso:** revisión cruzada de app #14 y smoke con tres identidades una vez confirmados los prerrequisitos de #32.
+
+## 2026-10-10 · docs(smoke): correct third-party consent playbook
+- **Qué hice:** con autorización de Franco, corregí la skill de la PR #32: paciente, emisor y médico tercero; QR nuevo por operación; comando real de verificación; hash del archivo cifrado; controles de denegación, revocación, vencimiento y auditoría. Aclaré configuración, credenciales y la dependencia de privilegios aún no versionada.
+- **Archivos clave:** .devin/skills/e2e-smoke/SKILL.md y mi estado.
+- **Validación:** contraste estático con API, contratos, scripts y visor; diff sin errores de whitespace. No ejecuté el smoke, SQL, firmas, migraciones ni despliegues.
+- **Próximo paso:** revisión cruzada de #32, obtener la migración de privilegios de Franco/Misael y corregir el ciclo de registro de app #14 en una entrega separada.
+
 ## 2026-10-08 · fix(auth): bind enrollment to visible account and audit atomically
 - **Qué hice:** desafío v2 con correo del JWT y UUID; validación de cuenta/origen/wallet/desafío; índice único de médicos y trigger de coherencia; auditoría wallet_enrolled en la misma transacción. Factory compartida de #19 y cliente reutilizado, rate limit antes de JWT y configuración validada al iniciar.
 - **Archivos clave:** hcd_api/src/auth/wallet-enrollment*, supabase-session.guard.ts, auth.module.ts, supabase-admin.factory.ts, WALLET_ENROLLMENT.md, supabase/migrations/20261008020000_wallet_enrollment.sql y supabase/tests/wallet_enrollment.sql.

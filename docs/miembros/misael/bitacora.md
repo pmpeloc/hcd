@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · Merge staging into docs/misael-railway-deploy
+- **Qué hice:** traje `staging` a la rama del PR hcd#34 y resolví el conflicto de `estado.md`: quedó el estado del 14/10 (deploy) y conservé los pendientes conocidos del MVP.
+- **Archivos clave:** `docs/miembros/misael/estado.md`.
+- **Próximo paso:** aprobación de otro miembro para mergear hcd#34 a `staging`.
+
 ## 2026-10-14 · style(records): fix lint errors in doctor record access
 - **Qué hice:** en el PR hcd_api#25 de Franco (con su rama y a pedido del equipo, para llevarlo a `staging`) arreglé los 6 errores de lint: formato de prettier, tipo de retorno explícito en `findRecord` en lugar del cast que eslint marcaba como innecesario, y un `eslint-disable` justificado en `new anchor.BN(...)` porque `bn.js` no trae tipos. Sin cambios de lógica; tsc, build y 185/185 tests verdes.
 - **Archivos clave:** `hcd_api/src/records/records.repository.ts`, `hcd_api/src/records/records.service.ts`, `hcd_api/src/tx/tx-builder.service.ts`.
