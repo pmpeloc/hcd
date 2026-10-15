@@ -5,9 +5,12 @@
 ## En qué estoy
 Deploy de producción: API en Railway, app y landing en Vercel, todo desde `main`. Supabase al día (9 migraciones aplicadas). Arreglo del build de Railway (`railpack.json` fuerza Node).
 
+Landing de Salua implementada en `hcd_landing` (rama `feat/salua-landing`): diseño aprobado, bilingüe con inglés por defecto, movimiento real y metadata para compartir. Referencias de diseño en `decisiones.md`.
+
 Destrabar el onboarding en Vercel: tras enrolar la wallet la app no registraba al paciente on-chain ni redirigía. El arreglo está en hcd_app#14 (Franco); le corregí el lint y también dejé al día hcd_app#9 (Matías).
 
 ## Próximo paso
+- `hcd_landing`: revisión de Rodrigo/Maxi, merge a `staging` y luego a `main` para el deploy en salua-landing.vercel.app.
 - hcd_app#14 y #9: revisión de otro miembro (en #14, Matías tiene que descartar su revisión ya resuelta); después promover `staging` a `main`.
 - Redeploy de la API en Railway y cargar las variables de entorno; después la app en Vercel con `NEXT_PUBLIC_API_URL`.
 - Arreglar el lint de hcd_api#25 (Franco) para que entre antes del smoke; hcd_api#24 (permisos, Matías) después del deploy.
