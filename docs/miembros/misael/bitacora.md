@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-14 · style(records): fix lint errors in doctor record access
+- **Qué hice:** en el PR hcd_api#25 de Franco (con su rama y a pedido del equipo, para llevarlo a `staging`) arreglé los 6 errores de lint: formato de prettier, tipo de retorno explícito en `findRecord` en lugar del cast que eslint marcaba como innecesario, y un `eslint-disable` justificado en `new anchor.BN(...)` porque `bn.js` no trae tipos. Sin cambios de lógica; tsc, build y 185/185 tests verdes.
+- **Archivos clave:** `hcd_api/src/records/records.repository.ts`, `hcd_api/src/records/records.service.ts`, `hcd_api/src/tx/tx-builder.service.ts`.
+- **Próximo paso:** aprobar y mergear hcd_api#25 y #24 a `staging`; la migración de #24 se aplica en Supabase después del deploy.
+
 ## 2026-10-14 · build(deploy): force Node provider for Railway build
 - **Qué hice:** el deploy de la API en Railway fallaba con `npm: not found` porque Railpack ve el `Cargo.toml` del programa Anchor en la raíz y arma la imagen como Rust. Agregué `railpack.json` en `hcd_api` con `provider: node` y `startCommand: npm run start:prod`. Antes abrí los PRs `staging → main` de api, app y landing, y confirmé que las 9 migraciones ya estaban aplicadas en Supabase.
 - **Archivos clave:** `hcd_api/railpack.json`.
