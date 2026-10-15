@@ -2,6 +2,12 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-10 · El estado de un permiso lo dice la cadena, no `access_requests` · Misael
+- **`GET /access-requests/mine`** lee cada `AccessGrant` on-chain y devuelve `grant_status` por estudio: `active`, `revoked`, `expired`, `missing` (aprobado pero nunca firmado) o `unknown` (RPC caído). Si todos los grants firmados están revocados o vencidos, la solicitud sale como `revoked` o `expired` aunque la fila diga `approved`.
+- **Aprobar dos veces ya no da 409:** si la aprobación quedó a medias (el paciente canceló la firma o falló un `grant_access`), `POST /access-requests/:id/approve` devuelve solo los grants que faltan, con el vencimiento original. La app la vuelve a mostrar en la bandeja para terminar de firmar.
+- Por qué: `revoke_access` y el vencimiento nunca tocan la base, así que la app mostraba como activo un permiso revocado. Así no hace falta un endpoint ni una migración nuevos.
+- **Impacto (Franco/Maxi):** contrato nuevo en `hcd_api#21` y `hcd_app#13`.
+
 ## 2026-10-06 · Programa endurecido tras la revisión de seguridad (IDL v1) · Misael
 Una revisión independiente del programa no encontró nada crítico ni alto. Cambios:
 - **`storage_ref` es el `id` (UUID) de la fila de `records`.** El programa solo acepta un UUID en minúsculas, así que no se puede grabar on-chain una ruta legible, un nombre o un DNI. **Impacto (Franco/Mati):** el builder de `issue_record` tiene que mandar `records.id`, no `storage_path`; conviene que el esquema Zod pase de `z.string().max(64)` a `z.string().uuid()`.
