@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · feat(landing): implement the bilingual Salua landing with share metadata
+- **Qué hice:** pasé a `hcd_landing` la landing aprobada (mockup y HTML de ChatGPT Astra, revisados en navegador): markup en JSX, estilos, diccionario EN/ES, script de movimiento e idioma. Inglés por defecto, "Try the demo" a hcd-app-solana.vercel.app, Open Graph y tarjeta de Twitter completos para salua-landing.vercel.app con imagen 1200x630, favicon e ícono de Apple. Arreglé la config de ESLint, que ya estaba rota con eslint-config-next 16.
+- **Archivos clave:** `hcd_landing/app/layout.tsx`, `app/landing.css`, `app/opengraph-image.png`, `components/landing-markup.tsx`, `lib/landing-dictionary.ts`, `lib/landing-runtime.js`, `public/assets/`, `eslint.config.mjs`.
+- **Próximo paso:** revisión de Rodrigo o Maxi, merge a `staging` y después a `main` para que Vercel la publique; validar la tarjeta en el depurador de Facebook/LinkedIn.
+
 ## 2026-10-15 · Merge main into staging to unblock the release PR
 - **Qué hice:** el PR hcd#36 (staging → main) tenía conflictos porque `main` conserva commits de antes de proteger las ramas. 9 de los 11 ya estaban en `staging` con otro hash; en los conflictos me quedé con `staging` y reapliqué los 2 únicos cambios faltantes: los ajustes de CSS del demo de Franco (tipografía un paso más grande y sidebar centrada).
 - **Archivos clave:** `demo/styles.css`.
