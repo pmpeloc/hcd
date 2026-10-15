@@ -2,6 +2,11 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · Merge main into staging to unblock the release PR
+- **Qué hice:** el PR hcd#36 (staging → main) tenía conflictos porque `main` conserva commits de antes de proteger las ramas. 9 de los 11 ya estaban en `staging` con otro hash; en los conflictos me quedé con `staging` y reapliqué los 2 únicos cambios faltantes: los ajustes de CSS del demo de Franco (tipografía un paso más grande y sidebar centrada).
+- **Archivos clave:** `demo/styles.css`.
+- **Próximo paso:** aprobar este PR a `staging`; después hcd#36 queda sin conflictos para mergear a `main`.
+
 ## 2026-10-15 · feat(app): add Open Graph image, favicon and app icons
 - **Qué hice:** metadata completa de hcd_app (`metadataBase` desde `NEXT_PUBLIC_APP_URL` o `VERCEL_PROJECT_PRODUCTION_URL`, Open Graph es_AR y tarjeta grande de Twitter), imagen OG 1200×630 con `next/og`, favicon e ícono de Apple generados del logo y manifest con íconos. Coordinado con Maxi (dueño de hcd_app). Lint, tsc y build verdes; meta tags verificados con el build local.
 - **Archivos clave:** `hcd_app/app/layout.tsx`, `hcd_app/app/opengraph-image.tsx`, `hcd_app/app/icon.png`, `hcd_app/app/apple-icon.png`, `hcd_app/public/manifest.webmanifest`.
