@@ -2,6 +2,13 @@
 
 Una entrada por decisión, la más nueva arriba. Formato: fecha · decisión · quién la propuso · por qué.
 
+## 2026-10-15 · Identidad visual de la landing de Salua y su referencia de diseño · Misael
+- **Línea visual:** clara y minimalista, como las piezas de lanzamiento de @Salua_x (fondo `#EEF1F6`, tinta `#171F2C`, acentos cobalto `#0162D7`/`#0674EF`, Poppins + Inter). Se descartaron un estilo oscuro tipo Web3 y los renders 3D estáticos.
+- **"3D" quiere decir movimiento real:** objetos mate (la S de Salua, cápsulas, llave, discos, esfera) que rotan, flotan y siguen al cursor o al scroll con CSS 3D y JavaScript, sin librerías nuevas. Respeta `prefers-reduced-motion`.
+- **Fuente de verdad:** la landing en vivo (https://claude.ai/artifact/Fr5Q8YZ9KEzudfstVhvwG1), el design system (https://claude.ai/artifact/7fwuoazEeXvZ5jpBU9Dvzv) y los mockups aprobados (https://claude.ai/artifact/MgifVa4cUdDzPJVTSmM253). Mockup y HTML generados con ChatGPT (GPT-6 Astra) y revisados en navegador.
+- **Idioma:** inglés por defecto; el switch EN/ES guarda la elección. "Probá el demo" lleva a https://hcd-app-solana.vercel.app.
+- **Impacto (Rodrigo/Maxi):** `hcd_landing` ya implementa este diseño (PR de `feat/salua-landing`); los cambios de copy se hacen en `lib/landing-dictionary.ts`.
+
 ## 2026-10-10 · El estado de un permiso lo dice la cadena, no `access_requests` · Misael
 - **`GET /access-requests/mine`** lee cada `AccessGrant` on-chain y devuelve `grant_status` por estudio: `active`, `revoked`, `expired`, `missing` (aprobado pero nunca firmado) o `unknown` (RPC caído). Si todos los grants firmados están revocados o vencidos, la solicitud sale como `revoked` o `expired` aunque la fila diga `approved`.
 - **Aprobar dos veces ya no da 409:** si la aprobación quedó a medias (el paciente canceló la firma o falló un `grant_access`), `POST /access-requests/:id/approve` devuelve solo los grants que faltan, con el vencimiento original. La app la vuelve a mostrar en la bandeja para terminar de firmar.
