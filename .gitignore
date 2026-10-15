@@ -2,3 +2,6 @@
 /hcd_api/
 /hcd_app/
 /hcd_landing/
+
+# Archify diagram working directories (generated artifacts land in docs/)
+/.archify/

@@ -15,4 +15,4 @@ Correcciones del día: `expires_at` i64 → `BN` en `tx-builder` (rompía `/tx/b
 
 ## Bloqueos
 - Ninguno del smoke. La keypair admin quedó en `D:\hackathon\keys\admin.json` (fuera de repos, sin commitear).
-- Cuenta médico con password temporal de prueba (`SaluaSmoke62589!`) — rotar o quitar antes de producción.
+- Cuenta médico con password temporal de prueba — rotar o quitar antes de producción.
