@@ -2,6 +2,21 @@
 
 Una entrada por commit, la más nueva arriba.
 
+## 2026-10-15 · feat(app): add Open Graph image, favicon and app icons
+- **Qué hice:** metadata completa de hcd_app (`metadataBase` desde `NEXT_PUBLIC_APP_URL` o `VERCEL_PROJECT_PRODUCTION_URL`, Open Graph es_AR y tarjeta grande de Twitter), imagen OG 1200×630 con `next/og`, favicon e ícono de Apple generados del logo y manifest con íconos. Coordinado con Maxi (dueño de hcd_app). Lint, tsc y build verdes; meta tags verificados con el build local.
+- **Archivos clave:** `hcd_app/app/layout.tsx`, `hcd_app/app/opengraph-image.tsx`, `hcd_app/app/icon.png`, `hcd_app/app/apple-icon.png`, `hcd_app/public/manifest.webmanifest`.
+- **Próximo paso:** revisión de Maxi; tras el deploy, validar la tarjeta con el depurador de LinkedIn o de Facebook.
+
+## 2026-10-15 · fix(records): align shared schemas with the current API contract
+- **Qué hice:** en el PR hcd_app#9 de Matías (a pedido del equipo, para dejarlo listo) actualicé `lib/schemas/records.ts` al contrato vigente de `hcd_api`: blob sellado iv+ciphertext+tag (mínimo 29 bytes), metadata `title`/`study_date`/`origin` y listado no estricto para tolerar cache-busters. Sin consumidores todavía en la app.
+- **Archivos clave:** `hcd_app/lib/schemas/records.ts`.
+- **Próximo paso:** aprobación de otro miembro para mergear hcd_app#9.
+
+## 2026-10-15 · fix(doctor): satisfy lint in doctor access and panel pages
+- **Qué hice:** en el PR hcd_app#14 de Franco (bloquea el registro on-chain y la redirección tras enrolar la wallet en Vercel) arreglé el error de lint del último commit: el `setState` síncrono del effect sin sesión pasa a un valor derivado en el render, sin cambiar lo que se ve; saqué un import sin uso. Lint, tsc, 22/22 tests y build verdes.
+- **Archivos clave:** `hcd_app/app/(medico)/mis-accesos/page.tsx`, `hcd_app/app/(medico)/panel/page.tsx`.
+- **Próximo paso:** que Matías descarte su revisión vieja (ya resuelta) y otro miembro apruebe; después promover `staging` a `main` para Vercel.
+
 ## 2026-10-15 · Merge staging into docs/misael-railway-deploy
 - **Qué hice:** traje `staging` a la rama del PR hcd#34 y resolví el conflicto de `estado.md`: quedó el estado del 14/10 (deploy) y conservé los pendientes conocidos del MVP.
 - **Archivos clave:** `docs/miembros/misael/estado.md`.
